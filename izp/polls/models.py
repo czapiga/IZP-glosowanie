@@ -28,6 +28,10 @@ class Question(models.Model):
 
 
 # TODO Create SimpleQuestion class (derived from Question) with predefined, fixed set of choices - (Yes/No)
+class SimpleQuestion(Question0):
+    ...
+
+
 # TODO Create OpenQuestion class (derived from Question) with no predefined choices
 
 class Choice(models.Model):
