@@ -1,16 +1,26 @@
-<h1>{{ question.question_text }}</h1>
+<!DOCTYPE html>
+<html lang="pl"> 
+	<head>
+		<meta charset="utf-8">
+		{%load staticfiles %}
+		<link href={% static "bootstrap4/css/bootstrap.css" %} rel="stylesheet">
+   	<script src={% static "bootstrap4/js/bootstrap.js" %} ></script> 	
+	</head>
+	<body>
+		<h1>{{ question.question_text }}</h1>
 
-{% if error %}<p><strong>{{ error }}</strong></p>{% endif %}
+		{% if error %}<p><strong>{{ error }}</strong></p>{% endif %}
 
-<form action="{% url 'polls:vote' question.id %}" method="post">
-{% csrf_token %}
-{% for choice in question.choice_set.all %}
-    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
-    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
-{% endfor %}
-    <input type="password" name="code" id="code" value="" />
-<input type="submit" value="Głosuj" />
-</form>
+		<form action="{% url 'polls:vote' question.id %}" method="post">
+			{% csrf_token %}
+			{% for choice in question.choice_set.all %}
+				 <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
+				 <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
+			{% endfor %}
+				 <input type="password" name="code" id="code" value="" />
+			<input type="submit" value="Głosuj" />
+		</form>
 
-<br>
-<a href="{% url 'polls:index' %}">Głosowania</a>
+		<br>
+		<a href="{% url 'polls:index' %}">Głosowania</a>
+	</body>
