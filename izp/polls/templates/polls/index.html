@@ -1,15 +1,29 @@
-{% if error %} <p><strong>{{error}}</strong></p> {% endif %}
-{% if questions_list %}
-<h1>Lista pytań:</h1>
-<ul>
-    {% for question in questions_list %}
-    <li>
-        <a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a>
-        {{question.start_date}} - {{question.end_date}}
-        <a href="{% url 'polls:result' question.id %}">Wynik</a>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>Brak ankiet.</p>
-{% endif %}
+
+
+<!DOCTYPE html>
+<html lang="pl"> 
+	<head>
+		<meta charset="utf-8">
+		{%load staticfiles %}
+		<link href={% static "bootstrap4/css/bootstrap.css" %} rel="stylesheet">
+   	<script src={% static "bootstrap4/js/bootstrap.js" %} ></script> 	
+	</head>
+	<body>
+		{% if error %} <p><strong>{{error}}</strong></p> {% endif %}
+		{% if questions_list %}
+		<h1>Lista pytań:</h1>
+		<ul>
+			 {% for question in questions_list %}
+			 <li>
+				  <a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a>
+				  {{question.start_date}} - {{question.end_date}}
+				  <a href="{% url 'polls:result' question.id %}">Wynik</a>
+			 </li>
+			 {% endfor %}
+		</ul>
+		{% else %}
+		<p class="text-right">Brak ankiet.</p>
+		{% endif %}
+
+	</body>
+</html>
