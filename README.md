@@ -22,5 +22,5 @@ How to create superuser
 $ python3.5 manage.py createsuperuser
 
 After create account and login you can go to :
-page with code list -> http://127.0.0.1:8000/codeList/
-download code list in pdf -> http://127.0.0.1:8000/codeList/codes.pdf
+page with code list -> http://127.0.0.1:8000/codesList/
+download code list in pdf -> http://127.0.0.1:8000/codesList/codes.pdf
