@@ -28,8 +28,11 @@ class Question(models.Model):
 
 
 # TODO Create SimpleQuestion class (derived from Question) with predefined, fixed set of choices - (Yes/No)
-class SimpleQuestion(Question0):
-    ...
+class SimpleQuestion(Question):
+    def save(self):
+        super(SimpleQuestion, self).save()    
+        self.choice_set.create(choice_text='Yes', votes=0)
+        self.choice_set.create(choice_text='No', votes=0)
 
 
 # TODO Create OpenQuestion class (derived from Question) with no predefined choices
