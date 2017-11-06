@@ -19,14 +19,6 @@ def create_question(question_text, days=0, start=0, end=0):
         return Question.objects.create(question_text=question_text, start_date=start, end_date=time)
     return Question.objects.create(question_text=question_text, start_date=start, end_date=start)
 
-# def create_question(question_text, start, end):
-#     """
-#     Create a question with the given `question_text` and published the
-#     given number of `days` offset to now (negative for questions published
-#     in the past, positive for questions that have yet to be published).
-#     """
-#     return Question.objects.create(question_text=question_text, start_date=start, end_date=end)
-
 
 class QuestionIndexViewTests(TestCase):
     def test_no_questions(self):
