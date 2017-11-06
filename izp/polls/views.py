@@ -7,7 +7,7 @@ from .models import Choice, Question, Vote
 
 
 def index(request):
-    return render(request, 'polls/index.html',
+	return render(request, 'polls/index.html',
                   {'questions_list': Question.objects.order_by('-end_date', '-start_date')})
 
 
