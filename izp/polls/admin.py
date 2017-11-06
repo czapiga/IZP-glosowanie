@@ -22,8 +22,6 @@ class BaseQuestionAdmin(admin.ModelAdmin):
 class QuestionAdmin(BaseQuestionAdmin):
     inlines = [ChoiceInline]
 
-class SimpleQuestionAdmin(BaseQuestionAdmin):
-    ...
 
 admin.site.register(Question, QuestionAdmin)
-admin.site.register(SimpleQuestion, SimpleQuestionAdmin)
+admin.site.register(SimpleQuestion, BaseQuestionAdmin)
