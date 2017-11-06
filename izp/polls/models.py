@@ -30,8 +30,8 @@ class Question(models.Model):
 class SimpleQuestion(Question):
     def save(self):
         super(SimpleQuestion, self).save()    
-        self.choice_set.create(choice_text='Yes', votes=0)
-        self.choice_set.create(choice_text='No', votes=0)
+        self.choice_set.create(choice_text='Yes')
+        self.choice_set.create(choice_text='No')
 
 
 # TODO Create OpenQuestion class (derived from Question) with no predefined choices
