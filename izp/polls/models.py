@@ -4,12 +4,13 @@ from django.utils import timezone
 
 class Question(models.Model):
     question_text = models.CharField('Pytanie', max_length=200)
-    start_date = models.DateTimeField('Data rozpoczęcia', blank=True, default=timezone.now)
+    start_date = models.DateTimeField(
+        'Data rozpoczęcia', blank=True, default=timezone.now)
     end_date = models.DateTimeField('Data zakończenia', blank=True)
     time = models.IntegerField('Czas na odpowiedź [minuty]', default=5)
     access_codes = ['AAA', 'BBB', 'CCC']  # TODO generate random codes
 
-    def save(self):
+    def save(self, force_insert=False, force_update=False, using=None):
         # TODO validate self.time variable
         if not self.id:
             if self.start_date and self.end_date:
@@ -17,7 +18,8 @@ class Question(models.Model):
             if not self.start_date:
                 self.start_date = timezone.now()
             if not self.end_date:
-                self.end_date = self.start_date + timezone.timedelta(minutes=self.time)
+                self.end_date = self.start_date + \
+                    timezone.timedelta(minutes=self.time)
             super(Question, self).save()
 
     def __str__(self):
