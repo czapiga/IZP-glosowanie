@@ -1,5 +1,7 @@
 """
 Random access codes generation module.
+Codes are created form digits and uppercase letters.
+
 To use, import the generate_codes function and call it,
 specifying number of codes and length of a single code.
 The latter should be around 8-10 characters as a compromise
