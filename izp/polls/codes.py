@@ -23,6 +23,7 @@ def _create_code(char_base,
                  index):
     """
     Private helper function. Do not use in other modules.
+    Returns new access code.
 
     The random part of the code is created from randomly selected characters
     from the character base. The unique part creation can be described
@@ -44,6 +45,7 @@ def _create_code(char_base,
 def generate_codes(number_of_codes, code_length):
     """
     Public function to be imported.
+    Returns a list of access codes.
 
     Raises ValueError if code length is not big enough to create
     desired number of unique codes. Length of the random part of the
