@@ -96,8 +96,8 @@ class QuestionIndexViewTests(TestCase):
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(
             response.context['questions_list'],
-            ['<Question: Long time question 2.>',
-             '<Question: Long time question 1.>']
+            ['<Question: Long time question 1.>',
+             '<Question: Long time question 2.>']
         )
 
     def test_short_time_questions(self):
@@ -114,8 +114,8 @@ class QuestionIndexViewTests(TestCase):
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(
             response.context['questions_list'],
-            ['<Question: Short time question 3.>', '<Question: Short time question 2.>',
-             '<Question: Short time question 1.>']
+            ['<Question: Short time question 1.>', '<Question: Short time question 3.>',
+             '<Question: Short time question 2.>']
         )
 
 
