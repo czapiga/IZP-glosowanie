@@ -16,13 +16,15 @@ class Question(models.Model):
         # TODO validate self.time variable
         if not self.id:
             if self.start_date and self.end_date:
-                self.time = (self.end_date - self.start_date).total_seconds() / 60
+                self.time = (self.end_date -
+                             self.start_date).total_seconds() / 60
             if not self.start_date:
                 self.start_date = timezone.now()
             if not self.end_date:
                 self.end_date = self.start_date + \
                     timezone.timedelta(minutes=self.time)
-            super(Question, self).save()
+            super(Question, self).save(force_insert=force_insert,
+                                       force_update=force_update, using=using)
 
     def __str__(self):
         return self.question_text
