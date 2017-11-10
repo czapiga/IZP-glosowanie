@@ -42,16 +42,20 @@ class QuestionIndexViewTests(TestCase):
             ['<Question: Past question.>']
         )
 
+    def test_question_with_same_start_and_end_time(self):
+        """
+        Questions with a start_date which is equal to and_date should not be desplayd.
+        """
+        create_question(question_text="Current question.", start=timezone.now(), end=timezone.now())
+        response = self.client.get(reverse('polls:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Brak ankiet.")
+        self.assertQuerysetEqual(response.context['questions_list'], [])
+        
+
     def test_future_question(self):
         """
         Questions with a start_date in the future are displayed on the index page.
-        """
-        """
-        Alternative version, in case we don't want to show future questions:
-            create_question(question_text="Future question.", days=30)
-            response = self.client.get(reverse('polls:index'))
-            self.assertContains(response, "Brak ankiet.")
-            self.assertQuerysetEqual(response.context['questions_list'], [])
         """
         create_question(question_text="Future question.", days=30)
         response = self.client.get(reverse('polls:index'))
@@ -145,9 +149,9 @@ class QuestionDetailViewTests(TestCase):
         self.assertContains(response, past_question.question_text)
         self.assertContains(response, "Głosowanie nie jest aktywne")
 
-    def test_future_actual_and_past_question(self):
+    def test_future_current_and_past_question(self):
         """
-        Even if past, actual and future questions exist, only actual questions
+        Even if past, current and future questions exist, only current questions
         are able to vote.
         """
 
@@ -163,15 +167,15 @@ class QuestionDetailViewTests(TestCase):
         past_response = self.client.get(url)
         self.assertContains(past_response, "Głosowanie nie jest aktywne")
 
-        actual_question = create_question(
-            question_text='Actual question.', days=0)
-        url = reverse('polls:detail', args=(actual_question.id,))
-        actual_response = self.client.get(url)
-        self.assertNotContains(actual_response, "Głosowanie nie jest aktywne")
+        current_question = create_question(
+            question_text='current question.',  start=timezone.now(), end=timezone.now() + datetime.timedelta(minutes=5))
+        url = reverse('polls:detail', args=(current_question.id,))
+        current_response = self.client.get(url)
+        self.assertNotContains(current_response, "Głosowanie nie jest aktywne")
 
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(
             response.context['questions_list'],
-            ['<Question: Future question.>', '<Question: Actual question.>',
+            ['<Question: Future question.>', '<Question: current question.>',
              '<Question: Past question.>']
         )
