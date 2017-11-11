@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+
+table {
+  table-layout:fixed;
+  width:100%;
+}
+
+table, th, td {
+	border: 3px solid black;
+	border-collapse: collapse;
+}
+
+th,td 
+{
+	text-align: center;
+	padding: 15px;
+}
+
+th.id {
+	width:15%;
+}
+
+</style>
+</head>
+   <body> 
+   		<table>
+   		<tr>
+			<th class = "id">id</th> <th>code</th>
+			</tr>
+				{% for key,value in codes_dict.items %}
+    				<tr>
+					<td> {{key}} </td>				
+					<td> {{value}} </td>
+				</tr>
+      {% endfor %}
+      </table>
+   </body>
+</html>
