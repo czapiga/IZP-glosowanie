@@ -36,8 +36,6 @@ class SimpleQuestion(Question):
         self.choice_set.create(choice_text='Nie')
 
 
-# TODO Create OpenQuestion class (derived from Question) with no predefined choices
-
 class OpenQuestion(Question):
     def save(self):
         super(OpenQuestion, self).save()
