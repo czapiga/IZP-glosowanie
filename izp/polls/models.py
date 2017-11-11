@@ -29,7 +29,13 @@ class Question(models.Model):
         return code in self.access_codes
 
 
-# TODO Create SimpleQuestion class (derived from Question) with predefined, fixed set of choices - (Yes/No)
+class SimpleQuestion(Question):
+    def save(self):
+        super(SimpleQuestion, self).save()    
+        self.choice_set.create(choice_text='Tak')
+        self.choice_set.create(choice_text='Nie')
+
+
 # TODO Create OpenQuestion class (derived from Question) with no predefined choices
 
 class OpenQuestion(Question):
