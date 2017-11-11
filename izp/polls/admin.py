@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Choice, Question
+from .models import Choice, Question, OpenQuestion
 
 
 class ChoiceInline(admin.TabularInline):
@@ -17,7 +17,8 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [ChoiceInline]
     list_display = ('question_text', 'start_date', 'end_date')
     list_filter = ['start_date', 'end_date']
-    verbose_name = 'Pytanie'
+    verbose_name = 'Pytanie'   
 
 
 admin.site.register(Question, QuestionAdmin)
+admin.site.register(OpenQuestion, QuestionAdmin)
