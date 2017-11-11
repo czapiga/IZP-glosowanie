@@ -1,8 +1,6 @@
 from django.test import TestCase
 from django.utils import timezone
 from .models import SimpleQuestion, Question
-from functools import reduce
-# Create your tests here.
 
 class SimpleQuestionTests(TestCase):
 
@@ -15,12 +13,10 @@ class SimpleQuestionTests(TestCase):
         q = SimpleQuestion(question_text = "Ultimate Question of Life, the Universe, and Everything")
         q.save()
         q = map(str, q.choice_set.all())
-        self.assertIs('Yes' in q and 'No' in q, True)   
+        self.assertIs('Tak' in q and 'Nie' in q, True)   
 		
     def test_initial_votes(self):
         q = SimpleQuestion(question_text = "Ultimate Question of Life, the Universe, and Everything")
         q.save()
-        vc = 0
-        for c in q.choice_set.all():
-            vc += c.votes		
-        self.assertIs(vc, 0) 
+        for choice in q.choice_set.all():
+            self.assertIs(choice.votes, 0) 
