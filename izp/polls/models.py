@@ -39,7 +39,7 @@ class SimpleQuestion(Question):
 # TODO Create OpenQuestion class (derived from Question) with no predefined choices
 
 class OpenQuestion(Question):
-    def save(self, force_insert=False, force_update=False, using=None):
+    def save(self):
         super(OpenQuestion, self).save()
 
 
@@ -52,25 +52,12 @@ class Choice(models.Model):
         return self.choice_text
 
 
-class BasicVote(models.Model):
+class Vote(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
     code = models.CharField(max_length=10)
     date = models.DateTimeField(default=timezone.now)
 
-    class Meta:
-        abstract = True
-
-
-class Vote(BasicVote):
     def __str__(self):
         return self.question.question_text + ' ' + self.choice.choice_text + ' ' + self.code
-            
-            
-class OpenVote(BasicVote):
-    question = models.ForeignKey(OpenQuestion, on_delete=models.CASCADE)
-    new_choice = models.CharField(max_length=200)
-            
-    def __str__(self):
-        return self.question.question_text + ' ' + self.choice.choice_text + ' ' + self.new_choice + ' ' + self.code
             
