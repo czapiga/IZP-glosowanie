@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Choice, Question, Vote
+from .models import Choice, Question, Vote, OpenQuestion
 
 
 def index(request):
@@ -16,8 +16,12 @@ def detail(request, question_id):
     if question.start_date > timezone.now() or question.end_date < timezone.now():
         return render(request, 'polls/detail.html', {
             'question': question, 'error': "Głosowanie nie jest aktywne"})
-    return render(request, 'polls/detail.html', {'question': question})
-
+    try:
+        openQuestion = OpenQuestion.objects.get(pk=question_id)
+    except OpenQuestion.DoesNotExist:
+        return render(request, 'polls/detail.html', {'question': question})
+    return render(request, 'polls/openDetail.html', {'question': openQuestion})
+    
 
 def result(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -43,26 +47,81 @@ def vote(request, question_id):
         return render(request, 'polls/detail.html', {
             'question': question, 'error': "Głosowanie nie jest aktywne"})
     try:
-        choice = question.choice_set.get(pk=request.POST['choice'])
-        code = request.POST['code']
-        if code == '' or not question.is_code_correct(code):
-            raise AttributeError
+        openQuestion = OpenQuestion.objects.get(pk=question_id)
+    except OpenQuestion.DoesNotExist:
+        try:
+            choice = question.choice_set.get(pk=request.POST['choice'])
+            code = request.POST['code']
+            if code == '' or not question.is_code_correct(code):
+                raise AttributeError
 
-    except (KeyError, Choice.DoesNotExist):
-        return render(request, 'polls/detail.html', {'question': question, 'error': "Nie wybrano odpowiedzi"})
+        except (KeyError, Choice.DoesNotExist):
+            return render(request, 'polls/detail.html', {'question': question, 'error': "Nie wybrano odpowiedzi"})
 
-    except AttributeError:
-        return render(request, 'polls/detail.html',
-                      {'question': question, 'error': "Niewłaściwy kod uwierzytelniający"})
+        except AttributeError:
+            return render(request, 'polls/detail.html',
+                          {'question': question, 'error': "Niewłaściwy kod uwierzytelniający"})
 
+        else:
+            prev_vote = Vote.objects.filter(question__exact=question, code__exact=code).last()
+            if prev_vote:
+                prev_vote.choice.votes -= 1
+                prev_vote.choice.save()
+
+            choice = Choice.objects.get(pk=choice.id)
+            choice.votes += 1
+            choice.save()
+            Vote.objects.create(question=question, choice=choice, code=code)
+            return HttpResponseRedirect(reverse('polls:index'))
     else:
-        prev_vote = Vote.objects.filter(question__exact=question, code__exact=code).last()
-        if prev_vote:
-            prev_vote.choice.votes -= 1
-            prev_vote.choice.save()
+        try:
+            #choice = question.choice_set.get(pk=request.POST['choice'])
+            new_choice = request.POST['new_choice']
+            if new_choice == '':
+                try:
+                    choice = question.choice_set.get(pk=request.POST['choice'])
+                    code = request.POST['code']
+                    if code == '' or not question.is_code_correct(code):
+                        raise AttributeError
 
-        choice = Choice.objects.get(pk=choice.id)
-        choice.votes += 1
-        choice.save()
-        Vote.objects.create(question=question, choice=choice, code=code)
-        return HttpResponseRedirect(reverse('polls:index'))
+                except (KeyError, Choice.DoesNotExist):
+                    return render(request, 'polls/openDetail.html', {'question': question, 'error': "Nie wybrano odpowiedzi"})
+                else:
+                    prev_vote = Vote.objects.filter(question__exact=question, code__exact=code).last()
+                    if prev_vote:
+                        prev_vote.choice.votes -= 1
+                        prev_vote.choice.save()
+
+                    choice = Choice.objects.get(pk=choice.id)
+                    choice.votes += 1
+                    choice.save()
+                    Vote.objects.create(question=question, choice=choice, code=code)
+                    return HttpResponseRedirect(reverse('polls:index'))
+            else:
+                try:
+                    choice = question.choice_set.create(choice_text=new_choice)
+                    #question.choice_set.get(pk=request.POST['new_choice'])
+                    code = request.POST['code']
+                    if code == '' or not question.is_code_correct(code):
+                        raise AttributeError
+
+                except (KeyError, Choice.DoesNotExist):
+                    return render(request, 'polls/openDetail.html', {'question': question, 'error': "Nie wybrano odpowiedzi"})
+                else:
+                    prev_vote = Vote.objects.filter(question__exact=question, code__exact=code).last()
+                    if prev_vote:
+                        prev_vote.choice.votes -= 1
+                        prev_vote.choice.save()
+
+                    choice = Choice.objects.get(pk=choice.id)
+                    choice.votes += 1
+                    choice.save()
+                    Vote.objects.create(question=question, choice=choice, code=code)
+                    return HttpResponseRedirect(reverse('polls:index'))
+        except (KeyError, Choice.DoesNotExist):
+            return render(request, 'polls/openDetail.html', {'question': question, 'error': "Nie wybrano odpowiedzi"})
+        except AttributeError:
+            return render(request, 'polls/openDetail.html',
+                          {'question': question, 'error': "Niewłaściwy kod uwierzytelniający"})
+
+    

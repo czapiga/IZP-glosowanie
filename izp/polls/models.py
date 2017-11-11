@@ -11,7 +11,7 @@ class Question(models.Model):
     time = models.IntegerField('Czas na odpowiedź [minuty]', default=5)
     access_codes = ['AAA', 'BBB', 'CCC']  # TODO generate random codes
 
-    def save(self):
+    def save(self, force_insert=False, force_update=False, using=None):
         # TODO validate self.time variable
         if not self.id:
             if self.start_date and self.end_date:
@@ -32,6 +32,11 @@ class Question(models.Model):
 # TODO Create SimpleQuestion class (derived from Question) with predefined, fixed set of choices - (Yes/No)
 # TODO Create OpenQuestion class (derived from Question) with no predefined choices
 
+class OpenQuestion(Question):
+    def save(self, force_insert=False, force_update=False, using=None):
+        super(OpenQuestion, self).save()
+
+
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField('Odpowiedź', max_length=200)
@@ -41,11 +46,25 @@ class Choice(models.Model):
         return self.choice_text
 
 
-class Vote(models.Model):
+class BasicVote(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
     code = models.CharField(max_length=10)
     date = models.DateTimeField(default=timezone.now)
 
+    class Meta:
+        abstract = True
+
+
+class Vote(BasicVote):
     def __str__(self):
         return self.question.question_text + ' ' + self.choice.choice_text + ' ' + self.code
+            
+            
+class OpenVote(BasicVote):
+    question = models.ForeignKey(OpenQuestion, on_delete=models.CASCADE)
+    new_choice = models.CharField(max_length=200)
+            
+    def __str__(self):
+        return self.question.question_text + ' ' + self.choice.choice_text + ' ' + self.new_choice + ' ' + self.code
+            
