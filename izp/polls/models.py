@@ -11,7 +11,7 @@ class Question(models.Model):
     time = models.IntegerField('Czas na odpowiedź [minuty]', default=5)
     access_codes = ['AAA', 'BBB', 'CCC']  # TODO generate random codes
 
-    def save(self, force_insert=False, force_update=False, using=None):
+    def save(self):
         # TODO validate self.time variable
         if not self.id:
             if self.start_date and self.end_date:
@@ -37,8 +37,7 @@ class SimpleQuestion(Question):
 
 
 class OpenQuestion(Question):
-    def save(self):
-        super(OpenQuestion, self).save()
+    ...
 
 
 class Choice(models.Model):

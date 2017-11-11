@@ -20,7 +20,7 @@ def detail(request, question_id):
         openQuestion = OpenQuestion.objects.get(pk=question_id)
     except OpenQuestion.DoesNotExist:
         return render(request, 'polls/detail.html', {'question': question})
-    return render(request, 'polls/openDetail.html', {'question': openQuestion})
+    return render(request, 'polls/detail.html', {'question': openQuestion, 'is_open': True})
     
 
 def result(request, question_id):
@@ -86,8 +86,8 @@ def vote(request, question_id):
             new_choice = request.POST['new_choice']
             choice = question.choice_set.get(pk=request.POST['choice'])
         except AttributeError:
-            return render(request, 'polls/openDetail.html',
-                  {'question': question, 'error': "Niewłaściwy kod uwierzytelniający"})
+            return render(request, 'polls/detail.html',
+                  {'question': question, 'error': "Niewłaściwy kod uwierzytelniający", 'is_open': True})
         except (KeyError, Choice.DoesNotExist): # case for an unselected radio button
             if new_choice == '':    # no answer
                 raise KeyError
@@ -97,12 +97,12 @@ def vote(request, question_id):
                 return HttpResponseRedirect(reverse('polls:index'))
 
         except (KeyError, Choice.DoesNotExist): # no answer selected
-            return render(request, 'polls/openDetail.html', {'question': question, 'error': "Nie wybrano odpowiedzi"})
+            return render(request, 'polls/detail.html', {'question': question, 'error': "Nie wybrano odpowiedzi", 'is_open': True})
         else:
             if new_choice == '':
                 voting(question, choice, code)
                 return HttpResponseRedirect(reverse('polls:index'))
             else:
-                return render(request, 'polls/openDetail.html',
-                              {'question': question, 'error': "Nie można udzielić dwóch głosów"})
+                return render(request, 'polls/detail.html',
+                              {'question': question, 'error': "Nie można udzielić dwóch głosów", 'is_open': True})
     
