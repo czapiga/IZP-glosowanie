@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 from .models import SimpleQuestion, Question
+from .codes import generate_codes
 
 class SimpleQuestionTests(TestCase):
 
@@ -20,3 +21,25 @@ class SimpleQuestionTests(TestCase):
         q.save()
         for choice in q.choice_set.all():
             self.assertIs(choice.votes, 0)
+
+class CodesTests(TestCase):
+
+    def test_codes_number_and_length(self):
+        codes = generate_codes(10, 10)
+        self.assertEqual(len(codes), 10)
+        for code in codes:
+            self.assertEqual(len(code), 10)
+
+    def test_codes_characters(self):
+        code = generate_codes(1, 1000)[0]
+        char_base = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        for char in code:
+            self.assertIn(char, char_base)
+
+    def test_codes_invalid_params(self):
+        try:
+            generate_codes(10, 1)
+        except ValueError:
+            return
+        else:
+            self.fail("Expected ValueError with given params")

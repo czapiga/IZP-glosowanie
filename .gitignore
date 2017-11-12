@@ -3,3 +3,4 @@
 **/.idea
 db.sqlite3
 izp/polls/migrations/*.py
+izp/.vscode/*

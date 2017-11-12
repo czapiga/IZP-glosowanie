@@ -1,67 +1,35 @@
 """
-Random access codes generation module.
-Codes are created form digits and uppercase letters.
-
-To use, import the generate_codes function and call it,
-specifying number of codes and length of a single code.
-The latter should be around 8-10 characters as a compromise
-between safety and users' comfort.
-
-All generated codes have a random part and an unique part.
-The unique part is there to ensure that no two codes are the same
-and is as short as possible (expected no more than 2 characters
-in this project's use cases).
+Access code generation module.
+Used for creating random unique codes
+from digits and uppercase letters.
+In other modules use the generate_codes function only.
 """
 
-from string import ascii_uppercase, digits
+from string import digits, ascii_uppercase
 from random import choice
-from math import ceil
 
-def _create_code(char_base,
-                 random_part_length,
-                 unique_part_length,
-                 index):
+def _create_code(char_base, length):
     """
-    Private helper function. Do not use in other modules.
-    Returns new access code.
-
-    The random part of the code is created from randomly selected characters
-    from the character base. The unique part creation can be described
-    as converting the index to a base-decimal number system, where base is the
-    number of different characters in character base.
+    Creates a random code of a given length
+    by randomly selecting characters from char_base.
     """
-
-    random_part = ''.join(choice(char_base) for _ in range(random_part_length))
-
-    base = len(char_base)
-    unique_part = ''
-    for exp in range(unique_part_length - 1, -1, -1):
-        unique_part += char_base[index // base ** exp]
-        index = index % base ** exp
-
-    return random_part + unique_part
-
+    return ''.join(choice(char_base) for _ in range(length))
 
 def generate_codes(number_of_codes, code_length):
     """
-    Public function to be imported.
-    Returns a list of access codes.
-
-    Raises ValueError if code length is not big enough to create
-    desired number of unique codes. Length of the random part of the
-    access code can be 0 (not recommended though).
+    Generates given number of random unique codes
+    of a given length. Please be aware that code length
+    must be big enough to randomly generate several different codes. 
     """
     char_base = digits + ascii_uppercase
-    unique_part_length = ceil(number_of_codes / len(char_base))
+    if number_of_codes > len(char_base) ** code_length / 10:
+        raise ValueError("Codes not long enough")
 
-    if unique_part_length > code_length:
-        raise ValueError("Codes must be at least %d characters long"
-                         % unique_part_length)
+    generated_codes = []
+    for _ in range(number_of_codes):
+        new_code = _create_code(char_base, code_length)
+        while new_code in generated_codes:
+            new_code = _create_code(char_base, code_length)
+        generated_codes.append(new_code)
 
-    codes = []
-    for index in range(number_of_codes):
-        codes.append(_create_code(char_base,
-                                  code_length - unique_part_length,
-                                  unique_part_length,
-                                  index))
-    return codes
+    return generated_codes
