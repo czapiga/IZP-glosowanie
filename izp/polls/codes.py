@@ -26,10 +26,9 @@ def generate_codes(number_of_codes, code_length):
         raise ValueError("Codes not long enough")
 
     generated_codes = []
-    for _ in range(number_of_codes):
+    while len(generated_codes) < number_of_codes:
         new_code = _create_code(char_base, code_length)
-        while new_code in generated_codes:
-            new_code = _create_code(char_base, code_length)
-        generated_codes.append(new_code)
+        if new_code not in generated_codes:
+            generated_codes.append(new_code)        
 
     return generated_codes

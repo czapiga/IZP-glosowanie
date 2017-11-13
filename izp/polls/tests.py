@@ -43,3 +43,9 @@ class CodesTests(TestCase):
             return
         else:
             self.fail("Expected ValueError with given params")
+
+    def test_codes_uniqueness(self):
+        codes = generate_codes(100, 10)
+        while codes: # codes equals true if its not empty
+            code = codes.pop()
+            self.assertNotIn(code, codes)
