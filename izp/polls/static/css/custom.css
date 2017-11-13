@@ -1,0 +1,42 @@
+.header{
+   width: 100%;
+   height: auto;
+   background-color: #00709e;
+}
+
+.navbar {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    
+}
+
+.left-nav {
+    float: left;
+}
+.right-nav {
+    float: right;    
+}
+.left-nav a {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: white !important;
+}
+.right-nav a {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: white !important;
+}
+
+.left-nav a:hover {
+    background-color: #111;
+}
+.right-nav:hover {
+    background-color: #111;
+}

@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
+	  
    {% if questions_list %}
-   <h3 class="text-muted">Lista pytan:</h3>
-   <table class="table">
+   <table class="table table-striped">
+      <caption>Lista pytan:</caption>
       <thead>
          <tr>
             <th>Glosowanie</th>
@@ -27,9 +28,9 @@
       </tbody>
    </table>
    {% else %}
-   <div class="alert alert-info" role="alert">
-      <strong>Brak ankiet!</strong> 
-      <span>Nie ma żadnego otwartego głosowania na ten moment.</span>
+   <div class="text-info" role="alert">
+      <h2>Brak ankiet!</h2> 
+      <h4>Nie ma żadnego otwartego głosowania na ten moment.</h4>
    </div>
    {% endif %}
 {% endblock %}
