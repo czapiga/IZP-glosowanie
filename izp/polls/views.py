@@ -53,7 +53,7 @@ def vote(request, question_id):
                 {'question': question, 'error': "Niewłaściwy kod uwierzytelniający"})
 
     choice = request.POST.get('choice', None)
-    new_choice = request.POST['new_choice']
+    new_choice = request.POST.get('new_choice','')
     if(choice and new_choice != ''):
         return render(request, 'polls/detail.html',
                 {'question': question, 'error': "Nie można głosować na istniejącą odpowiedź i jednocześnie proponować nową"})

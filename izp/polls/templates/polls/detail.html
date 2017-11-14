@@ -7,7 +7,7 @@
       {% csrf_token %}
          {% for choice in question.choice_set.all %}
        	 <div class="radio">
-            <label><input id="{{ choice.id }}" type="radio" name="optradio">
+            <label><input id="{{ choice.id }}" type="radio" name="choice" value="{{ choice.id }}">
                 {{ choice.choice_text}}
             </label>
           </div>
@@ -17,14 +17,14 @@
             <label for="new_choice">
                 Własna propozycja:
             </label>
-            <input id="new_choice" type="text" class="form-control" >
+            <input id="new_choice" name="new_choice" type="text" class="form-control" >
          </div>
          {% endif %}
          <div class="form-group">
-            <label for="pwd">
+            <label for="code">
                 Kod dostępu:
             </label>
-            <input id="pwd" type="password" class="form-control" >
+            <input id="code" name="code" type="password" class="form-control" >
          </div>
          <button class="btn btn-primary">Głosuj</button>
       </form>
