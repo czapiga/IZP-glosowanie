@@ -6,6 +6,8 @@ class Question(models.Model):
     question_text = models.CharField('Pytanie', max_length=200)
     start_date = models.DateTimeField('Data rozpoczęcia', blank=True, default=timezone.now)
     end_date = models.DateTimeField('Data zakończenia', blank=True)
+    # TODO Remove time variable. We need it only as field in form based on which we can calculate end_date if user
+    # does not provide one
     time = models.IntegerField('Czas na odpowiedź [minuty]', default=5)
     access_codes = ['AAA', 'BBB', 'CCC']  # TODO generate random codes
 
@@ -13,7 +15,7 @@ class Question(models.Model):
         # TODO validate self.time variable
         if not self.id:
             if self.start_date and self.end_date:
-                self.time = (self.end_date - self.start_date) / 60
+                self.time = (self.end_date - self.start_date).total_seconds() / 60
             if not self.start_date:
                 self.start_date = timezone.now()
             if not self.end_date:
@@ -27,8 +29,16 @@ class Question(models.Model):
         return code in self.access_codes
 
 
-# TODO Create SimpleQuestion class (derived from Question) with predefined, fixed set of choices - (Yes/No)
-# TODO Create OpenQuestion class (derived from Question) with no predefined choices
+class SimpleQuestion(Question):
+    def save(self):
+        super(SimpleQuestion, self).save()    
+        self.choice_set.create(choice_text='Tak')
+        self.choice_set.create(choice_text='Nie')
+
+
+class OpenQuestion(Question):
+    ...
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -47,3 +57,4 @@ class Vote(models.Model):
 
     def __str__(self):
         return self.question.question_text + ' ' + self.choice.choice_text + ' ' + self.code
+            

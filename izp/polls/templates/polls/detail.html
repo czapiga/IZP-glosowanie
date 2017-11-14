@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends 'base.html' %}
 {% block content %}
 	
@@ -12,9 +13,17 @@
             </label>
           </div>
          {% endfor %}
+         {% if is_open %}
+         <div class="form-group">
+            <label for="new_choice">
+                Własna propozycja:
+            </label>
+            <input id="new_choice" type="text" class="form-control" >
+         </div>
+         {% endif %}
          <div class="form-group">
             <label for="pwd">
-                Password:
+                Kod dostępu:
             </label>
             <input id="pwd" type="password" class="form-control" >
          </div>
