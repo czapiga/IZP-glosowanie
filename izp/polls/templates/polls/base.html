@@ -14,7 +14,7 @@
           <div class="left-nav"><a href="{% url 'polls:index' %}">Głosowanie</a></div>
           <div class="left-nav"><a href="#stat">Statystyki</a></div>
           <div class="left-nav"><a href="#options">Opcje</a></div>
-          <div class="right-nav"><a href="#">Administracja</a></div>
+          <div class="right-nav"><a href="{% url 'admin:index' %}">Administracja</a></div>
        </div>
        <div class="container-fluid">     
          {% if error %} 
