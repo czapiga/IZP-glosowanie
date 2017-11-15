@@ -2,9 +2,11 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
+from django.contrib.auth.decorators import user_passes_test
+from easy_pdf.rendering import render_to_pdf_response
 
 from .models import Choice, Question, Vote, OpenQuestion
-
+from .codes import generate_codes
 
 def index(request):
     return render(request, 'polls/index.html',
@@ -82,3 +84,13 @@ def vote(request, question_id):
     choice.save()
     Vote.objects.create(question=question, choice=choice, code=code)
     return HttpResponseRedirect(reverse('polls:index'))
+
+@user_passes_test(lambda u: u.is_superuser)
+def code_page_view(request):
+	codes_dict = generate_codes(42, 15)
+	return render(request, 'polls/codesList.html', {"codes_dict" : codes_dict})
+
+@user_passes_test(lambda u: u.is_superuser)
+def perform_pdf(request):
+	codes_dict = generate_codes(42, 15)
+	return render_to_pdf_response(request, 'polls/codesList.html', {"codes_dict" : codes_dict})

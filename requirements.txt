@@ -1,0 +1,2 @@
+git+https://github.com/chrisglass/xhtml2pdf.git
+django-easy-pdf >= 0.1.1
