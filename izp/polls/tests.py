@@ -1,8 +1,12 @@
-from django.test import TestCase
+# -*- coding: utf-8 -*-
+"""
+Tests
+"""
 import datetime
+from django.test import TestCase
 from django.utils import timezone
-from polls.models import Question
 from django.urls import reverse
+from polls.models import Question
 
 
 def create_question(question_text, days=0, start=0, end=0):
@@ -21,6 +25,10 @@ def create_question(question_text, days=0, start=0, end=0):
 
 
 class QuestionIndexViewTests(TestCase):
+    """
+    Tests for views
+    """
+
     def test_no_questions(self):
         """
         If no questions exist, an appropriate message is displayed.
@@ -44,14 +52,15 @@ class QuestionIndexViewTests(TestCase):
 
     def test_question_with_same_start_and_end_time(self):
         """
-        Questions with a start_date which is equal to and_date should not be desplayd.
+        Questions with a start_date which is equal to end_date should not be displayed.
         """
-        create_question(question_text="Current question.", start=timezone.now(), end=timezone.now())
+        time = timezone.now()
+        create_question(question_text="Current question.",
+                        start=time, end=time)
         response = self.client.get(reverse('polls:index'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Brak ankiet.")
         self.assertQuerysetEqual(response.context['questions_list'], [])
-        
 
     def test_future_question(self):
         """
@@ -124,6 +133,10 @@ class QuestionIndexViewTests(TestCase):
 
 
 class QuestionDetailViewTests(TestCase):
+    """
+    Tests of polls details
+    """
+
     def test_future_question(self):
         """
         The detail view of a question with a start_date in the future display question
@@ -168,7 +181,9 @@ class QuestionDetailViewTests(TestCase):
         self.assertContains(past_response, "Głosowanie nie jest aktywne")
 
         current_question = create_question(
-            question_text='current question.',  start=timezone.now(), end=timezone.now() + datetime.timedelta(minutes=5))
+            question_text='current question.',
+            start=timezone.now(),
+            end=timezone.now() + datetime.timedelta(minutes=5))
         url = reverse('polls:detail', args=(current_question.id,))
         current_response = self.client.get(url)
         self.assertNotContains(current_response, "Głosowanie nie jest aktywne")
