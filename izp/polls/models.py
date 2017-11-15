@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
-from django.core.exceptions import ValidationError
-from django.contrib import messages
-from django import forms
+
 class Question(models.Model):
     question_text = models.CharField('Pytanie', max_length=200)
     start_date = models.DateTimeField(
@@ -37,8 +35,15 @@ class Question(models.Model):
         return code in self.access_codes
 
 
-# TODO Create SimpleQuestion class (derived from Question) with predefined, fixed set of choices - (Yes/No)
-# TODO Create OpenQuestion class (derived from Question) with no predefined choices
+class SimpleQuestion(Question):
+    def save(self):
+        super(SimpleQuestion, self).save()    
+        self.choice_set.create(choice_text='Tak')
+        self.choice_set.create(choice_text='Nie')
+
+
+class OpenQuestion(Question):
+    ...
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -57,3 +62,4 @@ class Vote(models.Model):
 
     def __str__(self):
         return self.question.question_text + ' ' + self.choice.choice_text + ' ' + self.code
+            
