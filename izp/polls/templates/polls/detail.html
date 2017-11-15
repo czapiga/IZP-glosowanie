@@ -8,6 +8,11 @@
     <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
     <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
 {% endfor %}
+{% if is_open %}
+	<label for="new_choice">Własna propozycja: </label>
+	<input type="text" name="new_choice" id="new_choice" value="" /><br />
+{% endif %}
+	<label for="code">Kod dostępu: </label>
     <input type="password" name="code" id="code" value="" />
 <input type="submit" value="Głosuj" />
 </form>
