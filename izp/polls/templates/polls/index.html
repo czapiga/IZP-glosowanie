@@ -5,9 +5,8 @@
       <caption><h3>Lista pytań</h3></caption>
       <thead>
          <tr>
-            <th>Glosowanie</th>
+            <th>Głosowanie</th>
             <th>Data</th>
-            <th>Wynik</th>
          </tr>
       </thead>
       <tbody>
@@ -19,9 +18,6 @@
                </a>
             </td>
             <td>{{question.start_date}} - {{question.end_date}}</td>	
-            <td>
-               <a href="{% url 'polls:result' question.id %}">Wynik{{question.wynik}}</a>
-            </td> 
          </tr>
          {% endfor %}
       </tbody>
@@ -29,7 +25,6 @@
    {% else %}
    <div class="text-info" role="alert">
       <h2>Brak ankiet!</h2> 
-      <h4>Nie ma żadnego otwartego głosowania na ten moment.</h4>
    </div>
    {% endif %}
 {% endblock %}
