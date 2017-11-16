@@ -7,6 +7,7 @@
          <tr>
             <th>Głosowanie</th>
             <th>Data</th>
+            <th>Wynik</th>
             <th>Kody</th>
             <th>Kody w pdf</th>
          </tr>
@@ -19,7 +20,8 @@
                   {{question.question_text}}
                </a>
             </td>
-            <td>{{question.start_date}} - {{question.end_date}}</td>	
+            <td>{{question.start_date}} - {{question.end_date}}</td>
+            <td><a href="{% url 'polls:result' question.id %}">Wynik</a></td>
             <td><a href="{% url 'polls:codes' question.id %}">
                Wyświetl kody</a>
             </td>
