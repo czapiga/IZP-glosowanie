@@ -16,6 +16,3 @@ $ python manage.py runserver
 ```
 Django will inform you in terminal about server IP address and port.
 After starting server you can go to [admin home page](http://127.0.0.1:8000/admin) and [list of active polls](http://127.0.0.1:8000/polls) to check if application actually started.
-
-After creating superuser account and login you can go to :
-[page with code list] (http://127.0.0.1:8000/codesList/) and [list of codes in pdf] (http://127.0.0.1:8000/codesList.pdf)

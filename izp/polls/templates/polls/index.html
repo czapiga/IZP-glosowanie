@@ -7,6 +7,8 @@
         <a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a>
         {{question.start_date}} - {{question.end_date}}
         <a href="{% url 'polls:result' question.id %}">Wynik</a>
+        <a href="{% url 'polls:codes' question.id %}">Lista kodów</a>
+        <a href="{% url 'polls:codes_pdf' question.id %}">Lista kodów w pdf</a>
     </li>
     {% endfor %}
 </ul>

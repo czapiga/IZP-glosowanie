@@ -88,17 +88,9 @@ def vote(request, question_id):
 @user_passes_test(lambda u: u.is_superuser)
 def codes(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    if not question.access_codes:
-        return render(request, 'polls/detail.html',
-                {'question': question, 'error': "Brak kodów dla tego pytania"})
-    codes_list = question.access_codes
-    return render(request, 'polls/codesList.html', {"codes_dict" : codes_list})
+    return render(request, 'polls/codesList.html', {"codes_dict" : question.access_codes})
 
 @user_passes_test(lambda u: u.is_superuser)
 def codes_pdf(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    if not question.access_codes:
-        return render(request, 'polls/detail.html',
-                {'question': question, 'error': "Brak kodów dla tego pytania"})
-    codes_list = question.access_codes
-    return render_to_pdf_response(request, 'polls/codesList.html', {"codes_dict" : codes_list})
+    return render_to_pdf_response(request, 'polls/codesList.html', {"codes_dict" : question.access_codes})
