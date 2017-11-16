@@ -86,11 +86,19 @@ def vote(request, question_id):
     return HttpResponseRedirect(reverse('polls:index'))
 
 @user_passes_test(lambda u: u.is_superuser)
-def code_page_view(request):
-	codes_dict = generate_codes(42, 15)
-	return render(request, 'polls/codesList.html', {"codes_dict" : codes_dict})
+def codes(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    if not question.access_codes:
+        return render(request, 'polls/detail.html',
+                {'question': question, 'error': "Brak kodów dla tego pytania"})
+    codes_list = question.access_codes
+    return render(request, 'polls/codesList.html', {"codes_dict" : codes_list})
 
 @user_passes_test(lambda u: u.is_superuser)
-def perform_pdf(request):
-	codes_dict = generate_codes(42, 15)
-	return render_to_pdf_response(request, 'polls/codesList.html', {"codes_dict" : codes_dict})
+def codes_pdf(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    if not question.access_codes:
+        return render(request, 'polls/detail.html',
+                {'question': question, 'error': "Brak kodów dla tego pytania"})
+    codes_list = question.access_codes
+    return render_to_pdf_response(request, 'polls/codesList.html', {"codes_dict" : codes_list})
