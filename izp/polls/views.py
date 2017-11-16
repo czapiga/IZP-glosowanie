@@ -77,7 +77,7 @@ def vote(request, question_id):
             return render(request, 'polls/detail.html',
                     {'question': question, 'error': "Odpowiedź nie istnieje", 'is_open' : is_open})
 
-    if not choice and OpenQuestion.objects.filter(pk=question.pk).exists():
+    if not choice and is_open:
         choice = Choice.objects.create(question=question, choice_text=new_choice)
 
     prev_vote = Vote.objects.filter(question__exact=question, code__exact=code).last()
