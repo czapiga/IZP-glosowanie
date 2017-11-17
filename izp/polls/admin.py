@@ -11,14 +11,15 @@ class ChoiceInline(admin.TabularInline):
 
 class BaseQuestionAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,               {'fields': ['question_text']}),
-        ('Termin głosowania',  {'fields': ['start_date', 'end_date', 'time']}),
+        (None, {'fields': ['question_text']}),
+        ('Termin głosowania', {'fields': ['start_date', 'end_date', 'time']}),
     ]
 
     list_display = ('question_text', 'start_date', 'end_date')
     list_filter = ['start_date', 'end_date']
     verbose_name = 'Pytanie'
-	
+
+
 class QuestionAdmin(BaseQuestionAdmin):
     inlines = [ChoiceInline]
 

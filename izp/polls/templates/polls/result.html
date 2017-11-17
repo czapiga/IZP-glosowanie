@@ -1,23 +1,45 @@
-{% if error %}
-<p><strong>{{error}}</strong></p>
-{% else %}
-<h1>{{ question.question_text }}</h1>
-<h3>Wynik głosowania:</h3>
-<ul>
-    {% for choice in choices %}
-    <li>{{ choice.choice_text }} : {{ choice.votes }}</li>
-    {% endfor %}
-</ul>
+{% extends 'polls/base.html' %}
+{% block content %}
+   
+   <h1>{{ question.question_text }}</h1>
+  
+   <table class="table table-striped">
+      <caption><h3>Wynik głosowania:</h3></caption>
+      <thead>
+         <tr>
+            <th>Odpowiedź</th>
+            <th>Liczba głosów</th>
+         </tr>
+      </thead>
+      <tbody>
+         {% for choice in choices %}
+         <tr>
+            <td>{{ choice.choice_text }}</td>
+            <td>{{ choice.votes }}</td> 
+         </tr>
+         {% endfor %}
+      </tbody>
+   </table>
 
-<br>
-<h3>Użyte kody:</h3>
-<ul>
-    <li>(kod, liczba użyć, ostatni głos)</li>
-    {% for code in codes %}
-    <li>{{ code.code }}, {{ code.num_of_votes }}, {{ code.last_choice }}</li>
-    {% endfor %}
-</ul>
-
-{% endif %}
-<br>
-<a href="{% url 'polls:index' %}">Głosowania</a>
+   {% if codes %}
+   <table class="table table-striped">
+      <caption><h3>Użyte kody:</h3></caption>
+      <thead>
+         <tr>
+            <th>Kod</th>
+            <th>Liczba głosów</th>
+            <th>Ostatni wybór</th>
+         </tr>
+      </thead>
+      <tbody>
+         {% for code in codes %}
+         <tr>
+            <td>{{ code.code }}</td>
+            <td>{{ code.num_of_votes }}</td> 
+            <td>{{ code.last_choice }}</td>
+         </tr>
+         {% endfor %}
+      </tbody>
+   </table>
+   {% endif %}
+{% endblock %}

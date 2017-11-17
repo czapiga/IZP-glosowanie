@@ -1,21 +1,32 @@
-<h1>{{ question.question_text }}</h1>
-
-{% if error %}<p><strong>{{ error }}</strong></p>{% endif %}
-
-<form action="{% url 'polls:vote' question.id %}" method="post">
-{% csrf_token %}
-{% for choice in question.choice_set.all %}
-    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
-    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
-{% endfor %}
-{% if is_open %}
-	<label for="new_choice">Własna propozycja: </label>
-	<input type="text" name="new_choice" id="new_choice" value="" /><br />
-{% endif %}
-	<label for="code">Kod dostępu: </label>
-    <input type="password" name="code" id="code" value="" />
-<input type="submit" value="Głosuj" />
-</form>
-
-<br>
-<a href="{% url 'polls:index' %}">Głosowania</a>
+{% extends 'polls/base.html' %}
+{% block content %}
+	
+   <h1>{{ question.question_text }}</h1>
+   <div class="col-sm-3">
+      <form action="{% url 'polls:vote' question.id %}" method="post">
+      {% csrf_token %}
+         {% for choice in question.choice_set.all %}
+       	 <div class="radio">
+            <label><input id="{{ choice.id }}" type="radio" name="choice" value="{{ choice.id }}">
+                {{ choice.choice_text}}
+            </label>
+          </div>
+         {% endfor %}
+         {% if is_open %}
+         <div class="form-group">
+            <label for="new_choice">
+                Własna propozycja:
+            </label>
+            <input id="new_choice" name="new_choice" type="text" class="form-control" >
+         </div>
+         {% endif %}
+         <div class="form-group">
+            <label for="code">
+                Kod dostępu:
+            </label>
+            <input id="code" name="code" type="password" class="form-control" >
+         </div>
+         <button class="btn btn-primary">Głosuj</button>
+      </form>
+   </div>
+{% endblock %}
