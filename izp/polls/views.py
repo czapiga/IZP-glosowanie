@@ -77,18 +77,12 @@ def vote(request, question_id):
                  'is_open' : is_open})
 
     choice = request.POST.get('choice', None)
-
-'''    if is_open:
-        new_choice = request.POST['new_choice']
-    else:
-        new_choice = ""'''
-
     new_choice = request.POST.get('new_choice', '')
+
     if(choice and new_choice != ''):
         return render(request, 'polls/detail.html',
                 {'question': question,
-                 'error': "Nie można głosować na istniejącą odpowiedź i \
-                 jednocześnie proponować nową",
+                 'error': "Nie można głosować na istniejącą odpowiedź i jednocześnie proponować nową",
                  'is_open' : is_open})
 
     if not choice and new_choice == '':
