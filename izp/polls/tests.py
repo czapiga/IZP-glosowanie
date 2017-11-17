@@ -5,7 +5,7 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from .models import  Question, SimpleQuestion, OpenQuestion
+from .models import Question, SimpleQuestion, OpenQuestion
 from .codes import generate_codes
 
 
@@ -250,7 +250,7 @@ class QuestionVoteViewTests(TestCase):
         self.assertContains(response, 'Odp2')
         self.assertNotContains(response, 'new_choice')
 
-    def test_wrong_access_code_for_open_question(self):
+    def test_wrong_access_code_for_question(self):
         question = Question(question_text="OpenQuestion")
         question.save()
         question.choice_set.create(choice_text="Odp1")
