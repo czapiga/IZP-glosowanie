@@ -89,7 +89,7 @@ def vote(request, question_id):
         return render(request, 'polls/detail.html',
                 {'question': question,
                  'error': "Nie wybrano odpowiedzi",
-                  'is_open' : is_open})
+                 'is_open' : is_open})
 
 
     if choice:
