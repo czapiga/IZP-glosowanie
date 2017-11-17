@@ -60,14 +60,9 @@ def vote(request, question_id):
 
     if question.start_date > timezone.now() or question.end_date < timezone.now():
         return render(request, 'polls/detail.html',
-                {'question': question, 'error': "Głosowanie nie jest aktywne", 'is_open' : is_open})
-
-    if question.start_date > timezone.now() \
-       or question.end_date < timezone.now():
-        return render(request,
-                      'polls/detail.html',
-                      {'question': question,
-                       'error': "Głosowanie nie jest aktywne"})
+                {'question': question,
+                 'error': "Głosowanie nie jest aktywne", 
+                 'is_open' : is_open})
 
     code = request.POST['code']
     if code == '' or not question.is_code_correct(code):
