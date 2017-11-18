@@ -44,9 +44,17 @@ def result(request, question_id):
             last_choice = '-'
         codes.append({'code': code, 'num_of_votes': num_of_votes,
                       'last_choice': last_choice})
+    is_successful = is_vote_successful(question)    
     return render(request, 'polls/result.html',
-                  {'question': question, 'choices': choices, 'codes': codes})
+                  {'question': question, 'choices': choices, 'codes': codes, 'success': is_successful})
 
+def is_vote_successful(question):
+    codes = question.access_codes
+    used_codes = Vote.objects.filter(question__exact=question).values('code').distinct()
+    if len(used_codes) / len(codes) * 100 < 50:
+        return False
+    else:
+        return True
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
