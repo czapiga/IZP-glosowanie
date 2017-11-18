@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from .codes import generate_codes
 
 
 class Question(models.Model):
@@ -11,11 +12,15 @@ class Question(models.Model):
     # on which we can calculate end_date if user
     # does not provide one
     time = models.IntegerField('Czas na odpowiedź [minuty]', default=5)
-    access_codes = ['AAA', 'BBB', 'CCC']  # TODO generate random codes
+    access_codes = []
 
     def save(self, force_insert=False, force_update=False, using=None):
         # TODO validate self.time variable
-        if not self.id and self.start_date != self.end_date:
+        if not self.id:
+            codes = generate_codes(82, 8)
+            for code in codes:
+                self.access_codes.append(code)
+
             if self.start_date and self.end_date:
                 self.time = (self.end_date -
                              self.start_date).total_seconds() / 60
@@ -24,9 +29,11 @@ class Question(models.Model):
             if not self.end_date:
                 self.end_date = self.start_date + \
                     timezone.timedelta(minutes=self.time)
+        
         if self.start_date != self.end_date:
             if Question.objects.filter(end_date__gt = self.start_date):
                 raise Exception('Nie wolno tworzyć czasowo nakładających się głosowań')
+
             super(Question, self).save(force_insert=force_insert,
                                        force_update=force_update,
                                        using=using)
@@ -39,10 +46,13 @@ class Question(models.Model):
 
 
 class SimpleQuestion(Question):
-    def save(self):
-        super(SimpleQuestion, self).save()
-        self.choice_set.create(choice_text='Tak')
-        self.choice_set.create(choice_text='Nie')
+    def save(self, force_insert=False, force_update=False, using=None):
+        super(SimpleQuestion, self).save(force_insert=force_insert,
+                                         force_update=force_update,
+                                         using=using)
+        if self.choice_set.all().count() == 0:
+            self.choice_set.create(choice_text='Tak')
+            self.choice_set.create(choice_text='Nie')
 
 
 class OpenQuestion(Question):

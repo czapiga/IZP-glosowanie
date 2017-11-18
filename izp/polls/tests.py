@@ -38,7 +38,7 @@ class QuestionIndexViewTests(TestCase):
         """
         response = self.client.get(reverse('polls:index'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Brak ankiet.")
+        self.assertContains(response, "Brak ankiet!")
         self.assertQuerysetEqual(response.context['questions_list'], [])
 
     def test_past_question(self):
@@ -63,7 +63,7 @@ class QuestionIndexViewTests(TestCase):
                         start=time, end=time)
         response = self.client.get(reverse('polls:index'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Brak ankiet.")
+        self.assertContains(response, "Brak ankiet!")
         self.assertQuerysetEqual(response.context['questions_list'], [])
 
     def test_future_question(self):

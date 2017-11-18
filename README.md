@@ -3,11 +3,13 @@
 Requirements:
 * python 3.6.3
 * django 1.11.6
+* pip3
 
 To start server with application on you local machine please execute following commands:
 ```
 $ git clone https://github.com/czapiga/IZP-glosowanie.git
 $ cd IZP-glosowanie/izp
+$ pip3 install -r ../requirements.txt
 $ python manage.py makemigrations polls
 $ python manage.py migrate
 $ python manage.py runserver
