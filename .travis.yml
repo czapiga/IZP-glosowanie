@@ -5,4 +5,6 @@ install:
   - pip install -r requirements.txt    
     
 script:
-   python izp/manage.py test
+  - python izp/manage.py makemigrations
+  - python izp/manage.py migrate 
+  - python izp/manage.py test
