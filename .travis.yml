@@ -3,6 +3,7 @@ python:
     - 3.6
 install:
   - pip install -r requirements.txt    
+  - atp install pep8
     
 script:
   - python izp/manage.py makemigrations
