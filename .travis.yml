@@ -2,4 +2,4 @@ language: python
 python:
     - 3.6
 script:
-   python izp\manage.py test
+   python izp/manage.py test
