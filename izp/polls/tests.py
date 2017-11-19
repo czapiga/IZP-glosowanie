@@ -274,7 +274,10 @@ class OpenQuestionVoteViewTests(TestCase):
         open_question.choice_set.create(choice_text="Odp2")
         url = reverse('polls:vote', args=(open_question.id,))
         response = self.client.post(
-            url, {'is_open': True, 'choice': 1, 'new_choice': "sth", 'code': open_question.get_codes()[0]})
+            url, {'is_open': True, 
+                  'choice': 1, 
+                  'new_choice': "sth", 
+                  'code': open_question.get_codes()[0]})
         self.assertContains(response, "Nie można głosować na istniejącą odpowiedź i \
                           jednocześnie proponować nową")
         self.assertContains(response, open_question.question_text)
@@ -289,7 +292,9 @@ class OpenQuestionVoteViewTests(TestCase):
         open_question.choice_set.create(choice_text="Odp2")
         url = reverse('polls:vote', args=(open_question.id,))
         response = self.client.post(
-            url, {'is_open': True, 'new_choice': '', 'code': open_question.get_codes()[0]})
+            url, {'is_open': True, 
+                  'new_choice': '', 
+                  'code': open_question.get_codes()[0]})
         self.assertContains(response, open_question.question_text)
         self.assertContains(response, "Nie wybrano odpowiedzi")
         self.assertContains(response, 'Odp1')
