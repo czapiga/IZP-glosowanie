@@ -7,7 +7,6 @@ from django.utils import timezone
 from django.urls import reverse
 from .models import Question, SimpleQuestion, OpenQuestion
 from .codes import generate_codes
-import json
 
 
 def create_question(question_text, days=0, start=0, end=0):
