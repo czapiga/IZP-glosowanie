@@ -59,7 +59,7 @@ def vote(request, question_id):
                       'polls/detail.html',
                       {'question': question,
                        'error': "Głosowanie nie jest aktywne",
-                       'is_open' : is_open})
+                       'is_open': is_open})
 
     code = request.POST['code']
     if code == '' or not question.is_code_correct(code):
@@ -67,7 +67,7 @@ def vote(request, question_id):
                       'polls/detail.html',
                       {'question': question,
                        'error': "Niewłaściwy kod uwierzytelniający",
-                       'is_open' : is_open})
+                       'is_open': is_open})
 
     choice = request.POST.get('choice', None)
     new_choice = request.POST.get('new_choice', '')
@@ -79,14 +79,14 @@ def vote(request, question_id):
                 'question': question,
                 'error': "Nie można głosować na istniejącą odpowiedź i \
                           jednocześnie proponować nową",
-                'is_open' : is_open})
+                'is_open': is_open})
 
     if not choice and new_choice == '':
         return render(request, 'polls/detail.html',
                       {
                           'question': question,
                           'error': "Nie wybrano odpowiedzi",
-                          'is_open' : is_open})
+                          'is_open': is_open})
 
     if choice:
         if question.choice_set.filter(pk=choice).exists():
@@ -96,7 +96,7 @@ def vote(request, question_id):
                 request, 'polls/detail.html',
                 {'question': question,
                  'error': "Odpowiedź nie istnieje",
-                 'is_open' : is_open})
+                 'is_open': is_open})
 
     if not choice and is_open:
         choice = Choice.objects.create(
