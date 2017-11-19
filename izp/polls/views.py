@@ -98,7 +98,7 @@ def vote(request, question_id):
                  'error': "Odpowiedź nie istnieje",
                  'is_open' : is_open})
 
-    if not choice and OpenQuestion.objects.filter(pk=question.pk).exists():
+    if not choice and is_open:
         choice = Choice.objects.create(
             question=question, choice_text=new_choice)
 
