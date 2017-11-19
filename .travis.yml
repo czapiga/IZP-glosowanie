@@ -8,4 +8,4 @@ script:
     - python izp/manage.py makemigrations
     - python izp/manage.py migrate 
     - python izp/manage.py test
-    - pycodestyle izp/*.py
+    - pycodestyle izp/*.py --exclude=migrations
