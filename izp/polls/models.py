@@ -24,8 +24,11 @@ class Question(models.Model):
             if not self.end_date:
                 self.end_date = self.start_date + \
                     timezone.timedelta(minutes=self.time)
+        
+        if self.start_date != self.end_date:
+            if Question.objects.filter(end_date__gt = self.start_date):
+                raise Exception('Nie wolno tworzyć czasowo nakładających się głosowań')
 
-        if self.start_date != self.end_date:  # TODO better error case handling
             super(Question, self).save(force_insert=force_insert,
                                        force_update=force_update,
                                        using=using)
