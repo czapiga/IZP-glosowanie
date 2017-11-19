@@ -26,6 +26,20 @@ def create_question(question_text, days=0, start=0, end=0):
     return Question.objects.create(
         question_text=question_text, start_date=start, end_date=end)
 
+def create_open_question(question_text, days=0, start=0, end=0):
+    """
+    Similar to 'create_question' but instead creates an open question.
+    """
+    if days != 0 and start == 0 and end == 0:
+        start = timezone.now() + datetime.timedelta(days=days)
+        return OpenQuestion.objects.create(
+            question_text=question_text, start_date=start)
+    if days != 0 and start != 0 and end == 0:
+        end = start + datetime.timedelta(days=days)
+        return OpenQuestion.objects.create(
+            question_text=question_text, start_date=start, end_date=end)
+    return OpenQuestion.objects.create(
+        question_text=question_text, start_date=start, end_date=end)
 
 class QuestionIndexViewTests(TestCase):
     """
