@@ -1,11 +1,11 @@
 """
 Tests
 """
-import datetime
+import datetime, random
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from .models import Question, SimpleQuestion
+from .models import Question, SimpleQuestion, OpenQuestion, Choice
 from .codes import generate_codes
 
 
@@ -142,7 +142,52 @@ class QuestionIndexViewTests(TestCase):
              '<Question: Short time question 3.>',
              '<Question: Short time question 2.>']
         )
-
+        
+class QuestionVoteTests(TestCase):
+    """
+    Tests for "vote" view
+    """
+    def test_vote_same_open_answer_twice(self):
+        """
+        If the same open answer is written twice in two votes,
+        it counts as one answer with two votes.
+        """
+        new_question = create_open_question(
+            question_text="Open question",
+            start = timezone.now() - datetime.timedelta(minutes=6),
+            end = timezone.now() + datetime.timedelta(minutes=6))
+        new_question.save()
+        url = reverse('polls:vote', args=(new_question.id,))
+        password = random.choice(new_question.accesscode_set.all()).code
+        response = self.client.post(url,
+            {'code': password, 'new_choice': 'odpowiedz'})    
+        password = random.choice(new_question.accesscode_set.all()).code
+        response = self.client.post(url,
+            {'code': password, 'new_choice': 'odpowiedz'})
+        self.assertIs(Choice.objects.all().count(), 1)
+        for c in Choice.objects.all():
+            self.assertIs(c.votes, 2)
+        
+    def test_vote_two_similar_answers(self):
+        """
+        If two similar but not the same open answers are written in two votes,
+        it counts as two different answers with one vote each.
+        """
+        new_question = create_open_question(
+            question_text="Open question",
+            start = timezone.now() - datetime.timedelta(minutes=6),
+            end = timezone.now() + datetime.timedelta(minutes=6))
+        new_question.save()
+        url = reverse('polls:vote', args=(new_question.id,))
+        password = random.choice(new_question.accesscode_set.all()).code
+        response = self.client.post(url,
+            {'code': password, 'new_choice': 'odpowiedz2'})    
+        password = random.choice(new_question.accesscode_set.all()).code
+        response = self.client.post(url,
+            {'code': password, 'new_choice': 'odpowiedz'})
+        self.assertIs(Choice.objects.all().count(), 2)
+        for c in Choice.objects.all():
+            self.assertIs(c.votes, 1)
 
 class QuestionDetailViewTests(TestCase):
     """
