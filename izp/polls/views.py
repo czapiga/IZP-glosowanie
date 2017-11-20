@@ -49,7 +49,6 @@ def result(request, question_id):
     return render(request, 'polls/result.html',
                   {'question': question, 'choices': choices, 'codes': codes})
 
-
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     if question.start_date > timezone.now() \
@@ -60,6 +59,7 @@ def vote(request, question_id):
                        'error': "Głosowanie nie jest aktywne"})
 
     code = request.POST['code']
+    code = code.replace(" ", "")
     if code == '' or not question.is_code_correct(code):
         return render(request,
                       'polls/detail.html',
@@ -110,16 +110,26 @@ def vote(request, question_id):
     Vote.objects.create(question=question, choice=choice, code=code)
     return HttpResponseRedirect(reverse('polls:index'))
 
+def format_codes_list(codes_list):
+    formated_codes_list = []
+    for i in codes_list:
+        code = ""
+        for l, c in enumerate(i):
+            code += c
+            if (l+1)%4 == 0:
+                code += ' '
+        formated_codes_list.append(code)
+    return formated_codes_list
 
 @user_passes_test(lambda u: u.is_superuser)
 def codes(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, 'polls/codesList.html',
-                  {"codes_dict": question.get_codes()})
+                  {"codes_dict": format_codes_list(question.get_codes())})
 
 
 @user_passes_test(lambda u: u.is_superuser)
 def codes_pdf(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render_to_pdf_response(request, 'polls/codesList.html',
-                                  {"codes_dict": question.get_codes()})
+                                  {"codes_dict": format_codes_list(question.get_codes())})

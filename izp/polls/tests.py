@@ -256,3 +256,9 @@ class CodesTests(TestCase):
         while codes:
             code = codes.pop()
             self.assertNotIn(code, codes)
+
+    def test_codes_html_view(self):
+        q = create_question(question_text="question 1.",
+                        start=timezone.now(), days=30)
+        resp = self.client.get("/polls/" + str(q.id) + "/codes")
+        self.assertEqual(resp.status_code, 200)
