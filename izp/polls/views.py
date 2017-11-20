@@ -92,12 +92,11 @@ def vote(request, question_id):
                 {'question': question, 'error': "Odpowiedź nie istnieje"})
 
     if not choice and OpenQuestion.objects.filter(pk=question.pk).exists():
-        already_exists = 0
-        for c in Choice.objects.all():
-            if c.choice_text == new_choice: 
-                choice = c
-                already_exists = 1
-        if already_exists == 0:
+        if Choice.objects.filter(question__exact=question,
+                                 choice_text__exact=new_choice).exists():
+            choice = Choice.objects.filter(
+                question__exact=question, choice_text__exact=new_choice).last()
+        else:
             choice = Choice.objects.create(
                 question=question, choice_text=new_choice)
 
