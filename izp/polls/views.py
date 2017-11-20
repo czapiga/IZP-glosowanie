@@ -125,11 +125,11 @@ def format_codes_list(codes_list):
 def codes(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, 'polls/codesList.html',
-                  {"codes_dict": format_codes_list(question.get_codes())})
+                  {"codes_list": format_codes_list(question.get_codes())})
 
 
 @user_passes_test(lambda u: u.is_superuser)
 def codes_pdf(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render_to_pdf_response(request, 'polls/codesList.html',
-                                  {"codes_dict": format_codes_list(question.get_codes())})
+                                  {"codes_list": format_codes_list(question.get_codes())})

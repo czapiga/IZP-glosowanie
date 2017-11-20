@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.urls import reverse
 from .models import Question, SimpleQuestion
 from .codes import generate_codes
-
+from django.contrib.auth.models import User
 
 def create_question(question_text, days=0, start=0, end=0):
     """
@@ -230,7 +230,6 @@ class SimpleQuestionTests(TestCase):
 
 
 class CodesTests(TestCase):
-
     def test_codes_number_and_length(self):
         codes = generate_codes(10, 10)
         self.assertEqual(len(codes), 10)
@@ -260,5 +259,38 @@ class CodesTests(TestCase):
     def test_codes_html_view(self):
         q = create_question(question_text="question 1.",
                         start=timezone.now(), days=30)
-        resp = self.client.get("/polls/" + str(q.id) + "/codes")
+        resp = self.client.get("polls/" + str(q.id) + "/codes", follow=True)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_codes_pdf_view(self):
+        q = create_question(question_text="question 1.",
+                        start=timezone.now(), days=30)
+        resp = self.client.get("polls/" + str(q.id) + "/codes_pdf", follow=True)
+        self.assertEqual(resp.status_code, 404)
+
+class CodesTestNeedsLogin(TestCase):
+    def setUp(self):
+        User.objects.create_superuser(
+            'user1',
+            'user1@example.com',
+            'pswd',
+        )
+        self.client.login(username="user1", password="pswd")
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_codes_html_view(self):
+        q = create_question(question_text="question 1.",
+                            start=timezone.now(), days=30)
+        resp = self.client.get("/polls/" + str(q.id) + "/codes/", follow=True)
         self.assertEqual(resp.status_code, 200)
+        self.assertTrue( len(resp.context['codes_list']) == len(q.get_codes()))
+
+
+    def test_codes_html_view(self):
+        q = create_question(question_text="question 1.",
+                            start=timezone.now(), days=30)
+        resp = self.client.get("/polls/" + str(q.id) + "/codes_pdf/", follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue( len(resp.context['codes_list']) == len(q.get_codes()))

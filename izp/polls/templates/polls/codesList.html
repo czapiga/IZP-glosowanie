@@ -29,6 +29,7 @@
 
     div.container {
         max-width:20cm;
+        width:100%;
         color:black;
         margin: auto;
         background-color:rgb(255,255,255);
@@ -65,7 +66,7 @@ tr:nth-child(even) {background-color: #f2f2f2;}
 <div class="container">
 <div>
 <table>
-    {% for value in codes_dict %}
+    {% for value in codes_list %}
     <tr><td>{{ value }}</td></tr>
     {% endfor %}
 </table>
