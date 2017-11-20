@@ -9,6 +9,7 @@ from .models import Question, SimpleQuestion
 from .codes import generate_codes
 from django.contrib.auth.models import User
 
+
 def create_question(question_text, days=0, start=0, end=0):
     """
     Create a question with the given `question_text` and published the
@@ -258,15 +259,18 @@ class CodesTests(TestCase):
 
     def test_codes_html_view(self):
         q = create_question(question_text="question 1.",
-                        start=timezone.now(), days=30)
-        resp = self.client.get("polls/" + str(q.id) + "/codes", follow=True)
+                            start=timezone.now(), days=30)
+        resp = self.client.get("polls/" + str(q.id) + "/codes",
+                               follow=True)
         self.assertEqual(resp.status_code, 404)
 
     def test_codes_pdf_view(self):
         q = create_question(question_text="question 1.",
-                        start=timezone.now(), days=30)
-        resp = self.client.get("polls/" + str(q.id) + "/codes_pdf", follow=True)
+                            start=timezone.now(), days=30)
+        resp = self.client.get("polls/" + str(q.id) + "/codes_pdf",
+                               follow=True)
         self.assertEqual(resp.status_code, 404)
+
 
 class CodesTestNeedsLogin(TestCase):
     def setUp(self):
@@ -283,14 +287,15 @@ class CodesTestNeedsLogin(TestCase):
     def test_codes_html_view(self):
         q = create_question(question_text="question 1.",
                             start=timezone.now(), days=30)
-        resp = self.client.get("/polls/" + str(q.id) + "/codes/", follow=True)
+        resp = self.client.get("/polls/" + str(q.id) + "/codes/",
+                               follow=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue( len(resp.context['codes_list']) == len(q.get_codes()))
-
+        self.assertTrue(len(resp.context['codes_list']) == len(q.get_codes()))
 
     def test_codes_html_view(self):
         q = create_question(question_text="question 1.",
                             start=timezone.now(), days=30)
-        resp = self.client.get("/polls/" + str(q.id) + "/codes_pdf/", follow=True)
+        resp = self.client.get("/polls/" + str(q.id) + "/codes_pdf/",
+                               follow=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue( len(resp.context['codes_list']) == len(q.get_codes()))
+        self.assertTrue(len(resp.context['codes_list']) == len(q.get_codes()))

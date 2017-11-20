@@ -4,27 +4,28 @@
     <meta charset="utf-8">
     <style type="text/css">
 
-@media print
-{
-    @page {
-        margin: 7pt 7pt 7pt 7pt;
+    @media print {
+        @page {
+            margin: 7pt 7pt 7pt 7pt;
+        }
+
+        div.container {
+            box-shadow: none !important;;
+        }
+
+        div {
+            page-break-inside: avoid;
+        }
+
+        table {
+            width:100%;
+        }
     }
 
-    div.container {
-        box-shadow: none !important;;
-    }
-
-    div{
-        page-break-inside: avoid;
-    }
-    table{
-        width:100%;
-    }
-}
-    body{
+    body {
         color:#000;
         background-color:rgb(204,204,204);
-        width:100%; /*The body is naturally a 100% of the browser window space, but let us just write it to make sure */
+        width:100%;
     }
 
     div.container {
@@ -56,21 +57,23 @@
         border: 1px solid black;
     }
 
-tr:nth-child(even) {background-color: #f2f2f2;}
-
-
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
 
     </style>
 </head>
 <body>
 <div class="container">
-<div>
-<table>
-    {% for value in codes_list %}
-    <tr><td>{{ value }}</td></tr>
-    {% endfor %}
-</table>
-</div>
+    <div>
+        <table>
+            {% for value in codes_list %}
+            <tr>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 </body>
 </html>
