@@ -26,21 +26,6 @@ def create_question(question_text, days=0, start=0, end=0):
     return Question.objects.create(
         question_text=question_text, start_date=start, end_date=end)
 
-def create_open_question(question_text, days=0, start=0, end=0):
-    """
-    Similar to 'create_question' but instead creates an open question.
-    """
-    if days != 0 and start == 0 and end == 0:
-        start = timezone.now() + datetime.timedelta(days=days)
-        return OpenQuestion.objects.create(
-            question_text=question_text, start_date=start)
-    if days != 0 and start != 0 and end == 0:
-        end = start + datetime.timedelta(days=days)
-        return OpenQuestion.objects.create(
-            question_text=question_text, start_date=start, end_date=end)
-    return OpenQuestion.objects.create(
-        question_text=question_text, start_date=start, end_date=end)
-
 class QuestionIndexViewTests(TestCase):
     """
     Tests for views
@@ -166,37 +151,32 @@ class QuestionVoteTests(TestCase):
         If the same open answer is written twice in two votes,
         it counts as one answer with two votes.
         """
-        new_question = create_open_question(
-            question_text="Open question",
-            start = timezone.now() - datetime.timedelta(minutes=6),
-            end = timezone.now() + datetime.timedelta(minutes=6))
+        new_question = OpenQuestion.objects.create(
+            question_text="Open question")
         new_question.save()
         url = reverse('polls:vote', args=(new_question.id,))
-        password = random.choice(new_question.accesscode_set.all()).code
+        password = new_question.accesscode_set.all()[0].code
         response = self.client.post(url,
             {'code': password, 'new_choice': 'odpowiedz'})    
-        password = random.choice(new_question.accesscode_set.all()).code
+        password = new_question.accesscode_set.all()[1].code
         response = self.client.post(url,
             {'code': password, 'new_choice': 'odpowiedz'})
         self.assertIs(Choice.objects.all().count(), 1)
-        for c in Choice.objects.all():
-            self.assertIs(c.votes, 2)
+        self.assertIs(Choice.objects.all()[0].votes, 2)
         
     def test_vote_two_similar_answers(self):
         """
         If two similar but not the same open answers are written in two votes,
         it counts as two different answers with one vote each.
         """
-        new_question = create_open_question(
-            question_text="Open question",
-            start = timezone.now() - datetime.timedelta(minutes=6),
-            end = timezone.now() + datetime.timedelta(minutes=6))
+        new_question = OpenQuestion.objects.create(
+            question_text="Open question")
         new_question.save()
         url = reverse('polls:vote', args=(new_question.id,))
-        password = random.choice(new_question.accesscode_set.all()).code
+        password = new_question.accesscode_set.all()[0].code
         response = self.client.post(url,
             {'code': password, 'new_choice': 'odpowiedz2'})    
-        password = random.choice(new_question.accesscode_set.all()).code
+        password = new_question.accesscode_set.all()[1].code
         response = self.client.post(url,
             {'code': password, 'new_choice': 'odpowiedz'})
         self.assertIs(Choice.objects.all().count(), 2)
