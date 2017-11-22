@@ -50,6 +50,21 @@ def result(request, question_id):
                   {'question': question, 'choices': choices, 'codes': codes})
 
 
+def reformat_code(code):
+    if len(code) <= 4 or not '-' in code:
+        return code
+
+    newCode = ""
+    for l, c in enumerate(code):
+        if (l+1) % 5 == 0:
+            if l+1 == len(code) or code[l] != "-":
+                return ''
+        elif code[l] == "-":
+            return ''
+        else:
+            newCode += c
+    return newCode
+
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     if question.start_date > timezone.now() \
@@ -60,7 +75,7 @@ def vote(request, question_id):
                        'error': "Głosowanie nie jest aktywne"})
 
     code = request.POST['code']
-    code = code.replace(" ", "")
+    code = reformat_code(code)
     if code == '' or not question.is_code_correct(code):
         return render(request,
                       'polls/detail.html',
@@ -111,15 +126,14 @@ def vote(request, question_id):
     Vote.objects.create(question=question, choice=choice, code=code)
     return HttpResponseRedirect(reverse('polls:index'))
 
-
 def format_codes_list(codes_list):
     formated_codes_list = []
     for i in codes_list:
         code = ""
         for l, c in enumerate(i):
             code += c
-            if (l+1) % 4 == 0:
-                code += ' '
+            if (l+1) % 4 == 0 and (l+1) != len(i):
+                code += '-'
         formated_codes_list.append(code)
     return formated_codes_list
 
@@ -134,7 +148,6 @@ def codes(request, question_id):
 @user_passes_test(lambda u: u.is_superuser)
 def codes_pdf(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    return \
-        render_to_pdf_response(
-            request, 'polls/codesList.html',
-            {"codes_list": format_codes_list(question.get_codes())})
+    return render_to_pdf_response(
+        request, 'polls/codesList.html',
+        {"codes_list": format_codes_list(question.get_codes())})
