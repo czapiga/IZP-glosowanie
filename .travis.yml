@@ -2,10 +2,11 @@ language: python
 python:
     - 3.6
 install:
-    - pip install -r requirements.txt    
-    
+    - pip install -r requirements.txt
+
 script:
-    - python izp/manage.py makemigrations
-    - python izp/manage.py migrate 
-    - python izp/manage.py test
-    - pycodestyle . --exclude=izp/polls/migrations
+    - cd izp
+    - python manage.py makemigrations
+    - python manage.py migrate
+    - python manage.py test
+    - pycodestyle . --exclude=polls/migrations
