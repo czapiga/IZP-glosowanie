@@ -47,9 +47,8 @@ def result(request, question_id):
         codes.append({'code': code.code, 'num_of_votes': code.counter,
                       'last_choice': last_choice})
     
-    is_successful = is_vote_successful(question)
     return render(request, 'polls/result.html',
-                  {'question': question, 'choices': choices, 'codes': codes, 'success':is_successful})
+                  {'question': question, 'choices': choices, 'codes': codes, 'success': is_vote_successful(question)})
 
 def is_vote_successful(question):
     codes = question.get_codes()
