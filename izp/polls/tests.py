@@ -267,11 +267,12 @@ class QuestionVoteViewTests(TestCase):
         question = Question.objects.get(question_text="Question")
         url = reverse('polls:vote', args=(question.id,))
         response = self.client.post(
-            url, 
-            {'choice': question.choice_set.all().last().id, 
+            url,
+            {'choice': question.choice_set.all().last().id,
              'code': ""})
         basic_check_of_question(self, response, question,
                                 "Niewłaściwy kod uwierzytelniający")
+
 
 class OpenQuestionVoteViewTests(TestCase):
     def setUp(self):
@@ -285,7 +286,7 @@ class OpenQuestionVoteViewTests(TestCase):
         url = reverse('polls:vote', args=(open_question.id,))
         response = self.client.post(
             url, {'is_open': True,
-                  'choice': question.choice_set.all().last().id,
+                  'choice': open_question.choice_set.all().last().id,
                   'new_choice': "sth",
                   'code': open_question.get_codes()[0]})
         basic_check_of_open_question(
@@ -309,7 +310,10 @@ class OpenQuestionVoteViewTests(TestCase):
         open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
         url = reverse('polls:vote', args=(open_question.id,))
         response = self.client.post(
-            url, {'is_open': True, 'choice': question.choice_set.all().last().id, 'new_choice': '', 'code': ""})
+            url, {'is_open': True,
+                  'choice': open_question.choice_set.all().last().id,
+                  'new_choice': '',
+                  'code': ""})
         basic_check_of_open_question(
             self, response, open_question, "Niewłaściwy kod uwierzytelniający")
 
