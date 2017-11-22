@@ -267,7 +267,7 @@ class QuestionVoteViewTests(TestCase):
     def test_invalid_access_code(self):
         question = Question.objects.get(question_text="Question")
         url = reverse('polls:vote', args=(question.id,))
-        response = self.client.post(url, {'code': ""})
+        response = self.client.post(url, {'choice': 1, 'code': ""})
         basic_check_of_question(self, response, question,
                                 "Niewłaściwy kod uwierzytelniający")
         self.assertNotContains(response, 'new_choice')
