@@ -257,45 +257,44 @@ class CodesTests(TestCase):
             code = codes.pop()
             self.assertNotIn(code, codes)
 
-    def test_codes_html_view(self):
-        q = create_question(question_text="question 1.",
-                            start=timezone.now(), days=30)
-        resp = self.client.get("polls/" + str(q.id) + "/codes",
-                               follow=True)
-        self.assertEqual(resp.status_code, 404)
 
-    def test_codes_pdf_view(self):
-        q = create_question(question_text="question 1.",
-                            start=timezone.now(), days=30)
-        resp = self.client.get("polls/" + str(q.id) + "/codes_pdf",
-                               follow=True)
-        self.assertEqual(resp.status_code, 404)
-
-
-class CodesTestNeedsLogin(TestCase):
+class CodesViewsTests(TestCase):
     def setUp(self):
         User.objects.create_superuser(
             'user1',
             'user1@example.com',
             'pswd',
         )
-        self.client.login(username="user1", password="pswd")
 
-    def tearDown(self):
+        self.client.login(username="user1", password="pswd")
+        self.q = Question.objects.create(question_text="question 1.",
+                                         start_date=timezone.now())
         self.client.logout()
 
-    def test_codes_html_view(self):
-        q = create_question(question_text="question 1.",
-                            start=timezone.now(), days=30)
-        resp = self.client.get("/polls/" + str(q.id) + "/codes/",
+    def test_codes_html_view_as_superuser(self):
+        self.client.login(username="user1", password="pswd")
+        resp = self.client.get("/polls/" + str(self.q.id) + "/codes/",
                                follow=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(len(resp.context['codes_list']) == len(q.get_codes()))
+        self.assertTrue(
+            len(resp.context['codes_list']) == len(self.q.get_codes()))
+        self.client.logout()
 
-    def test_codes_html_view(self):
-        q = create_question(question_text="question 1.",
-                            start=timezone.now(), days=30)
-        resp = self.client.get("/polls/" + str(q.id) + "/codes_pdf/",
+    def test_codes_pdf_view_as_superuser(self):
+        self.client.login(username="user1", password="pswd")
+        resp = self.client.get("/polls/" + str(self.q.id) + "/codes_pdf/",
                                follow=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(len(resp.context['codes_list']) == len(q.get_codes()))
+        self.assertTrue(
+            len(resp.context['codes_list']) == len(self.q.get_codes()))
+        self.client.logout()
+
+    def test_codes_html_view_as_user(self):
+        resp = self.client.get("polls/" + str(self.q.id) + "/codes",
+                               follow=True)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_codes_pdf_view_as_user(self):
+        resp = self.client.get("polls/" + str(self.q.id) + "/codes_pdf",
+                               follow=True)
+        self.assertEqual(resp.status_code, 404)
