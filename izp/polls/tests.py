@@ -297,6 +297,7 @@ class CodesViewsTests(TestCase):
                                follow=True)
         self.assertEqual(resp.status_code, 404)
 
+
 class ReformatCodeTests(TestCase):
     def test_short_code(self):
         code = "OPA"
@@ -324,6 +325,7 @@ class ReformatCodeTests(TestCase):
         self.assertEqual("", formated_code)
         self.assertEqual("", formated_code2)
 
+
 class FormatCodeListTests(TestCase):
     def test_format_codes_list(self):
         codes_list = ["IZ02FW4Z", "IZPW", "IZP", "IZ0FW4GEI"]
@@ -332,4 +334,3 @@ class FormatCodeListTests(TestCase):
         self.assertEqual("IZPW", formated_codes_list[1])
         self.assertEqual("IZP", formated_codes_list[2])
         self.assertEqual("IZ0F-W4GE-I", formated_codes_list[3])
-

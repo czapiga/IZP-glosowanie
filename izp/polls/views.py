@@ -51,7 +51,7 @@ def result(request, question_id):
 
 
 def reformat_code(code):
-    if len(code) <= 4 or not '-' in code:
+    if len(code) <= 4 or "-" not in code:
         return code
 
     newCode = ""
@@ -64,6 +64,7 @@ def reformat_code(code):
         else:
             newCode += c
     return newCode
+
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -125,6 +126,7 @@ def vote(request, question_id):
     code.save()
     Vote.objects.create(question=question, choice=choice, code=code)
     return HttpResponseRedirect(reverse('polls:index'))
+
 
 def format_codes_list(codes_list):
     formated_codes_list = []
