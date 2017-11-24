@@ -47,18 +47,22 @@ def result(request, question_id):
         codes.append({'code': code.code, 'num_of_votes': code.counter,
                       'last_choice': last_choice})
         
-    return render(request, 'polls/result.html',{'question':question,
-                                                'choices':choices,
-                                                'codes':codes,
-                                                'success':is_vote_successful(question)})
+    return render(request, 'polls/result.html', 
+                  {'question': question,
+                   'choices': choices,
+                   'codes': codes,
+                   'success': is_vote_successful(question)})
+
 
 def is_vote_successful(question):
     codes = question.get_codes()
-    used_codes = Vote.objects.filter(question__exact=question).values('code').distinct()
+    used_codes = Vote.objects.filter(question__exact=question)
+                             .values('code').distinct()
     if len(used_codes) / len(codes) * 100 < 50:
         return False
     else:
         return True
+
     
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
