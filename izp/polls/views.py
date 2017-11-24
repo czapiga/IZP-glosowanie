@@ -58,7 +58,7 @@ def is_vote_successful(question):
     codes = question.get_codes()
     used_codes = Vote.objects.filter(
         question__exact=question).values(
-            'code').distinct()
+        'code').distinct()
     if len(used_codes) / len(codes) * 100 < 50:
         return False
     else:
