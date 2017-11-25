@@ -27,6 +27,16 @@ def detail(request, question_id):
     return render(request, 'polls/detail.html',
                   {'question': openQuestion, 'is_open': True})
 
+def format_codes_list(codes_list):
+    codes = []
+    for code in codes_list:
+        codes.append(format_code(code))
+    return codes
+
+
+def format_code(code):
+    return '-'.join([code[i:i+4] for i in range(0, len(code), 4)])
+
 
 def result(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -44,7 +54,7 @@ def result(request, question_id):
             last_choice = last_choice.choice.choice_text
         else:
             last_choice = '-'
-        codes.append({'code': code.code, 'num_of_votes': code.counter,
+        codes.append({'code': format_code(code.code), 'num_of_votes': code.counter,
                       'last_choice': last_choice})
     return render(request, 'polls/result.html',
                   {'question': question, 'choices': choices, 'codes': codes})
@@ -126,18 +136,6 @@ def vote(request, question_id):
     code.save()
     Vote.objects.create(question=question, choice=choice, code=code)
     return HttpResponseRedirect(reverse('polls:index'))
-
-
-def format_codes_list(codes_list):
-    formated_codes_list = []
-    for i in codes_list:
-        code = ""
-        for l, c in enumerate(i):
-            code += c
-            if (l+1) % 4 == 0 and (l+1) != len(i):
-                code += '-'
-        formated_codes_list.append(code)
-    return formated_codes_list
 
 
 @user_passes_test(lambda u: u.is_superuser)
