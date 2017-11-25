@@ -27,6 +27,7 @@ def detail(request, question_id):
     return render(request, 'polls/detail.html',
                   {'question': openQuestion, 'is_open': True})
 
+
 def format_codes_list(codes_list):
     codes = []
     for code in codes_list:
@@ -54,7 +55,8 @@ def result(request, question_id):
             last_choice = last_choice.choice.choice_text
         else:
             last_choice = '-'
-        codes.append({'code': format_code(code.code), 'num_of_votes': code.counter,
+        codes.append({'code': format_code(code.code),
+                      'num_of_votes': code.counter,
                       'last_choice': last_choice})
     return render(request, 'polls/result.html',
                   {'question': question, 'choices': choices, 'codes': codes})
