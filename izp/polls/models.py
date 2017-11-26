@@ -24,7 +24,8 @@ class Question(models.Model):
                 if max_end_date < timezone.now():
                     self.start_date = timezone.now()
                 else:
-                    self.start_date = max_end_date + timezone.timedelta(minutes=2)
+                    self.start_date = max_end_date + \
+                        timezone.timedelta(minutes=2)
             if not self.end_date:
                 self.end_date = self.start_date + \
                     timezone.timedelta(minutes=self.time)
@@ -32,7 +33,7 @@ class Question(models.Model):
         if self.start_date != self.end_date:
             if Question.objects.filter(end_date__gt=self.start_date):
                 raise Exception('Nie wolno tworzyć czasowo' +
-                                ' nakładających się głosowań')
+                                'nakładających się głosowań')  
             super(Question, self).save(force_insert=force_insert,
                                        force_update=force_update,
                                        using=using)
