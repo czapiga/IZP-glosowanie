@@ -20,5 +20,4 @@ class QuestionAdminForm(forms.ModelForm):
                                         'Najbliższa możliwa ' +
                                         'data rozpoczencia ' +
                                         'nowego głosowania ' +
-                                        str(max_end_date)
-                                       )
+                                        str(max_end_date))
