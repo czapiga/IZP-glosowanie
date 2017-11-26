@@ -20,7 +20,11 @@ class Question(models.Model):
                 self.time = (self.end_date -
                              self.start_date).total_seconds() / 60
             if not self.start_date:
-                self.start_date = timezone.now()
+                max_end_date = Question.objects.latest('end_date').end_date
+                if max_end_date < timezone.now():
+                    self.start_date = timezone.now()
+                else:
+                    self.start_date = max_end_date + timezone.timedelta(minutes=2)
             if not self.end_date:
                 self.end_date = self.start_date + \
                     timezone.timedelta(minutes=self.time)
