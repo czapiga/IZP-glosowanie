@@ -14,10 +14,12 @@ class QuestionAdminForm(forms.ModelForm):
         time = self.cleaned_data.get('time')
         max_end_date = Question.objects.latest('end_date').end_date
         if start_date and max_end_date > start_date:
-            raise forms.ValidationError('Nie wolno tworzyć ' +
-                                        'czasowo nakładających ' +
-                                        'się głowowań. ' +
-                                        'Najbliższa możliwa ' +
-                                        'data rozpoczencia ' +
-                                        'nowego głosowania ' +
-                                        str(max_end_date))
+            raise forms.ValidationError(
+                'Nie wolno tworzyć ' +
+                'czasowo nakładających ' +
+                'się głowowań. ' +
+                'Najbliższa możliwa ' +
+                'data rozpoczencia ' +
+                'nowego głosowania ' +
+                str(max_end_date)
+            )
