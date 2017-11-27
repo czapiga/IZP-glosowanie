@@ -267,6 +267,7 @@ def create_question_form(name, start_date=0, end_date=0, time=0):
                 'end_date': end_date,
                 'time': time}
 
+
 def create_moved_on_delta_minutes_question(start_point, name, start_delta,
                                            end_delta):
 
@@ -303,11 +304,10 @@ class QuestionFormValidationTests(TestCase):
         create_moved_on_delta_minutes_question(self.start_point,
                                                'Q2', 20, 20)
 
-
         form_start_date = self.start_point + datetime.timedelta(minutes=10)
         form_end_date = self.start_point + datetime.timedelta(minutes=15)
 
-        form_data  = create_question_form(
+        form_data = create_question_form(
             'Qe3',
             form_start_date,
             form_end_date
@@ -323,7 +323,7 @@ class QuestionFormValidationTests(TestCase):
         time range 3,8
         overlap with other question time range 0,5
         """
-        
+
         create_moved_on_delta_minutes_question(self.start_point,
                                                'Q1', 0, 5)
 

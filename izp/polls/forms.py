@@ -20,7 +20,7 @@ class QuestionAdminForm(forms.ModelForm):
         start_date = self.cleaned_data.get('start_date')
         end_date = self.cleaned_data.get('end_date')
         time = self.cleaned_data.get('time')
-        if not start_date and not end date:
+        if not start_date and not end_date:
             start_date = timezone.now()
             end_date = start_date + datetime.timedelta(minutes=time)
         if not end_date:
