@@ -21,11 +21,11 @@ class Question(models.Model):
                              self.start_date).total_seconds() / 60
             if not self.start_date:
                 self.start_date = timezone.now()
-                
+
             if not self.end_date:
                 self.end_date = self.start_date + \
                     timezone.timedelta(minutes=self.time)
-        
+
         if self.start_date != self.end_date:
             super(Question, self).save(force_insert=force_insert,
                                        force_update=force_update,
@@ -80,7 +80,7 @@ class AccessCode(models.Model):
     code = models.CharField('Kod', max_length=8)
     counter = models.IntegerField('Liczba użyć', default=0)
 
-    
+
 class Vote(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)

@@ -267,7 +267,9 @@ def create_question_form(name, start_date=0, end_date=0, time=0):
                 'end_date': end_date,
                 'time': time}
 
-def create_moved_on_delta_minutes_question(start_point, name, start_delta, end_delta):
+def create_moved_on_delta_minutes_question(start_point, name, start_delta,
+                                           end_delta):
+
     start_date = start_point + \
         datetime.timedelta(minutes=start_delta)
     end_date = start_point + \
@@ -280,9 +282,9 @@ class QuestionFormValidationTests(TestCase):
     How does it work?
     When we try to create new Question
     function clean() from  QuestionAdminForm in forms.py
-    chech is out input data valid. If one of property 
-    is not valid we add error to error list. 
-    After is_valid() function check is error list 
+    check is our input data valid. If one of properties
+    is not valid than function add error to error list.
+    After, is_valid() function check is error list
     empty and return True or False
     """
     start_point = timezone.now()
@@ -291,7 +293,7 @@ class QuestionFormValidationTests(TestCase):
         """
         It must be able to create question if
         it does not overlap with other.
-        We try to create question with time range 10,15 
+        We try to create question with time range 10,15
         between qe_1 with time range 0,5
         and qe2 with time range 20,25.
         """
@@ -321,7 +323,7 @@ class QuestionFormValidationTests(TestCase):
 
     def test_start_overlap(self):
         """
-        Case when start_date of new question 
+        Case when start_date of new question
         time range 3,8
         overlap with other question time range 0,5
         """
@@ -368,7 +370,7 @@ class QuestionFormValidationTests(TestCase):
         """
         Case when end_date and start_date of new question
         time range 3,8
-        overlap with 2 different questions time ranges 
+        overlap with 2 different questions time ranges
         0,5 and 7,12
         """
         create_moved_on_delta_minutes_question(self.start_point,
@@ -393,11 +395,12 @@ class QuestionFormValidationTests(TestCase):
         self.assertFalse(form.is_valid())
 
 
+
     def test_voting_inside_voting_overlap(self):
         """
         Case when new question time range 1,7
-        is chronologically inside other 
-        time range 0,8 
+        is chronologically inside other
+        time range 0,8
         """
         create_moved_on_delta_minutes_question(self.start_point,
                                                'Qe1', 0, 8)
@@ -416,4 +419,3 @@ class QuestionFormValidationTests(TestCase):
         form = QuestionAdminForm(data=form_data)
 
         self.assertFalse(form.is_valid())
-        

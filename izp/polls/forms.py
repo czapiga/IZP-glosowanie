@@ -7,7 +7,7 @@ class QuestionAdminForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = '__all__'
-
+    
     def clean(self):
         question_text = self.cleaned_data.get('question_text')
         start_date = self.cleaned_data.get('start_date')
@@ -24,7 +24,7 @@ class QuestionAdminForm(forms.ModelForm):
                            'Data rozpoczęcia ' +
                            'nakłada się z innym głosowaniem')
 
-        if is_overlap(end_date): 
+        if is_overlap(end_date):
             self.add_error('end_date',
                            'Data okończenia ' +
                            'nakłada się z innym głosowaniem')
