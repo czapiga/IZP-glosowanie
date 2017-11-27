@@ -128,8 +128,12 @@ def vote(request, question_id):
                  'is_open': is_open})
 
     if not choice and is_open:
-        choice = Choice.objects.create(
-            question=question, choice_text=new_choice)
+        if Choice.objects.filter(question__exact=question,choice_text__exact=new_choice).exists():
+            choice = Choice.objects.filter(
+                question__exact=question, choice_text__exact=new_choice).last()
+        else:
+            choice = Choice.objects.create(
+                question=question, choice_text=new_choice)
 
     code = AccessCode.objects.get(question=question, code=code)
     prev_vote = Vote.objects.filter(
