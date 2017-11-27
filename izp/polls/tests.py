@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.urls import reverse
 from .models import Question, SimpleQuestion
 from .codes import generate_codes
+from .forms import QuestionAdminForm
+from django.forms import ValidationError
 
 
 def create_question(question_text, days=0, start=0, end=0):
@@ -256,3 +258,162 @@ class CodesTests(TestCase):
         while codes:
             code = codes.pop()
             self.assertNotIn(code, codes)
+
+
+def create_question_form(name, start_date=0, end_date=0, time=0):
+    if start_date != 0 and end_date != 0:
+        return {'question_text': name,
+                'start_date': start_date,
+                'end_date': end_date,
+                'time': time}
+
+def create_moved_on_delta_minutes_question(start_point, name, start_delta, end_delta):
+    start_date = start_point + \
+        datetime.timedelta(minutes=start_delta)
+    end_date = start_point + \
+        datetime.timedelta(minutes=end_delta)
+    create_question(name, 0, start_date, end_date)
+    
+class QuestionFormValidationTests(TestCase):
+    """
+    In this test case we use is_valid() function.
+    How does it work?
+    When we try to create new Question
+    function clean() from  QuestionAdminForm in forms.py
+    chech is out input data valid. If one of property 
+    is not valid we add error to error list. 
+    After is_valid() function check is error list 
+    empty and return True or False
+    """
+    start_point = timezone.now()
+
+    def test_correct_question_validation(self):
+        """
+        It must be able to create question if
+        it does not overlap with other.
+        We try to create question with time range 10,15 
+        between qe_1 with time range 0,5
+        and qe2 with time range 20,25.
+        """
+
+        create_moved_on_delta_minutes_question(self.start_point,
+                                               'Q1',0,5)
+
+        create_moved_on_delta_minutes_question(self.start_point,
+                                               'Q2',20,20)
+        
+
+        form_start_date = self.start_point + \
+        datetime.timedelta(minutes=10)
+        form_end_date = self.start_point + \
+        datetime.timedelta(minutes=15)
+
+        form_data  = create_question_form(
+            'Qe3',
+            form_start_date,
+            form_end_date
+        )
+
+        form = QuestionAdminForm(data=form_data)
+
+        self.assertTrue(form.is_valid())
+        
+
+    def test_start_overlap(self):
+        """
+        Case when start_date of new question 
+        time range 3,8
+        overlap with other question time range 0,5
+        """
+        
+        create_moved_on_delta_minutes_question(self.start_point,
+                                               'Q1',0,5)
+
+        form_start_date = self.start_point + \
+        datetime.timedelta(minutes=3)
+        form_end_date = self.start_point + \
+        datetime.timedelta(minutes=8)
+
+        form_data = create_question_form('Qe2',
+                                         form_start_date,
+                                         form_end_date)
+        form = QuestionAdminForm(data=form_data)
+
+        self.assertFalse(form.is_valid())
+
+
+    def test_end_overlap(self):
+        """
+        Case when end_date of new question time range 0,5
+        overlap with other question time range -3,1
+        """
+
+        create_moved_on_delta_minutes_question(self.start_point,
+                                               'Q1', 0, 5)
+
+        form_start_date = self.start_point + \
+        datetime.timedelta(minutes=1)
+        form_end_date = self.start_point - \
+        datetime.timedelta(minutes=3)
+
+        form_data = create_question_form('Qe2',
+                                         form_start_date,
+                                         form_end_date)
+        form = QuestionAdminForm(data=form_data)
+
+        self.assertFalse(form.is_valid())
+
+
+    def test_end_and_start_overlap(self):
+        """
+        Case when end_date and start_date of new question
+        time range 3,8
+        overlap with 2 different questions time ranges 
+        0,5 and 7,12
+        """
+        create_moved_on_delta_minutes_question(self.start_point,
+                                               'Qe1', 0, 5)
+
+        create_moved_on_delta_minutes_question(self.start_point,
+                                               'Qe2', 7, 12)
+
+        form_start_date = self.start_point + \
+        datetime.timedelta(minutes=3)
+        form_end_date = self.start_point + \
+        datetime.timedelta(minutes=8)
+
+        form_data = create_question_form(
+            'Qe3',
+            form_start_date,
+            form_end_date
+        )
+
+        form = QuestionAdminForm(data=form_data)
+
+        self.assertFalse(form.is_valid())
+
+
+    def test_voting_inside_voting_overlap(self):
+        """
+        Case when new question time range 1,7
+        is chronologically inside other 
+        time range 0,8 
+        """
+        create_moved_on_delta_minutes_question(self.start_point,
+                                               'Qe1', 0, 8)
+
+        form_start_date = self.start_point + \
+        datetime.timedelta(minutes=1)
+        form_end_date = self.start_point + \
+        datetime.timedelta(minutes=7)
+
+        form_data = create_question_form(
+            'Qe2',
+            form_start_date,
+            form_end_date
+        )
+
+        form = QuestionAdminForm(data=form_data)
+
+        self.assertFalse(form.is_valid())
+        
