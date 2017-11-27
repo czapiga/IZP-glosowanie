@@ -92,7 +92,7 @@ class Choice(models.Model):
 
 class AccessCode(models.Model):
     """
-    Class representing code used to gain access to the question. 
+    Class representing code used to gain access to the question.
     """
 
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -102,7 +102,7 @@ class AccessCode(models.Model):
 
 class Vote(models.Model):
     """
-    Class representing single vote. 
+    Class representing single vote.
     """
 
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
