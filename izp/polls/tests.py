@@ -5,10 +5,11 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from .models import Question, SimpleQuestion
+from .models import Question, SimpleQuestion, OpenQuestion
 from .codes import generate_codes
 from .forms import QuestionAdminForm
-from django.forms import ValidationError
+from django.contrib.auth.models import User
+from .views import reformat_code, format_codes_list
 
 
 def create_question(question_text, days=0, start=0, end=0):
@@ -27,6 +28,19 @@ def create_question(question_text, days=0, start=0, end=0):
             question_text=question_text, start_date=start, end_date=end)
     return Question.objects.create(
         question_text=question_text, start_date=start, end_date=end)
+
+
+def basic_check_of_question(cls, response, quest, error=""):
+    cls.assertContains(response, quest.question_text)
+    if error != "":
+        cls.assertContains(response, error)
+    cls.assertContains(response, 'Odp1')
+    cls.assertContains(response, 'Odp2')
+
+
+def basic_check_of_open_question(cls, response, quest, error=""):
+    basic_check_of_question(cls, response, quest, error)
+    cls.assertContains(response, 'new_choice')
 
 
 class QuestionIndexViewTests(TestCase):
@@ -211,6 +225,119 @@ class QuestionDetailViewTests(TestCase):
         )
 
 
+class OpenQuestionDetailViewTests(TestCase):
+    def setUp(self):
+        open_question = OpenQuestion.objects.create(
+            question_text="OpenQuestion")
+        open_question.choice_set.create(choice_text="Odp1")
+        open_question.choice_set.create(choice_text="Odp2")
+
+    def test_open_question_with_choices(self):
+        '''
+        Test for detail view of open question
+        '''
+        open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
+        url = reverse('polls:detail', args=(open_question.id,))
+        response = self.client.get(url)
+        basic_check_of_open_question(self, response, open_question)
+
+    def test_open_question_without_choices(self):
+        '''
+        Test for detail view of empty open question
+        '''
+        open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
+        url = reverse('polls:detail', args=(open_question.id,))
+        response = self.client.get(url)
+        self.assertContains(response, open_question.question_text)
+        self.assertContains(response, 'new_choice')
+
+
+class QuestionVoteViewTests(TestCase):
+    def setUp(self):
+        question = Question.objects.create(
+            question_text="Question")
+        question.choice_set.create(choice_text="Odp1")
+        question.choice_set.create(choice_text="Odp2")
+
+    def test_no_answer_for_question(self):
+        question = Question.objects.get(question_text="Question")
+        url = reverse('polls:vote', args=(question.id,))
+        response = self.client.post(url, {'code': question.get_codes()[0]})
+        basic_check_of_question(self, response, question,
+                                "Nie wybrano odpowiedzi")
+
+    def test_invalid_access_code(self):
+        question = Question.objects.get(question_text="Question")
+        url = reverse('polls:vote', args=(question.id,))
+        response = self.client.post(
+            url,
+            {'choice': question.choice_set.all().last().id,
+             'code': ""})
+        basic_check_of_question(self, response, question,
+                                "Niewłaściwy kod uwierzytelniający")
+
+
+class OpenQuestionVoteViewTests(TestCase):
+    def setUp(self):
+        open_question = OpenQuestion.objects.create(
+            question_text="OpenQuestion")
+        open_question.choice_set.create(choice_text="Odp1")
+        open_question.choice_set.create(choice_text="Odp2")
+
+    def test_two_answers_for_open_question(self):
+        open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
+        url = reverse('polls:vote', args=(open_question.id,))
+        response = self.client.post(
+            url, {'is_open': True,
+                  'choice': open_question.choice_set.all().last().id,
+                  'new_choice': "sth",
+                  'code': open_question.get_codes()[0]})
+        basic_check_of_open_question(
+            self,
+            response,
+            open_question,
+            "Nie można głosować na istniejącą odpowiedź i \
+                          jednocześnie proponować nową")
+
+    def test_no_answers_for_open_question(self):
+        open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
+        url = reverse('polls:vote', args=(open_question.id,))
+        response = self.client.post(
+            url, {'is_open': True,
+                  'new_choice': '',
+                  'code': open_question.get_codes()[0]})
+        basic_check_of_open_question(
+            self, response, open_question, "Nie wybrano odpowiedzi")
+
+    def test_invalid_access_code_for_open_question(self):
+        open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
+        url = reverse('polls:vote', args=(open_question.id,))
+        response = self.client.post(
+            url, {'is_open': True,
+                  'choice': open_question.choice_set.all().last().id,
+                  'new_choice': '',
+                  'code': ""})
+        basic_check_of_open_question(
+            self, response, open_question, "Niewłaściwy kod uwierzytelniający")
+
+
+class OpenQuestionTests(TestCase):
+    def test_creating_open_question(self):
+        open_question = OpenQuestion.objects.create(
+            question_text="OpenQuestion")
+        open_question.choice_set.create(choice_text="Odp1")
+        open_question.choice_set.create(choice_text="Odp2")
+        self.assertIs(len(open_question.choice_set.all()), 2)
+        open_question = map(str, open_question.choice_set.all())
+        self.assertIs(
+            'Odp1' in open_question and 'Odp2' in open_question, True)
+
+    def test_creating_empty_open_question(self):
+        open_question = OpenQuestion.objects.create(
+            question_text="OpenQuestion")
+        self.assertIs(len(open_question.choice_set.all()), 0)
+
+
 class SimpleQuestionTests(TestCase):
 
     def test_choices_count(self):
@@ -232,7 +359,6 @@ class SimpleQuestionTests(TestCase):
 
 
 class CodesTests(TestCase):
-
     def test_codes_number_and_length(self):
         codes = generate_codes(10, 10)
         self.assertEqual(len(codes), 10)
@@ -275,7 +401,8 @@ def create_moved_on_delta_minutes_question(start_point, name, start_delta,
     end_date = start_point + \
         datetime.timedelta(minutes=end_delta)
     create_question(name, 0, start_date, end_date)
-    
+
+
 class QuestionFormValidationTests(TestCase):
     """
     In this test case we use is_valid() function.
@@ -419,3 +546,83 @@ class QuestionFormValidationTests(TestCase):
         form = QuestionAdminForm(data=form_data)
 
         self.assertFalse(form.is_valid())
+<<<<<<< HEAD
+=======
+        
+
+class CodesViewsTests(TestCase):
+    def setUp(self):
+        User.objects.create_superuser(
+            'user1',
+            'user1@example.com',
+            'pswd',
+        )
+
+        self.q = Question.objects.create(question_text="question 1.")
+
+    def test_codes_html_view_as_superuser(self):
+        self.client.login(username="user1", password="pswd")
+        resp = self.client.get("/polls/" + str(self.q.id) + "/codes/",
+                               follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(
+            len(resp.context['codes_list']) == len(self.q.get_codes()))
+        self.client.logout()
+
+    def test_codes_pdf_view_as_superuser(self):
+        self.client.login(username="user1", password="pswd")
+        resp = self.client.get("/polls/" + str(self.q.id) + "/codes_pdf/",
+                               follow=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(
+            len(resp.context['codes_list']) == len(self.q.get_codes()))
+        self.client.logout()
+
+    def test_codes_html_view_as_user(self):
+        resp = self.client.get("polls/" + str(self.q.id) + "/codes",
+                               follow=True)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_codes_pdf_view_as_user(self):
+        resp = self.client.get("polls/" + str(self.q.id) + "/codes_pdf",
+                               follow=True)
+        self.assertEqual(resp.status_code, 404)
+
+
+class ReformatCodeTests(TestCase):
+    def test_short_code(self):
+        code = "OPA"
+        formated_code = reformat_code(code)
+        self.assertEqual(code, formated_code)
+
+    def test_code_without_separators(self):
+        code = "OPAFAJEMDEDJ"
+        formated_code = reformat_code(code)
+        self.assertEqual(code, formated_code)
+
+    def test_good_code_with_separators(self):
+        code = "IZ02-FW4Z"
+        code2 = "IZ02-FW4Z-HBQX-JWO"
+        formated_code = reformat_code(code)
+        formated_code2 = reformat_code(code2)
+        self.assertEqual("IZ02FW4Z", formated_code)
+        self.assertEqual("IZ02FW4ZHBQXJWO", formated_code2)
+
+    def test_wrong_code_with_separators(self):
+        code = "IZ02-FW4Z-"
+        code2 = "IZ-02-FW4Z-HBQX-JWO"
+        formated_code = reformat_code(code)
+        formated_code2 = reformat_code(code2)
+        self.assertEqual("", formated_code)
+        self.assertEqual("", formated_code2)
+
+
+class FormatCodeListTests(TestCase):
+    def test_format_codes_list(self):
+        codes_list = ["IZ02FW4Z", "IZPW", "IZP", "IZ0FW4GEI"]
+        formated_codes_list = format_codes_list(codes_list)
+        self.assertEqual("IZ02-FW4Z", formated_codes_list[0])
+        self.assertEqual("IZPW", formated_codes_list[1])
+        self.assertEqual("IZP", formated_codes_list[2])
+        self.assertEqual("IZ0F-W4GE-I", formated_codes_list[3])
+>>>>>>> 09d0ffdd83e8582715f1a9eaccbadd9b26dec76d
