@@ -128,7 +128,8 @@ def vote(request, question_id):
                  'is_open': is_open})
 
     if not choice and is_open:
-        if Choice.objects.filter(question__exact=question,choice_text__exact=new_choice).exists():
+        if Choice.objects.filter(question__exact=question,
+                                 choice_text__exact=new_choice).exists():
             choice = Choice.objects.filter(
                 question__exact=question, choice_text__exact=new_choice).last()
         else:
