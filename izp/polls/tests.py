@@ -324,16 +324,16 @@ class OpenQuestionVoteViewTests(TestCase):
         If the same open answer is written twice in two votes,
         it counts as one answer with two votes.
         """
-        new_question = OpenQuestion.objects.create(question_text="Open question")
+        new_question = OpenQuestion.objects.create(question_text="OpenQuest")
         new_question.save()
         url = reverse('polls:vote', args=(new_question.id,))
         password = new_question.accesscode_set.all()[0].code
         response = self.client.post(
-            url,{'code': password,
+            url,{'code': password, 
                  'new_choice': 'odpowiedz'})
         password = new_question.accesscode_set.all()[1].code
         response = self.client.post(
-            url,{'code': password,
+            url,{'code': password, 
                  'new_choice': 'odpowiedz'})
         self.assertIs(Choice.objects.all().count(), 1)
         self.assertIs(Choice.objects.all()[0].votes, 2)
@@ -343,16 +343,16 @@ class OpenQuestionVoteViewTests(TestCase):
         If two similar but not the same open answers are written in two votes,
         it counts as two different answers with one vote each.
         """
-        new_question = OpenQuestion.objects.create(question_text="Open question")
+        new_question = OpenQuestion.objects.create(question_text="OpenQuest")
         new_question.save()
         url = reverse('polls:vote', args=(new_question.id,))
         password = new_question.accesscode_set.all()[0].code
         response = self.client.post(
-            url,{'code': password,
+            url,{'code': password, 
                  'new_choice': 'odpowiedz2'})
         password = new_question.accesscode_set.all()[1].code
         response = self.client.post(
-            url,{'code': password,
+            url,{'code': password, 
                  'new_choice': 'odpowiedz'})
         self.assertIs(Choice.objects.all().count(), 2)
         for c in Choice.objects.all():
