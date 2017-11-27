@@ -329,12 +329,12 @@ class OpenQuestionVoteViewTests(TestCase):
         url = reverse('polls:vote', args=(new_question.id,))
         password = new_question.accesscode_set.all()[0].code
         response = self.client.post(
-            url,{'code': password, 
-                 'new_choice': 'odpowiedz'})
+            url, {'code': password,
+                  'new_choice': 'odpowiedz'})
         password = new_question.accesscode_set.all()[1].code
         response = self.client.post(
-            url,{'code': password, 
-                 'new_choice': 'odpowiedz'})
+            url, {'code': password,
+                  'new_choice': 'odpowiedz'})
         self.assertIs(Choice.objects.all().count(), 1)
         self.assertIs(Choice.objects.all()[0].votes, 2)
 
@@ -348,12 +348,12 @@ class OpenQuestionVoteViewTests(TestCase):
         url = reverse('polls:vote', args=(new_question.id,))
         password = new_question.accesscode_set.all()[0].code
         response = self.client.post(
-            url,{'code': password, 
-                 'new_choice': 'odpowiedz2'})
+            url, {'code': password,
+                  'new_choice': 'odpowiedz2'})
         password = new_question.accesscode_set.all()[1].code
         response = self.client.post(
-            url,{'code': password, 
-                 'new_choice': 'odpowiedz'})
+            url, {'code': password,
+                  'new_choice': 'odpowiedz'})
         self.assertIs(Choice.objects.all().count(), 2)
         for c in Choice.objects.all():
             self.assertIs(c.votes, 1)
