@@ -1,13 +1,20 @@
 from django import forms
 from .models import Question
 from django.utils import timezone
+import datetime
 
 
 class QuestionAdminForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = '__all__'
-    
+
+    """
+    When we try to create new Question
+    function clean() from  QuestionAdminForm in forms.py
+    check is our input data valid. If one of properties
+    is not valid than function add error to error list.
+    """
     def clean(self):
         question_text = self.cleaned_data.get('question_text')
         start_date = self.cleaned_data.get('start_date')
@@ -17,7 +24,7 @@ class QuestionAdminForm(forms.ModelForm):
             start_date = timezone.now()
         if not end_date:
             end_date = start_date + \
-            timezone.timedelta(minutes=time)
+            datetime.timedelta(minutes=time)
 
         if is_overlap(start_date):
             self.add_error('start_date',
@@ -36,8 +43,8 @@ class QuestionAdminForm(forms.ModelForm):
             self.add_error('end_date',
                            'Data okończenia ' +
                            'nakłada się z innym głosowaniem')
-            
-    
+
+
 def voting_between(start_date, end_date):
     contain = Question.objects.filter(
         start_date__gt=start_date,
@@ -47,8 +54,8 @@ def voting_between(start_date, end_date):
         return True
     else:
         return False
-    
-    
+
+
 def is_overlap(date):
     overlap_with = Question.objects.filter(
         start_date__lt=date,
@@ -58,6 +65,3 @@ def is_overlap(date):
         return True
     else:
         return False
-            
-            
-            
