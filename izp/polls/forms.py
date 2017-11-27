@@ -20,11 +20,13 @@ class QuestionAdminForm(forms.ModelForm):
         start_date = self.cleaned_data.get('start_date')
         end_date = self.cleaned_data.get('end_date')
         time = self.cleaned_data.get('time')
+        if not start_date and not end date:
+            start_date = timezone.now()
+            end_date = start_date + datetime.timedelta(minutes=time)
+        if not end_date:
+            end_date = start_date + datetime.timedelta(minutes=time)
         if not start_date:
             start_date = timezone.now()
-        if not end_date:
-            end_date = start_date + \
-            datetime.timedelta(minutes=time)
 
         if is_overlap(start_date):
             self.add_error('start_date',

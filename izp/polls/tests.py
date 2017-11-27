@@ -270,12 +270,11 @@ def create_question_form(name, start_date=0, end_date=0, time=0):
 def create_moved_on_delta_minutes_question(start_point, name, start_delta,
                                            end_delta):
 
-    start_date = start_point + \
-        datetime.timedelta(minutes=start_delta)
-    end_date = start_point + \
-        datetime.timedelta(minutes=end_delta)
+    start_date = start_point + datetime.timedelta(minutes=start_delta)
+    end_date = start_point + datetime.timedelta(minutes=end_delta)
     create_question(name, 0, start_date, end_date)
-    
+
+
 class QuestionFormValidationTests(TestCase):
     """
     In this test case we use is_valid() function.
@@ -299,16 +298,14 @@ class QuestionFormValidationTests(TestCase):
         """
 
         create_moved_on_delta_minutes_question(self.start_point,
-                                               'Q1',0,5)
+                                               'Q1', 0, 5)
 
         create_moved_on_delta_minutes_question(self.start_point,
-                                               'Q2',20,20)
-        
+                                               'Q2', 20, 20)
 
-        form_start_date = self.start_point + \
-        datetime.timedelta(minutes=10)
-        form_end_date = self.start_point + \
-        datetime.timedelta(minutes=15)
+
+        form_start_date = self.start_point + datetime.timedelta(minutes=10)
+        form_end_date = self.start_point + datetime.timedelta(minutes=15)
 
         form_data  = create_question_form(
             'Qe3',
@@ -319,7 +316,6 @@ class QuestionFormValidationTests(TestCase):
         form = QuestionAdminForm(data=form_data)
 
         self.assertTrue(form.is_valid())
-        
 
     def test_start_overlap(self):
         """
@@ -329,12 +325,10 @@ class QuestionFormValidationTests(TestCase):
         """
         
         create_moved_on_delta_minutes_question(self.start_point,
-                                               'Q1',0,5)
+                                               'Q1', 0, 5)
 
-        form_start_date = self.start_point + \
-        datetime.timedelta(minutes=3)
-        form_end_date = self.start_point + \
-        datetime.timedelta(minutes=8)
+        form_start_date = self.start_point + datetime.timedelta(minutes=3)
+        form_end_date = self.start_point + datetime.timedelta(minutes=8)
 
         form_data = create_question_form('Qe2',
                                          form_start_date,
@@ -342,7 +336,6 @@ class QuestionFormValidationTests(TestCase):
         form = QuestionAdminForm(data=form_data)
 
         self.assertFalse(form.is_valid())
-
 
     def test_end_overlap(self):
         """
@@ -353,10 +346,8 @@ class QuestionFormValidationTests(TestCase):
         create_moved_on_delta_minutes_question(self.start_point,
                                                'Q1', 0, 5)
 
-        form_start_date = self.start_point + \
-        datetime.timedelta(minutes=1)
-        form_end_date = self.start_point - \
-        datetime.timedelta(minutes=3)
+        form_start_date = self.start_point + datetime.timedelta(minutes=1)
+        form_end_date = self.start_point - datetime.timedelta(minutes=3)
 
         form_data = create_question_form('Qe2',
                                          form_start_date,
@@ -364,7 +355,6 @@ class QuestionFormValidationTests(TestCase):
         form = QuestionAdminForm(data=form_data)
 
         self.assertFalse(form.is_valid())
-
 
     def test_end_and_start_overlap(self):
         """
@@ -379,10 +369,8 @@ class QuestionFormValidationTests(TestCase):
         create_moved_on_delta_minutes_question(self.start_point,
                                                'Qe2', 7, 12)
 
-        form_start_date = self.start_point + \
-        datetime.timedelta(minutes=3)
-        form_end_date = self.start_point + \
-        datetime.timedelta(minutes=8)
+        form_start_date = self.start_point + datetime.timedelta(minutes=3)
+        form_end_date = self.start_point + datetime.timedelta(minutes=8)
 
         form_data = create_question_form(
             'Qe3',
@@ -393,7 +381,6 @@ class QuestionFormValidationTests(TestCase):
         form = QuestionAdminForm(data=form_data)
         self.assertFalse(form.is_valid())
 
-
     def test_voting_inside_voting_overlap(self):
         """
         Case when new question time range 1,7
@@ -403,10 +390,8 @@ class QuestionFormValidationTests(TestCase):
         create_moved_on_delta_minutes_question(self.start_point,
                                                'Qe1', 0, 8)
 
-        form_start_date = self.start_point + \
-        datetime.timedelta(minutes=1)
-        form_end_date = self.start_point + \
-        datetime.timedelta(minutes=7)
+        form_start_date = self.start_point + datetime.timedelta(minutes=1)
+        form_end_date = self.start_point + datetime.timedelta(minutes=7)
 
         form_data = create_question_form(
             'Qe2',
