@@ -5,7 +5,7 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from .models import Question, SimpleQuestion, OpenQuestion
+from .models import Question, SimpleQuestion, OpenQuestion, Choice
 from .codes import generate_codes
 from django.contrib.auth.models import User
 from .views import reformat_code, format_codes_list
@@ -318,6 +318,45 @@ class OpenQuestionVoteViewTests(TestCase):
                   'code': ""})
         basic_check_of_open_question(
             self, response, open_question, "Niewłaściwy kod uwierzytelniający")
+
+   def test_vote_same_open_answer_twice(self):
+        """
+        If the same open answer is written twice in two votes,
+        it counts as one answer with two votes.
+        """
+        new_question = OpenQuestion.objects.create(question_text="Open question")
+        new_question.save()
+        url = reverse('polls:vote', args=(new_question.id,))
+        password = new_question.accesscode_set.all()[0].code
+        response = self.client.post(
+            url,{'code': password,
+                 'new_choice': 'odpowiedz'})
+        password = new_question.accesscode_set.all()[1].code
+        response = self.client.post(
+            url,{'code': password,
+                 'new_choice': 'odpowiedz'})
+        self.assertIs(Choice.objects.all().count(), 1)
+        self.assertIs(Choice.objects.all()[0].votes, 2)
+
+    def test_vote_two_similar_answers(self):
+        """
+        If two similar but not the same open answers are written in two votes,
+        it counts as two different answers with one vote each.
+        """
+        new_question = OpenQuestion.objects.create(question_text="Open question")
+        new_question.save()
+        url = reverse('polls:vote', args=(new_question.id,))
+        password = new_question.accesscode_set.all()[0].code
+        response = self.client.post(
+            url,{'code': password,
+                 'new_choice': 'odpowiedz2'})
+        password = new_question.accesscode_set.all()[1].code
+        response = self.client.post(
+            url,{'code': password,
+                 'new_choice': 'odpowiedz'})
+        self.assertIs(Choice.objects.all().count(), 2)
+        for c in Choice.objects.all():
+            self.assertIs(c.votes, 1)
 
 
 class OpenQuestionTests(TestCase):
