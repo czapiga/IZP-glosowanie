@@ -319,7 +319,7 @@ class OpenQuestionVoteViewTests(TestCase):
         basic_check_of_open_question(
             self, response, open_question, "Niewłaściwy kod uwierzytelniający")
 
-   def test_vote_same_open_answer_twice(self):
+    def test_vote_same_open_answer_twice(self):
         """
         If the same open answer is written twice in two votes,
         it counts as one answer with two votes.
