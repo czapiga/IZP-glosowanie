@@ -57,7 +57,7 @@ class Question(models.Model):
 
 class SimpleQuestion(Question):
     """
-    Question with predefined answers Yes and No.
+    Question with predefined answers Tak and Nie.
     """
 
     def save(self, force_insert=False, force_update=False, using=None):
@@ -71,7 +71,7 @@ class SimpleQuestion(Question):
 
 class OpenQuestion(Question):
     """
-    Question to which voter may add custom answer.
+    Question to which voter may add new choice.
     """
 
     ...
