@@ -24,7 +24,18 @@ class QuestionAdmin(BaseQuestionAdmin):
     inlines = [ChoiceInline]
 
 
-admin.site.register(Poll)
+class SimpleQuestionInline(admin.StackedInline):
+    model = SimpleQuestion
+    extra = 2
+    vervose_name = "Simple questions"
+
+
+class PollAdmin(admin.ModelAdmin):
+    fields = ('poll_name',)
+    inlines = [SimpleQuestionInline]
+
+
+admin.site.register(Poll, PollAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(SimpleQuestion, BaseQuestionAdmin)
 admin.site.register(OpenQuestion, QuestionAdmin)
