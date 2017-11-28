@@ -271,7 +271,8 @@ class QuestionVoteViewTests(TestCase):
     def test_no_answer_for_question(self):
         question = Question.objects.get(question_text="Question")
         url = reverse('polls:vote', args=(question.id,))
-        response = self.client.post(url, {'code': question.poll.get_codes()[0]})
+        response = self.client.post(url,
+                                    {'code': question.poll.get_codes()[0]})
         basic_check_of_question(self, response, question,
                                 "Nie wybrano odpowiedzi")
 
@@ -388,21 +389,21 @@ class PollTests(TestCase):
 
     def test_adding_question(self):
         poll = create_poll("test-poll")
-        question = Question.objects.create(poll=poll,
-                                           question_text="test-question")
+        question = Question.objects.create(
+            poll=poll, question_text="test-question")
         self.assertIn(question, poll.question_set.all())
-    
+
     def test_adding_simple_question(self):
         poll = create_poll("test-poll")
-        question = SimpleQuestion.objects.create(poll=poll,
-                                           question_text="test-question")
+        question = SimpleQuestion.objects.create(
+            poll=poll, question_text="test-question")
         question_names = map(str, poll.question_set.all())
         self.assertIn(str(question), question_names)
-    
+
     def test_adding_open_question(self):
         poll = create_poll("test-poll")
-        question = OpenQuestion.objects.create(poll=poll,
-                                           question_text="test-question")
+        question = OpenQuestion.objects.create(
+            poll=poll, question_text="test-question")
         question_names = map(str, poll.question_set.all())
         self.assertIn(str(question), question_names)
 
