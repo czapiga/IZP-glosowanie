@@ -28,7 +28,9 @@ def detail(request, question_id):
 
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     return render(request, 'polls/detail.html',
-                  {'question': question, 'is_open': is_open, 'is_session': is_session})
+                  {'question': question,
+                   'is_open': is_open,
+                   'is_session': is_session})
 
 
 def format_codes_list(codes_list):
