@@ -87,10 +87,8 @@ def reformat_code(code):
 
 def logout(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    try:
+    if question_id in request.session:
         del request.session[question_id]
-    except KeyError:
-        pass
     return render(request, 'polls/index.html',
                   {'questions_list': Question.objects.order_by('-end_date',
                                                                '-start_date')})
