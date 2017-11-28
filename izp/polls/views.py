@@ -43,7 +43,7 @@ def format_codes_list(codes_list):
 
 
 def format_code(code):
-    return '-'.join([code[i:i+4] for i in range(0, len(code), 4)])
+    return '-'.join([code[i:i + 4] for i in range(0, len(code), 4)])
 
 
 def question_result(request, question_id):
@@ -75,14 +75,15 @@ def reformat_code(code):
 
     newCode = ""
     for l, c in enumerate(code):
-        if (l+1) % 5 == 0:
-            if l+1 == len(code) or code[l] != "-":
+        if (l + 1) % 5 == 0:
+            if l + 1 == len(code) or code[l] != "-":
                 return ''
         elif code[l] == "-":
             return ''
         else:
             newCode += c
     return newCode
+
 
 def logout(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -101,7 +102,6 @@ def logout(request, question_id):
     return render(request, 'polls/index.html',
                   {'questions_list': Question.objects.order_by('-end_date',
                                                                '-start_date')})
-
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
