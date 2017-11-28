@@ -18,7 +18,7 @@ def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     try:
         code = request.session[question_id]
-    except:
+    except KeyError:
         is_session = False
     else:
         is_session = True
@@ -64,7 +64,9 @@ def result(request, question_id):
                       'num_of_votes': code.counter,
                       'last_choice': last_choice})
     return render(request, 'polls/result.html',
-                  {'question': question, 'choices': choices, 'codes': codes})
+                  {'question': question,
+                   'choices': choices,
+                   'codes': codes})
 
 
 def reformat_code(code):
@@ -107,7 +109,7 @@ def vote(request, question_id):
 
     try:
         code = request.session[question_id]
-    except:
+    except KeyError:
         code = request.POST['code']
         code = reformat_code(code)
         if code == '' or not question.is_code_correct(code):
