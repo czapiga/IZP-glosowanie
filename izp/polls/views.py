@@ -17,7 +17,7 @@ def index(request):
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     try:
-        code = request.session['code']
+        code = request.session[question_id]
     except:
         is_session = False
     else:
@@ -82,6 +82,15 @@ def reformat_code(code):
             newCode += c
     return newCode
 
+def logout(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    try:
+        del request.session[question_id]
+    except KeyError:
+        pass
+    return render(request, 'polls/index.html',
+                  {'questions_list': Question.objects.order_by('-end_date',
+                                                               '-start_date')})
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -95,7 +104,7 @@ def vote(request, question_id):
                        'is_open': is_open})
 
     try:
-        code = request.session['code']
+        code = request.session[question_id]
     except:
         code = request.POST['code']
         code = reformat_code(code)
@@ -107,8 +116,10 @@ def vote(request, question_id):
                        'is_open': is_open,
                        'is_session': False})
         else:
-            request.session['code'] = code
+            request.session[question_id] = code
             is_session = True  
+    else:
+        is_session = True
 
     choice = request.POST.get('choice', None)
     new_choice = request.POST.get('new_choice', '')
