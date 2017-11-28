@@ -16,12 +16,10 @@ def index(request):
 
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    try:
-        code = request.session[question_id]
-    except KeyError:
-        is_session = False
-    else:
+    if question_id in request.session:
         is_session = True
+    else:
+        is_session = False
 
     if question.start_date > timezone.now() \
        or question.end_date < timezone.now():
@@ -87,10 +85,8 @@ def reformat_code(code):
 
 def logout(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    try:
+    if question_id in request.session:
         del request.session[question_id]
-    except KeyError:
-        pass
     return render(request, 'polls/index.html',
                   {'questions_list': Question.objects.order_by('-end_date',
                                                                '-start_date')})
@@ -107,9 +103,12 @@ def vote(request, question_id):
                        'error': "Głosowanie nie jest aktywne",
                        'is_open': is_open})
 
-    try:
-        code = request.session[question_id]
-    except KeyError:
+    if question_id in request.session:
+        is_session = True
+    else:
+        is_session = False
+
+    if not is_session:
         code = request.POST['code']
         code = reformat_code(code)
         if code == '' or not question.is_code_correct(code):
@@ -123,7 +122,7 @@ def vote(request, question_id):
             request.session[question_id] = code
             is_session = True
     else:
-        is_session = True
+        code = request.session[question_id]
 
     choice = request.POST.get('choice', None)
     new_choice = request.POST.get('new_choice', '')
