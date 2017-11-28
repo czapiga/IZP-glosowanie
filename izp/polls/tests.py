@@ -315,11 +315,13 @@ class OpenQuestionVoteViewTests(TestCase):
         url = reverse('polls:vote', args=(open_question.id,))
         password = open_question.get_codes()[0]
         response = self.client.post(
-            url, {'code': password,
+            url, {'is_open': True,
+                  'code': password,
                   'new_choice': 'odpowiedz2'})
         password = open_question.get_codes()[1]
         response = self.client.post(
-            url, {'code': password,
+            url, {'is_open': True,
+                  'code': password,
                   'new_choice': 'odpowiedz'})
         count1 = 0
         for c in Choice.objects.all():
