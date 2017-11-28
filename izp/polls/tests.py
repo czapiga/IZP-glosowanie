@@ -288,15 +288,17 @@ class OpenQuestionVoteViewTests(TestCase):
         If the same open answer is written twice in two votes,
         it counts as one answer with two votes.
         """
-        new_question = OpenQuestion.objects.get(question_text="OpenQuest")
-        url = reverse('polls:vote', args=(new_question.id,))
-        password = new_question.accesscode_set.all()[0].code
+        open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
+        url = reverse('polls:vote', args=(open_question.id,))
+        password = open_question.accesscode_set.all()[0].code
         response = self.client.post(
-            url, {'code': password,
+            url, {'is_open': True,
+                  'code': password,
                   'new_choice': 'odpowiedz'})
-        password = new_question.accesscode_set.all()[1].code
+        password = open_question.accesscode_set.all()[1].code
         response = self.client.post(
-            url, {'code': password,
+            url, {'is_open': True,
+                  'code': password,
                   'new_choice': 'odpowiedz'})
         self.assertIs(Choice.objects.all().count(), 3)
         self.assertIs(Choice.objects.all()[2].votes, 2)
@@ -306,13 +308,13 @@ class OpenQuestionVoteViewTests(TestCase):
         If two similar but not the same open answers are written in two votes,
         it counts as two different answers with one vote each.
         """
-        new_question = OpenQuestion.objects.get(question_text="OpenQuest")
-        url = reverse('polls:vote', args=(new_question.id,))
-        password = new_question.get_codes()[0]
+        open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
+        url = reverse('polls:vote', args=(open_question.id,))
+        password = open_question.get_codes()[0]
         response = self.client.post(
             url, {'code': password,
                   'new_choice': 'odpowiedz2'})
-        password = new_question.get_codes()[1]
+        password = open_question.get_codes()[1]
         response = self.client.post(
             url, {'code': password,
                   'new_choice': 'odpowiedz'})
