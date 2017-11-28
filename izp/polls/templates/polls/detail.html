@@ -20,12 +20,14 @@
             <input id="new_choice" name="new_choice" type="text" class="form-control" >
          </div>
          {% endif %}
-         <div class="form-group">
-            <label for="code">
-                Kod dostępu:
-            </label>
-            <input id="code" name="code" type="password" class="form-control" >
-         </div>
+         {% if not is_session %}
+           <div class="form-group">
+              <label for="code">
+                  Kod dostępu:
+              </label>
+              <input id="code" name="code" type="password" class="form-control" >
+           </div>
+         {% endif %}
          <button class="btn btn-primary">Głosuj</button>
       </form>
    </div>

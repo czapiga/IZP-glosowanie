@@ -16,16 +16,21 @@ def index(request):
 
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
+    try:
+        code = request.session['code']
+    except:
+        is_session = False
+    else:
+        is_session = True
+
     if question.start_date > timezone.now() \
        or question.end_date < timezone.now():
         return render(request, 'polls/detail.html', {
             'question': question, 'error': "Głosowanie nie jest aktywne"})
-    try:
-        openQuestion = OpenQuestion.objects.get(pk=question_id)
-    except OpenQuestion.DoesNotExist:
-        return render(request, 'polls/detail.html', {'question': question})
+
+    is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     return render(request, 'polls/detail.html',
-                  {'question': openQuestion, 'is_open': True})
+                  {'question': question, 'is_open': is_open, 'is_session': is_session})
 
 
 def format_codes_list(codes_list):
@@ -89,14 +94,21 @@ def vote(request, question_id):
                        'error': "Głosowanie nie jest aktywne",
                        'is_open': is_open})
 
-    code = request.POST['code']
-    code = reformat_code(code)
-    if code == '' or not question.is_code_correct(code):
-        return render(request,
+    try:
+        code = request.session['code']
+    except:
+        code = request.POST['code']
+        code = reformat_code(code)
+        if code == '' or not question.is_code_correct(code):
+            return render(request,
                       'polls/detail.html',
                       {'question': question,
                        'error': "Niewłaściwy kod uwierzytelniający",
-                       'is_open': is_open})
+                       'is_open': is_open,
+                       'is_session': False})
+        else:
+            request.session['code'] = code
+            is_session = True  
 
     choice = request.POST.get('choice', None)
     new_choice = request.POST.get('new_choice', '')
@@ -108,14 +120,16 @@ def vote(request, question_id):
                 'question': question,
                 'error': "Nie można głosować na istniejącą odpowiedź i \
                           jednocześnie proponować nową",
-                'is_open': is_open})
+                'is_open': is_open,
+                'is_session': is_session})
 
     if not choice and new_choice == '':
         return render(request, 'polls/detail.html',
                       {
                           'question': question,
                           'error': "Nie wybrano odpowiedzi",
-                          'is_open': is_open})
+                          'is_open': is_open,
+                          'is_session': is_session})
 
     if choice:
         if question.choice_set.filter(pk=choice).exists():
@@ -125,7 +139,8 @@ def vote(request, question_id):
                 request, 'polls/detail.html',
                 {'question': question,
                  'error': "Odpowiedź nie istnieje",
-                 'is_open': is_open})
+                 'is_open': is_open,
+                 'is_session': is_session})
 
     if not choice and is_open:
         choice = Choice.objects.create(
