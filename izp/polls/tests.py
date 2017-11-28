@@ -288,8 +288,7 @@ class OpenQuestionVoteViewTests(TestCase):
         If the same open answer is written twice in two votes,
         it counts as one answer with two votes.
         """
-        new_question = OpenQuestion.objects.create(question_text="OpenQuest")
-        new_question.save()
+        new_question = OpenQuestion.objects.get(question_text="OpenQuest")
         url = reverse('polls:vote', args=(new_question.id,))
         password = new_question.accesscode_set.all()[0].code
         response = self.client.post(
@@ -308,7 +307,6 @@ class OpenQuestionVoteViewTests(TestCase):
         it counts as two different answers with one vote each.
         """
         new_question = OpenQuestion.objects.get(question_text="OpenQuest")
-        new_question.save()
         url = reverse('polls:vote', args=(new_question.id,))
         password = new_question.get_codes()[0]
         response = self.client.post(
