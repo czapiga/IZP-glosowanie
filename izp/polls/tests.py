@@ -351,7 +351,6 @@ class OpenQuestionTests(TestCase):
 
 
 class SimpleQuestionTests(TestCase):
-
     def test_choices_count(self):
         poll = create_poll("test-poll")
         q = SimpleQuestion(poll=poll, question_text="Tak czy nie?")
@@ -371,6 +370,41 @@ class SimpleQuestionTests(TestCase):
         q.save()
         for choice in q.choice_set.all():
             self.assertIs(choice.votes, 0)
+
+
+class PollTests(TestCase):
+    def test_contains_codes(self):
+        poll = create_poll("test-poll")
+        codes = poll.get_codes()
+        self.assertTrue(codes)
+        self.assertEqual(len(codes), 82)
+        self.assertEqual(len(codes[0]), 8)
+
+    def test_is_code_correct(self):
+        poll = create_poll("test-poll")
+        codes = poll.get_codes()
+        for code in codes:
+            self.assertTrue(poll.is_code_correct(code))
+
+    def test_adding_question(self):
+        poll = create_poll("test-poll")
+        question = Question.objects.create(poll=poll,
+                                           question_text="test-question")
+        self.assertIn(question, poll.question_set.all())
+    
+    def test_adding_simple_question(self):
+        poll = create_poll("test-poll")
+        question = SimpleQuestion.objects.create(poll=poll,
+                                           question_text="test-question")
+        question_names = map(str, poll.question_set.all())
+        self.assertIn(str(question), question_names)
+    
+    def test_adding_open_question(self):
+        poll = create_poll("test-poll")
+        question = OpenQuestion.objects.create(poll=poll,
+                                           question_text="test-question")
+        question_names = map(str, poll.question_set.all())
+        self.assertIn(str(question), question_names)
 
 
 class CodesTests(TestCase):
