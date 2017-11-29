@@ -16,10 +16,7 @@ def index(request):
 
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    if question_id in request.session:
-        is_session = True
-    else:
-        is_session = False
+    is_session = question_id in request.session
 
     if question.start_date > timezone.now() \
        or question.end_date < timezone.now():
@@ -105,10 +102,7 @@ def vote(request, question_id):
                        'error': "Głosowanie nie jest aktywne",
                        'is_open': is_open})
 
-    if question_id in request.session:
-        is_session = True
-    else:
-        is_session = False
+    is_session = question_id in request.session
 
     if not is_session:
         code = request.POST['code']
