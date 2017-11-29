@@ -301,7 +301,7 @@ class OpenQuestionVoteViewTests(TestCase):
                   'code': password,
                   'new_choice': 'odpowiedz'})
         count2 = 0
-        for c in Choice.objects.all():
+        for c in open_question.choice_set.all():
             if c.votes == 2 and c.question.question_text == 'OpenQuestion':
                 count2 = count2 + 1
         self.assertIs(count2, 1)
@@ -324,11 +324,7 @@ class OpenQuestionVoteViewTests(TestCase):
                   'code': password,
                   'new_choice': 'odpowiedz'})
         count1 = 0
-        d = Choice.objects.filter(
-                question__exact=open_question, 
-                question_text__exact='OpenQuestion).last()
-        self.assertIs(d.votes, 2)
-        for c in Choice.objects.all():
+        for c in open_question.choice_set.all():
             if c.votes == 1 and c.question.question_text == 'OpenQuestion':
                 count1 = count1 + 1
         self.assertIs(count1, 2)
