@@ -5,7 +5,7 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from .models import Question, SimpleQuestion, OpenQuestion, Choice
+from .models import Question, SimpleQuestion, OpenQuestion
 from .codes import generate_codes
 from django.contrib.auth.models import User
 from .views import reformat_code, format_codes_list
@@ -302,7 +302,7 @@ class OpenQuestionVoteViewTests(TestCase):
                   'new_choice': 'odpowiedz'})
         count2 = 0
         for c in open_question.choice_set.all():
-            if c.votes == 2 and c.question.question_text == 'OpenQuestion':
+            if c.votes == 2:
                 count2 = count2 + 1
         self.assertIs(count2, 1)
 
@@ -325,7 +325,7 @@ class OpenQuestionVoteViewTests(TestCase):
                   'new_choice': 'odpowiedz'})
         count1 = 0
         for c in open_question.choice_set.all():
-            if c.votes == 1 and c.question.question_text == 'OpenQuestion':
+            if c.votes == 1:
                 count1 = count1 + 1
         self.assertIs(count1, 2)
 
