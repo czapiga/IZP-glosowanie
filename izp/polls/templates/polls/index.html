@@ -2,32 +2,20 @@
 {% block content %} 
    {% if questions_list %}
    <table class="table table-striped">
-      <caption><h3>Lista pytań</h3></caption>
+      <caption><h3>Lista ankiet</h3></caption>
       <thead>
          <tr>
-            <th>Głosowanie</th>
-            <th>Data</th>
+            <th>Ankieta</th>
             <th>Wynik</th>
-            <th>Kody</th>
-            <th>Kody w pdf</th>
          </tr>
       </thead>
       <tbody>
-         {% for question in questions_list %}
+         {% for poll in polls_list %}
          <tr>
-            <td>
-               <a href="{% url 'polls:detail' question.id %}">
-                  {{question.question_text}}
-               </a>
+            <td><a href="{% url 'polls:questions' poll.id %}">
+                  {{poll.poll_name}}</a>
             </td>
-            <td>{{question.start_date}} - {{question.end_date}}</td>
-            <td><a href="{% url 'polls:result' question.id %}">Wynik</a></td>
-            <td><a href="{% url 'polls:codes' question.id %}">
-               Wyświetl kody</a>
-            </td>
-            <td><a href="{% url 'polls:codes_pdf' question.id %}">
-               Pobierz kody w pdf</a>
-            </td>
+            <td><a href="{% url 'polls:poll_result' poll.id %}">Wynik</a></td>
          </tr>
          {% endfor %}
       </tbody>

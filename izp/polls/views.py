@@ -5,13 +5,12 @@ from django.utils import timezone
 from django.contrib.auth.decorators import user_passes_test
 from easy_pdf.rendering import render_to_pdf_response
 
-from .models import AccessCode, Choice, Question, Vote, OpenQuestion
+from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll
 
 
 def index(request):
     return render(request, 'polls/index.html',
-                  {'questions_list': Question.objects.order_by('-end_date',
-                                                               '-start_date')})
+                  {'polls_list': Poll.objects.all})
 
 
 def detail(request, question_id):
