@@ -68,13 +68,9 @@ def result(request, question_id):
 
 def is_vote_successful(question):
     codes = question.get_codes()
-    used_codes = Vote.objects.filter(
-        question__exact=question).values(
+    used_codes = Vote.objects.filter(question__exact=question).values(
         'code').distinct()
-    if len(used_codes) / len(codes) * 100 < 50:
-        return False
-    else:
-        return True
+    return len(used_codes) / len(codes) * 100 < 50
 
 
 def reformat_code(code):

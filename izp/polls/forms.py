@@ -48,22 +48,12 @@ class QuestionAdminForm(forms.ModelForm):
 
 
 def voting_between(start_date, end_date):
-    contain = Question.objects.filter(
+    return Question.objects.filter(
         start_date__gt=start_date,
-        end_date__lt=end_date
-    )
-    if contain:
-        return True
-    else:
-        return False
+        end_date__lt=end_date).exists()
 
 
 def is_overlap(date):
-    overlap_with = Question.objects.filter(
+    return Question.objects.filter(
         start_date__lt=date,
-        end_date__gt=date
-    )
-    if overlap_with:
-        return True
-    else:
-        return False
+        end_date__gt=date).exists()
