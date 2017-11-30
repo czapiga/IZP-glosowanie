@@ -33,7 +33,8 @@ class Poll(models.Model):
 
 
 class Question(models.Model):
-    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+    # default = <defaultPoll>
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, null=True)
     question_text = models.CharField('Pytanie', max_length=200)
     start_date = models.DateTimeField(
         'Data rozpoczęcia', blank=True, default=timezone.now)
@@ -88,7 +89,8 @@ class Choice(models.Model):
 
 
 class AccessCode(models.Model):
-    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+    # default = <defaultPoll>
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, null=True)
     code = models.CharField('Kod', max_length=8)
     counter = models.IntegerField('Liczba użyć', default=0)
 

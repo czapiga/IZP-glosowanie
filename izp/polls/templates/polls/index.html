@@ -1,6 +1,6 @@
 {% extends 'polls/base.html' %}
 {% block content %} 
-   {% if questions_list %}
+   {% if polls_list %}
    <table class="table table-striped">
       <caption><h3>Lista ankiet</h3></caption>
       <thead>
@@ -12,7 +12,7 @@
       <tbody>
          {% for poll in polls_list %}
          <tr>
-            <td><a href="{% url 'polls:questions' poll.id %}">
+            <td><a href="{% url 'polls:poll_detail' poll.id %}">
                   {{poll.poll_name}}</a>
             </td>
             <td><a href="{% url 'polls:poll_result' poll.id %}">Wynik</a></td>

@@ -3,7 +3,7 @@
 	
    <h1>{{ question.question_text }}</h1>
    <div class="col-sm-3">
-      <form action="{% url 'polls:vote' question.id %}" method="post">
+      <form action="{% url 'polls:vote' question.poll.id question.id %}" method="post">
       {% csrf_token %}
          {% for choice in question.choice_set.all %}
        	 <div class="radio">

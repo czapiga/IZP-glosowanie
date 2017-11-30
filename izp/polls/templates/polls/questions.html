@@ -16,16 +16,16 @@
          {% for question in questions_list %}
          <tr>
             <td>
-               <a href="{% url 'polls:detail' question.id %}">
+               <a href="{% url 'polls:question_detail' question.poll.id question.id %}">
                   {{question.question_text}}
                </a>
             </td>
             <td>{{question.start_date}} - {{question.end_date}}</td>
-            <td><a href="{% url 'polls:result' question.id %}">Wynik</a></td>
-            <td><a href="{% url 'polls:codes' question.id %}">
+            <td><a href="{% url 'polls:question_result' question.poll.id question.id %}">Wynik</a></td>
+            <td><a href="{% url 'polls:codes' question.poll.id question.id %}">
                Wyświetl kody</a>
             </td>
-            <td><a href="{% url 'polls:codes_pdf' question.id %}">
+            <td><a href="{% url 'polls:codes_pdf' question.poll.id question.id %}">
                Pobierz kody w pdf</a>
             </td>
          </tr>
