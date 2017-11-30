@@ -8,9 +8,16 @@ from easy_pdf.rendering import render_to_pdf_response
 from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll
 
 
-def index(request):
-    return render(request, 'polls/index.html',
+def poll_index(request):
+    return render(request, 'polls/poll_index.html',
                   {'polls_list': Poll.objects.all})
+
+
+def poll_detail(request, poll_id):
+    poll = get_object_or_404(Poll, pk=poll_id)
+    return render(request, 'polls/poll_detail.html',
+                  {'questions_list': Question.objects.filter(
+                      poll__exact=poll).order_by('-end_date', '-start_date')})
 
 
 def question_detail(request, poll_id, question_id):
@@ -23,7 +30,8 @@ def question_detail(request, poll_id, question_id):
     try:
         openQuestion = OpenQuestion.objects.get(pk=question_id)
     except OpenQuestion.DoesNotExist:
-        return render(request, 'polls/question_detail.html', {'question': question})
+        return render(request, 'polls/question_detail.html',
+                      {'question': question})
     return render(request, 'polls/question_detail.html',
                   {'question': openQuestion, 'is_open': True})
 
@@ -147,11 +155,6 @@ def vote(request, poll_id, question_id):
     Vote.objects.create(question=question, choice=choice, code=code)
     return HttpResponseRedirect(reverse('polls:poll_detail', args=(poll.id,)))
 
-def questions(request, poll_id):
-    poll = get_object_or_404(Poll, pk=poll_id)
-    return render(request, 'polls/questions.html',
-                  {'questions_list': Question.objects.filter
-                  (poll__exact=poll).order_by('-end_date', '-start_date')})
 
 @user_passes_test(lambda u: u.is_superuser)
 def codes(request, poll_id, question_id):

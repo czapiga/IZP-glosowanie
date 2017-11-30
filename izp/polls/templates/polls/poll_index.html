@@ -6,7 +6,6 @@
       <thead>
          <tr>
             <th>Ankieta</th>
-            <th>Wynik</th>
          </tr>
       </thead>
       <tbody>
@@ -15,7 +14,6 @@
             <td><a href="{% url 'polls:poll_detail' poll.id %}">
                   {{poll.poll_name}}</a>
             </td>
-            <td><a href="{% url 'polls:poll_result' poll.id %}">Wynik</a></td>
          </tr>
          {% endfor %}
       </tbody>
