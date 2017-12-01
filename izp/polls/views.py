@@ -150,7 +150,8 @@ def vote(request, question_id):
     code.counter += 1
     code.save()
     Vote.objects.create(question=question, choice=choice, code=code)
-    return HttpResponseRedirect(reverse('polls:poll_detail', args=(question.poll.id,)))
+    return HttpResponseRedirect(reverse('polls:poll_detail',
+                                        args=(question.poll.id,)))
 
 
 @user_passes_test(lambda u: u.is_superuser)
