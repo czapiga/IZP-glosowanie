@@ -20,9 +20,8 @@ def poll_detail(request, poll_id):
                       poll__exact=poll).order_by('-end_date', '-start_date')})
 
 
-def question_detail(request, poll_id, question_id):
-    poll = get_object_or_404(Poll, pk=poll_id)
-    question = get_object_or_404(Question, pk=question_id, poll__exact=poll)
+def question_detail(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
     if question.start_date > timezone.now() \
        or question.end_date < timezone.now():
         return render(request, 'polls/question_detail.html', {
@@ -47,9 +46,8 @@ def format_code(code):
     return '-'.join([code[i:i+4] for i in range(0, len(code), 4)])
 
 
-def question_result(request, poll_id, question_id):
-    poll = get_object_or_404(Poll, pk=poll_id)
-    question = get_object_or_404(Question, pk=question_id, poll__exact=poll)
+def question_result(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
     if timezone.now() < question.end_date:
         return render(request, 'polls/question_result.html',
                       {'error': 'Głosowanie jeszcze się nie zakończyło'})
@@ -87,9 +85,8 @@ def reformat_code(code):
     return newCode
 
 
-def vote(request, poll_id, question_id):
-    poll = get_object_or_404(Poll, pk=poll_id)
-    question = get_object_or_404(Question, pk=question_id, poll__exact=poll)
+def vote(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     if question.start_date > timezone.now() \
        or question.end_date < timezone.now():
@@ -153,21 +150,21 @@ def vote(request, poll_id, question_id):
     code.counter += 1
     code.save()
     Vote.objects.create(question=question, choice=choice, code=code)
-    return HttpResponseRedirect(reverse('polls:poll_detail', args=(poll.id,)))
+    return HttpResponseRedirect(reverse('polls:poll_detail', args=(question.poll.id,)))
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def codes(request, poll_id, question_id):
+def codes(request, poll_id):
     poll = get_object_or_404(Poll, pk=poll_id)
-    question = get_object_or_404(Question, pk=question_id, poll__exact=poll)
-    return render(request, 'polls/codesList.html',
+    question = get_object_or_404(Question, poll__exact=poll)
+    return render(request, 'polls/poll_codes_list.html',
                   {"codes_list": format_codes_list(question.poll.get_codes())})
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def codes_pdf(request, poll_id, question_id):
+def codes_pdf(request, poll_id):
     poll = get_object_or_404(Poll, pk=poll_id)
-    question = get_object_or_404(Question, pk=question_id, poll__exact=poll)
+    question = get_object_or_404(Question, poll__exact=poll)
     return render_to_pdf_response(
-        request, 'polls/codesList.html',
+        request, 'polls/poll_codes_list.html',
         {"codes_list": format_codes_list(question.poll.get_codes())})

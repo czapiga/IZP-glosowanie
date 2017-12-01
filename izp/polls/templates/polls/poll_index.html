@@ -6,6 +6,8 @@
       <thead>
          <tr>
             <th>Ankieta</th>
+            <th>Kody</th>
+            <th>Kody w pdf</th>
          </tr>
       </thead>
       <tbody>
@@ -13,6 +15,12 @@
          <tr>
             <td><a href="{% url 'polls:poll_detail' poll.id %}">
                   {{poll.poll_name}}</a>
+            </td>
+            <td><a href="{% url 'polls:codes' poll.id%}">
+               Wyświetl kody</a>
+            </td>
+            <td><a href="{% url 'polls:codes_pdf' poll.id %}">
+               Pobierz kody w pdf</a>
             </td>
          </tr>
          {% endfor %}

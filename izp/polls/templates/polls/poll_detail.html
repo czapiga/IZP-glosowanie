@@ -8,8 +8,6 @@
             <th>Głosowanie</th>
             <th>Data</th>
             <th>Wynik</th>
-            <th>Kody</th>
-            <th>Kody w pdf</th>
          </tr>
       </thead>
       <tbody>
@@ -22,12 +20,6 @@
             </td>
             <td>{{question.start_date}} - {{question.end_date}}</td>
             <td><a href="{% url 'polls:question_result' question.poll.id question.id %}">Wynik</a></td>
-            <td><a href="{% url 'polls:codes' question.poll.id question.id %}">
-               Wyświetl kody</a>
-            </td>
-            <td><a href="{% url 'polls:codes_pdf' question.poll.id question.id %}">
-               Pobierz kody w pdf</a>
-            </td>
          </tr>
          {% endfor %}
       </tbody>
