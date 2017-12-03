@@ -619,7 +619,7 @@ class QuestionFormValidationTests(TestCase):
         form_start_date = self.start_point
         form_end_date = self.start_point + datetime.timedelta(minutes=5)
 
-        form_data =  create_question_form(
+        form_data = create_question_form(
             'Qe2',
             form_start_date,
             form_end_date
@@ -627,7 +627,7 @@ class QuestionFormValidationTests(TestCase):
 
         form = QuestionAdminForm(data=form_data)
         self.assertFalse(form.is_valid())
-    
+
     def test_voting_with_end_date_less_than_start_date(self):
         """
         Case when question start_date > end_date

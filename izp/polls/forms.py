@@ -27,9 +27,9 @@ class QuestionAdminForm(forms.ModelForm):
             end_date = start_date + datetime.timedelta(minutes=time)
         if not start_date:
             start_date = timezone.now()
-        
+
         if start_date >= end_date:
-            self.add_error('end_date', 
+            self.add_error('end_date',
                            'Głosowanie nie odbędzie się ' +
                            'jeśli skończy się przed rozpoczęciem')
         if is_overlap(start_date):
