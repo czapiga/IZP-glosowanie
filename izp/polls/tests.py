@@ -45,7 +45,7 @@ class QuestionIndexViewTests(TestCase):
         Questions with a start_date in the past are displayed on the
         index page.
         """
-        past_time = timezone.now() + datetime.timedelta(days=-3)
+        past_time = timezone.now() + datetime.timedelta(days=-30)
         poll = Poll.objects.create()
         Question.objects.create(poll=poll, question_text="Past question",
                                 start_date=past_time)
@@ -76,7 +76,7 @@ class QuestionIndexViewTests(TestCase):
         Questions with a start_date in the future are displayed on the index
         page.
         """
-        future_time = timezone.now() + datetime.timedelta(days=3)
+        future_time = timezone.now() + datetime.timedelta(days=30)
         poll = Poll.objects.create()
         Question.objects.create(poll=poll, question_text="Future question",
                                 start_date=future_time)
@@ -91,8 +91,8 @@ class QuestionIndexViewTests(TestCase):
         """
         If both past and future questions exist, both are display.
         """
-        past_time = timezone.now() + datetime.timedelta(days=-3)
-        future_time = timezone.now() + datetime.timedelta(days=3)
+        past_time = timezone.now() + datetime.timedelta(days=-30)
+        future_time = timezone.now() + datetime.timedelta(days=30)
         poll = Poll.objects.create()
         Question.objects.create(poll=poll, question_text="Past question",
                                 start_date=past_time)
@@ -147,7 +147,7 @@ class QuestionIndexViewTests(TestCase):
         The questions index page may display short time questions.
         """
         time1 = timezone.now() + datetime.timedelta(minutes=6)
-        time2 = timezone.now() + datetime.timedelta(minutes=2)
+        time2 = timezone.now() + datetime.timedelta(minutes=3)
         time3 = timezone.now() + datetime.timedelta(minutes=5)
         poll = Poll.objects.create()
         Question.objects.create(poll=poll, question_text="Question 1",
