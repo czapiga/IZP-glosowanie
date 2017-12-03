@@ -12,6 +12,7 @@ from .views import reformat_code, format_codes_list
 from .forms import QuestionAdminForm
 from django.forms import ValidationError
 
+
 def create_question(question_text, days=0, start=0, end=0):
     """
     Create a question with the given `question_text` and published the
@@ -605,3 +606,40 @@ class QuestionFormValidationTests(TestCase):
         form = QuestionAdminForm(data=form_data)
 
         self.assertFalse(form.is_valid())
+
+    def test_voting_in_the_same_time_with_other(self):
+        """
+        Case when new question tome range 0,5
+        is in the same time with another with time range 0,5
+        """
+
+        create_moved_on_delta_minutes_question(self.start_point,
+                                               'Qe1', 0, 5)
+
+        form_start_date = self.start_point
+        form_end_date = self.start_point + datetime.timedelta(minutes=5)
+
+        form_data =  create_question_form(
+            'Qe2',
+            form_start_date,
+            form_end_date
+        )
+
+        form = QuestionAdminForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    
+    def test_voting_with_end_date_less_than_start_date(self):
+        """
+        Case when question start_date > end_date
+        """
+
+        form_start_date = self.start_point
+        form_end_date = self.start_point - datetime.timedelta(minutes=5)
+
+        form_data = create_question_form(
+            'Qe2',
+            form_start_date,
+            form_end_date
+        )
+
+        form = QuestionAdminForm(data=form_data)

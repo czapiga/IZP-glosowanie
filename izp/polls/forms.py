@@ -27,7 +27,11 @@ class QuestionAdminForm(forms.ModelForm):
             end_date = start_date + datetime.timedelta(minutes=time)
         if not start_date:
             start_date = timezone.now()
-
+        
+        if start_date >= end_date:
+            self.add_error('end_date', 
+                           'Głosowanie nie odbędzie się ' +
+                           'jeśli skończy się przed rozpoczęciem')
         if is_overlap(start_date):
             self.add_error('start_date',
                            'Data rozpoczęcia ' +
@@ -49,11 +53,11 @@ class QuestionAdminForm(forms.ModelForm):
 
 def voting_between(start_date, end_date):
     return Question.objects.filter(
-        start_date__gt=start_date,
-        end_date__lt=end_date).exists()
+        start_date__gte=start_date,
+        end_date__lte=end_date).exists()
 
 
 def is_overlap(date):
     return Question.objects.filter(
-        start_date__lt=date,
-        end_date__gt=date).exists()
+        start_date__lte=date,
+        end_date__gte=date).exists()
