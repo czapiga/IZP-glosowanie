@@ -58,8 +58,19 @@ def result(request, question_id):
         codes.append({'code': format_code(code.code),
                       'num_of_votes': code.counter,
                       'last_choice': last_choice})
+
     return render(request, 'polls/result.html',
-                  {'question': question, 'choices': choices, 'codes': codes})
+                  {'question': question,
+                   'choices': choices,
+                   'codes': codes,
+                   'success': is_vote_successful(question)})
+
+
+def is_vote_successful(question):
+    codes = question.get_codes()
+    used_codes = Vote.objects.filter(question__exact=question).values(
+        'code').distinct()
+    return len(used_codes) / len(codes) * 100 < 50
 
 
 def reformat_code(code):

@@ -25,11 +25,12 @@ class Question(models.Model):
                              self.start_date).total_seconds() / 60
             if not self.start_date:
                 self.start_date = timezone.now()
+
             if not self.end_date:
                 self.end_date = self.start_date + \
                     timezone.timedelta(minutes=self.time)
 
-        if self.start_date != self.end_date:  # TODO better error case handling
+        if self.start_date != self.end_date:
             super(Question, self).save(force_insert=force_insert,
                                        force_update=force_update,
                                        using=using)
@@ -112,4 +113,4 @@ class Vote(models.Model):
 
     def __str__(self):
         return self.question.question_text + ' ' + \
-            self.choice.choice_text + ' ' + self.code
+            self.choice.choice_text + ' ' + self.code.code

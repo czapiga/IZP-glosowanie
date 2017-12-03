@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import Choice, Question, SimpleQuestion, OpenQuestion
+from .forms import QuestionAdminForm
 
 
 class ChoiceInline(admin.TabularInline):
@@ -10,11 +11,7 @@ class ChoiceInline(admin.TabularInline):
 
 
 class BaseQuestionAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['question_text']}),
-        ('Termin głosowania', {'fields': ['start_date', 'end_date', 'time']}),
-    ]
-
+    form = QuestionAdminForm
     list_display = ('question_text', 'start_date', 'end_date')
     list_filter = ['start_date', 'end_date']
     verbose_name = 'Pytanie'
