@@ -14,5 +14,6 @@ urlpatterns = [
     url(r'^(?P<poll_id>[0-9]+)/codes/$', views.codes, name='codes'),
     url(r'^(?P<poll_id>[0-9]+)/codes_pdf/$',
         views.codes_pdf, name='codes_pdf'),
-    url(r'^[0-9]+/(?P<question_id>[0-9]+)/logout/$', views.logout, name='logout'),
+    url(r'^[0-9]+/(?P<question_id>[0-9]+)/logout/$',
+        views.logout, name='logout'),
 ]
