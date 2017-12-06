@@ -22,6 +22,7 @@ def poll_detail(request, poll_id):
 
 def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
+
     is_session = 'poll'+str(question.poll.id) in request.session
 
     if question.start_date > timezone.now() \
@@ -30,8 +31,11 @@ def question_detail(request, question_id):
             'question': question, 'error': "Głosowanie nie jest aktywne"})
 
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
+
     return render(request, 'polls/question_detail.html',
-                  {'question': question, 'is_open': is_open, 'is_session': is_session})
+                  {'question': question,
+                   'is_open': is_open,
+                   'is_session': is_session})
 
 
 def format_codes_list(codes_list):
@@ -64,6 +68,7 @@ def question_result(request, question_id):
         codes.append({'code': format_code(code.code),
                       'num_of_votes': code.counter,
                       'last_choice': last_choice})
+
     return render(request, 'polls/question_result.html',
                   {'question': question, 'choices': choices, 'codes': codes})
 
@@ -86,6 +91,7 @@ def reformat_code(code):
 
 def logout(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
+
     if 'poll'+str(question.poll.id) in request.session:
         del request.session['poll'+str(question.poll.id)]
     return render(request, 'polls/poll_detail.html',
