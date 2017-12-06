@@ -214,6 +214,8 @@ class ChoiceUniquenessTests(TestCase):
             url, {'is_open': True,
                   'code': password,
                   'new_choice': 'Odp'})
+
+        self.client.session.flush()
         password = question.poll.get_codes()[1]
         response = self.client.post(
             url, {'is_open': True,
@@ -235,6 +237,7 @@ class ChoiceUniquenessTests(TestCase):
             url, {'is_open': True,
                   'code': password,
                   'new_choice': 'odp3'})
+        self.client.session.flush()
         password = question.poll.get_codes()[1]
         response = self.client.post(
             url, {'is_open': True,
