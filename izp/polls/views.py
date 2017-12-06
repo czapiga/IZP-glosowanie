@@ -22,7 +22,7 @@ def poll_detail(request, poll_id):
 
 def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    is_session = question.poll.id in request.session
+    is_session = 'poll'+str(question.poll.id) in request.session
 
     if question.start_date > timezone.now() \
        or question.end_date < timezone.now():
@@ -86,11 +86,11 @@ def reformat_code(code):
 
 def logout(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    if question.poll.id in request.session:
-        del request.session[question.poll.id]
-    return render(request, 'polls/index.html',
-                  {'questions_list': Question.objects.order_by('-end_date',
-                                                               '-start_date')})
+    if 'poll'+str(question.poll.id) in request.session:
+        del request.session['poll'+str(question.poll.id)]
+    return render(request, 'polls/poll_detail.html',
+                  {'questions_list': Question.objects.filter(
+                      poll__exact=question.poll).order_by('-end_date', '-start_date')})
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -103,22 +103,24 @@ def vote(request, question_id):
                        'error': "Głosowanie nie jest aktywne",
                        'is_open': is_open})
 
-    is_session = question.poll.id in request.session
+    is_session = 'poll'+str(question.poll.id) in request.session
 
-    if not is_session:
-        code = reformat_code(request.POST['code'])
-        if code == '' or not question.poll.is_code_correct(code):
-            return render(request,
-                      'polls/question_detail.html',
-                      {'question': question,
-                       'error': "Niewłaściwy kod uwierzytelniający",
-                       'is_open': is_open,
-                       'is_session': is_session})
-        else:
-            request.session[question.poll.id] = code
-            is_session = True  
+    if is_session:
+        code = request.session['poll'+str(question.poll.id)]        
     else:
-        code = request.session[question.poll.id]
+        code = reformat_code(request.POST['code'])
+
+    if code == '' or not question.poll.is_code_correct(code):
+        return render(request,
+                  'polls/question_detail.html',
+                  {'question': question,
+                   'error': "Niewłaściwy kod uwierzytelniający",
+                   'is_open': is_open,
+                   'is_session': is_session})
+    else:
+        if not is_session:
+            request.session['poll'+str(question.poll.id)] = code
+            is_session = True
 
     choice = request.POST.get('choice', None)
     new_choice = request.POST.get('new_choice', '')
