@@ -96,7 +96,8 @@ def logout(request, question_id):
         del request.session['poll' + str(question.poll.id)]
     return render(request, 'polls/poll_detail.html',
                   {'questions_list': Question.objects.filter(
-                      poll__exact=question.poll).order_by('-end_date', '-start_date')})
+                      poll__exact=question.poll).order_by(
+                      '-end_date', '-start_date')})
 
 
 def vote(request, question_id):
