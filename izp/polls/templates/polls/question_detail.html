@@ -20,14 +20,20 @@
          </div>
          {% endif %}
          {% if not is_session %}
-           <div class="form-group">
-              <label for="code">
+            <div class="form-group">
+               <label for="code">
                   Kod dostępu:
-              </label>
-              <input id="code" name="code" type="password" class="form-control" >
-           </div>
+               </label>
+               <input id="code" name="code" type="password" class="form-control" >
+            </div>
          {% endif %}
          <button class="btn btn-primary">Głosuj</button>
+      </form>
+      <form action="{% url 'polls:logout' question.id %}" method="post">
+         {% csrf_token %}
+            {% if is_session %}
+            <button class="btn btn-primary">Zakończ sesję</button>
+            {% endif %}
       </form>
    </div>
 {% endblock %}
