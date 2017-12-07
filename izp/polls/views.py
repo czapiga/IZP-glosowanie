@@ -22,17 +22,20 @@ def poll_detail(request, poll_id):
 
 def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
+
+    is_session = 'poll' + str(question.poll.id) in request.session
+
     if question.start_date > timezone.now() \
        or question.end_date < timezone.now():
         return render(request, 'polls/question_detail.html', {
             'question': question, 'error': "Głosowanie nie jest aktywne"})
-    try:
-        openQuestion = OpenQuestion.objects.get(pk=question_id)
-    except OpenQuestion.DoesNotExist:
-        return render(request, 'polls/question_detail.html',
-                      {'question': question})
+
+    is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
+
     return render(request, 'polls/question_detail.html',
-                  {'question': openQuestion, 'is_open': True})
+                  {'question': question,
+                   'is_open': is_open,
+                   'is_session': is_session})
 
 
 def format_codes_list(codes_list):
@@ -43,7 +46,7 @@ def format_codes_list(codes_list):
 
 
 def format_code(code):
-    return '-'.join([code[i:i+4] for i in range(0, len(code), 4)])
+    return '-'.join([code[i:i + 4] for i in range(0, len(code), 4)])
 
 
 def question_result(request, question_id):
@@ -75,8 +78,8 @@ def reformat_code(code):
 
     newCode = ""
     for l, c in enumerate(code):
-        if (l+1) % 5 == 0:
-            if l+1 == len(code) or code[l] != "-":
+        if (l + 1) % 5 == 0:
+            if l + 1 == len(code) or code[l] != "-":
                 return ''
         elif code[l] == "-":
             return ''
@@ -85,24 +88,47 @@ def reformat_code(code):
     return newCode
 
 
+def logout(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+
+    if 'poll' + str(question.poll.id) in request.session:
+        del request.session['poll' + str(question.poll.id)]
+    return render(request, 'polls/poll_detail.html',
+                  {'questions_list': Question.objects.filter(
+                      poll__exact=question.poll).order_by(
+                      '-end_date', '-start_date')})
+
+
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
+    is_session = 'poll' + str(question.poll.id) in request.session
+
     if question.start_date > timezone.now() \
        or question.end_date < timezone.now():
         return render(request,
                       'polls/question_detail.html',
                       {'question': question,
                        'error': "Głosowanie nie jest aktywne",
-                       'is_open': is_open})
+                       'is_open': is_open,
+                       'is_session': is_session})
 
-    code = reformat_code(request.POST['code'])
+    if is_session:
+        code = request.session['poll' + str(question.poll.id)]
+    else:
+        code = reformat_code(request.POST['code'])
+
     if code == '' or not question.poll.is_code_correct(code):
         return render(request,
                       'polls/question_detail.html',
                       {'question': question,
                        'error': "Niewłaściwy kod uwierzytelniający",
-                       'is_open': is_open})
+                       'is_open': is_open,
+                       'is_session': is_session})
+    else:
+        if not is_session:
+            request.session['poll' + str(question.poll.id)] = code
+            is_session = True
 
     choice = request.POST.get('choice', None)
     new_choice = request.POST.get('new_choice', '')
@@ -114,14 +140,16 @@ def vote(request, question_id):
                 'question': question,
                 'error': "Nie można głosować na istniejącą odpowiedź i \
                           jednocześnie proponować nową",
-                'is_open': is_open})
+                'is_open': is_open,
+                'is_session': is_session})
 
     if not choice and new_choice == '':
         return render(request, 'polls/question_detail.html',
                       {
                           'question': question,
                           'error': "Nie wybrano odpowiedzi",
-                          'is_open': is_open})
+                          'is_open': is_open,
+                          'is_session': is_session})
 
     if choice:
         if question.choice_set.filter(pk=choice).exists():
@@ -131,7 +159,8 @@ def vote(request, question_id):
                 request, 'polls/question_detail.html',
                 {'question': question,
                  'error': "Odpowiedź nie istnieje",
-                 'is_open': is_open})
+                 'is_open': is_open,
+                 'is_session': is_session})
 
     if not choice and is_open:
         if Choice.objects.filter(question__exact=question,
