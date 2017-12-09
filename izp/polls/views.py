@@ -20,7 +20,7 @@ def poll_detail(request, poll_id):
     return render(request, 'polls/poll_detail.html',
                   {'poll': poll,
                    'questions_list': Question.objects.filter(
-                      poll__exact=poll).order_by('-end_date', '-start_date'),
+                       poll__exact=poll).order_by('-end_date', '-start_date'),
                    'is_session': is_session})
 
 
@@ -103,7 +103,7 @@ def logout(request, poll_id):
     poll = get_object_or_404(Poll, pk=poll_id)
 
     if 'poll' + str(poll_id) in request.session:
-        del request.session['poll' + str(poll_id)]  
+        del request.session['poll' + str(poll_id)]
 
     return HttpResponseRedirect(reverse('polls:poll_detail',
                                         args=(poll_id,)))
@@ -124,9 +124,8 @@ def login(request, poll_id):
     else:
         request.session['poll' + str(poll_id)] = code
 
-
         return HttpResponseRedirect(reverse('polls:poll_detail',
-                                        args=(poll_id,)))
+                                            args=(poll_id,)))
 
 
 def vote(request, question_id):
