@@ -15,14 +15,19 @@ def poll_index(request):
 
 def poll_detail(request, poll_id):
     poll = get_object_or_404(Poll, pk=poll_id)
+    is_session = 'poll' + str(poll_id) in request.session
+
     return render(request, 'polls/poll_detail.html',
-                  {'questions_list': Question.objects.filter(
-                      poll__exact=poll).order_by('-end_date', '-start_date')})
+                  {'poll': poll,
+                   'questions_list': Question.objects.filter(
+                      poll__exact=poll).order_by('-end_date', '-start_date'),
+                   'is_session': is_session})
 
 
 def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
 
+    is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
 
     if question.start_date > timezone.now() \
@@ -30,7 +35,13 @@ def question_detail(request, question_id):
         return render(request, 'polls/question_detail.html', {
             'question': question, 'error': "Głosowanie nie jest aktywne"})
 
-    is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
+    if not is_session:
+        return render(request,
+                      'polls/question_detail.html',
+                      {'question': question,
+                       'error': "Użytkownik niezalogowany",
+                       'is_open': is_open,
+                       'is_session': is_session})
 
     return render(request, 'polls/question_detail.html',
                   {'question': question,
@@ -88,15 +99,34 @@ def reformat_code(code):
     return newCode
 
 
-def logout(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
+def logout(request, poll_id):
+    poll = get_object_or_404(Poll, pk=poll_id)
 
-    if 'poll' + str(question.poll.id) in request.session:
-        del request.session['poll' + str(question.poll.id)]
-    return render(request, 'polls/poll_detail.html',
-                  {'questions_list': Question.objects.filter(
-                      poll__exact=question.poll).order_by(
-                      '-end_date', '-start_date')})
+    if 'poll' + str(poll_id) in request.session:
+        del request.session['poll' + str(poll_id)]  
+
+    return HttpResponseRedirect(reverse('polls:poll_detail',
+                                        args=(poll_id,)))
+
+
+def login(request, poll_id):
+    poll = get_object_or_404(Poll, pk=poll_id)
+    code = reformat_code(request.POST['code'])
+
+    if code == '' or not poll.is_code_correct(code):
+        return render(request, 'polls/poll_detail.html',
+                      {'poll': poll,
+                       'questions_list': Question.objects.filter(poll__exact=poll).order_by('-end_date', '-start_date'),
+                       'is_session': False,
+                       'error': "Niewłaściwy kod uwierzytelniający"
+                       })
+
+    else:
+        request.session['poll' + str(poll_id)] = code
+
+
+        return HttpResponseRedirect(reverse('polls:poll_detail',
+                                        args=(poll_id,)))
 
 
 def vote(request, question_id):
@@ -116,19 +146,12 @@ def vote(request, question_id):
     if is_session:
         code = request.session['poll' + str(question.poll.id)]
     else:
-        code = reformat_code(request.POST['code'])
-
-    if code == '' or not question.poll.is_code_correct(code):
         return render(request,
                       'polls/question_detail.html',
                       {'question': question,
-                       'error': "Niewłaściwy kod uwierzytelniający",
+                       'error': "Użytkownik niezalogowany",
                        'is_open': is_open,
                        'is_session': is_session})
-    else:
-        if not is_session:
-            request.session['poll' + str(question.poll.id)] = code
-            is_session = True
 
     choice = request.POST.get('choice', None)
     new_choice = request.POST.get('new_choice', '')

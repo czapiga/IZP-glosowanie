@@ -1,5 +1,24 @@
 {% extends 'polls/base.html' %}
 {% block content %}
+   {% if is_session %}
+   <form action="{% url 'polls:logout' poll.id %}" method="post">
+      {% csrf_token %}
+      <button class="btn btn-primary">Zakończ sesję</button>
+   </form>
+   {% else %}
+   <form action="{% url 'polls:login' poll.id %}" method="post">
+      {% csrf_token %}
+      <div class="form-group">
+         <div class="col-sm-3">
+            <label for="code">
+               Kod dostępu:
+            </label>
+            <input id="code" name="code" type="password" class="form-control" size="10">
+            <button class="btn btn-primary">Zaloguj</button>
+         </div>
+      </div>
+   </form>
+   {% endif %}
    {% if questions_list %}
    <table class="table table-striped">
       <caption><h3>Lista pytań</h3></caption>

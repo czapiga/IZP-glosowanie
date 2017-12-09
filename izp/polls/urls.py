@@ -12,8 +12,7 @@ urlpatterns = [
         views.question_result, name='question_result'),
     url(r'^[0-9]+/(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
     url(r'^(?P<poll_id>[0-9]+)/codes/$', views.codes, name='codes'),
-    url(r'^(?P<poll_id>[0-9]+)/codes_pdf/$',
-        views.codes_pdf, name='codes_pdf'),
-    url(r'^[0-9]+/(?P<question_id>[0-9]+)/logout/$',
-        views.logout, name='logout'),
+    url(r'^(?P<poll_id>[0-9]+)/codes_pdf/$', views.codes_pdf, name='codes_pdf'),
+    url(r'^(?P<poll_id>[0-9]+)/logout/$', views.logout, name='logout'),
+    url(r'^(?P<poll_id>[0-9]+)/login/$', views.login, name='login'),
 ]
