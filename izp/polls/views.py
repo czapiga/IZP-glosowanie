@@ -116,7 +116,8 @@ def login(request, poll_id):
     if code == '' or not poll.is_code_correct(code):
         return render(request, 'polls/poll_detail.html',
                       {'poll': poll,
-                       'questions_list': Question.objects.filter(poll__exact=poll).order_by('-end_date', '-start_date'),
+                       'questions_list': Question.objects.filter(
+                            poll__exact=poll).order_by('-end_date', '-start_date'),
                        'is_session': False,
                        'error': "Niewłaściwy kod uwierzytelniający"
                        })
