@@ -187,19 +187,6 @@ class QuestionVoteViewTests(TestCase):
         basic_check_of_question(self, response, question,
                                 "Nie wybrano odpowiedzi")
 
-    # I think we don't need this test now -
-    #    it is impossible to vote without being logged in
-    #
-    # def test_invalid_access_code(self):
-    #     question = Question.objects.get(question_text="Question")
-    #     url = reverse('polls:vote', args=(question.id,))
-    #     response = self.client.post(
-    #         url,
-    #         {'choice': question.choice_set.all().last().id,
-    #          'code': ""})
-    #     basic_check_of_question(self, response, question,
-    #                             "Niewłaściwy kod uwierzytelniający")
-
 
 class ChoiceUniquenessTests(TestCase):
     def setUp(self):
@@ -308,22 +295,6 @@ class OpenQuestionVoteViewTests(TestCase):
                                               + str(open_question.poll.id)]})
         basic_check_of_open_question(
             self, response, open_question, "Nie wybrano odpowiedzi")
-
-    # I think we don't need this test now
-    #   - it is impossible to vote without being logged in
-    #
-    # def test_invalid_access_code_for_open_question(self):
-    #     open_question = OpenQuestion.objects.get(
-    #       question_text="OpenQuestion")
-    #     url = reverse('polls:vote', args=(open_question.id,))
-    #     response = self.client.post(
-    #         url, {'is_open': True,
-    #               'choice': open_question.choice_set.all().last().id,
-    #               'new_choice': '',
-    #               'code': ""})
-    #     basic_check_of_open_question(
-    #         self, response, open_question,
-    #           "Niewłaściwy kod uwierzytelniający")
 
 
 class OpenQuestionTests(TestCase):
