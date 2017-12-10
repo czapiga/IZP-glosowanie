@@ -183,11 +183,11 @@ class QuestionVoteViewTests(TestCase):
         question = Question.objects.get(question_text="Question")
         url = reverse('polls:vote', args=(question.id,))
         response = self.client.post(url,
-            {'code': self.client.session['poll' + str(question.poll.id)]})
+                                    {'code': self.client.session['poll' + str(question.poll.id)]})
         basic_check_of_question(self, response, question,
                                 "Nie wybrano odpowiedzi")
 
-    # I think we don't need this test now - 
+    # I think we don't need this test now -
     #    it is impossible to vote without being logged in
     #
     # def test_invalid_access_code(self):
@@ -305,11 +305,11 @@ class OpenQuestionVoteViewTests(TestCase):
             url, {'is_open': True,
                   'new_choice': '',
                   'code': self.client.session['poll'
-                    + str(open_question.poll.id)]})
+                                              + str(open_question.poll.id)]})
         basic_check_of_open_question(
             self, response, open_question, "Nie wybrano odpowiedzi")
 
-    # I think we don't need this test now 
+    # I think we don't need this test now
     #   - it is impossible to vote without being logged in
     #
     # def test_invalid_access_code_for_open_question(self):
