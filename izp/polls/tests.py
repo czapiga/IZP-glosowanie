@@ -175,23 +175,29 @@ class QuestionVoteViewTests(TestCase):
         question.choice_set.create(choice_text="Odp1")
         question.choice_set.create(choice_text="Odp2")
 
+        s = self.client.session
+        s['poll' + str(question.poll.id)] = poll.get_codes()[0]
+        s.save()
+
     def test_no_answer_for_question(self):
         question = Question.objects.get(question_text="Question")
         url = reverse('polls:vote', args=(question.id,))
         response = self.client.post(url,
-                                    {'code': question.poll.get_codes()[0]})
+                                    {'code': self.client.session['poll' + str(question.poll.id)]})
         basic_check_of_question(self, response, question,
                                 "Nie wybrano odpowiedzi")
 
-    def test_invalid_access_code(self):
-        question = Question.objects.get(question_text="Question")
-        url = reverse('polls:vote', args=(question.id,))
-        response = self.client.post(
-            url,
-            {'choice': question.choice_set.all().last().id,
-             'code': ""})
-        basic_check_of_question(self, response, question,
-                                "Niewłaściwy kod uwierzytelniający")
+    # I think we don't need this test now - it is impossible to vote without being logged in
+    #
+    # def test_invalid_access_code(self):
+    #     question = Question.objects.get(question_text="Question")
+    #     url = reverse('polls:vote', args=(question.id,))
+    #     response = self.client.post(
+    #         url,
+    #         {'choice': question.choice_set.all().last().id,
+    #          'code': ""})
+    #     basic_check_of_question(self, response, question,
+    #                             "Niewłaściwy kod uwierzytelniający")
 
 
 class ChoiceUniquenessTests(TestCase):
@@ -208,20 +214,27 @@ class ChoiceUniquenessTests(TestCase):
         it counts as one answer with two votes.
         """
         question = OpenQuestion.objects.get(question_text="OpenQuestion")
+
+        s = self.client.session
+        s['poll' + str(question.poll.id)] = question.poll.get_codes()[0]
+        s.save()
+
         url = reverse('polls:vote', args=(question.id,))
-        password = question.poll.get_codes()[0]
+
         response = self.client.post(
             url, {'is_open': True,
-                  'code': password,
                   'new_choice': 'Odp'})
 
-        self.client.session.flush()
+        del s['poll' + str(question.poll.id)]
+        s.save()
 
-        password = question.poll.get_codes()[1]
+        s['poll' + str(question.poll.id)] = question.poll.get_codes()[1]
+        s.save()
+
         response = self.client.post(
             url, {'is_open': True,
-                  'code': password,
                   'new_choice': 'Odp'})
+
         self.assertIs(question.choice_set.filter(votes__exact=2).count(), 1)
         self.assertIs(question.choice_set.filter(votes__exact=0).count(), 2)
         self.assertIs(question.choice_set.all().count(), 3)
@@ -233,19 +246,25 @@ class ChoiceUniquenessTests(TestCase):
         """
         question = OpenQuestion.objects.get(question_text="OpenQuestion")
         url = reverse('polls:vote', args=(question.id,))
-        password = question.poll.get_codes()[0]
+
+        s = self.client.session
+        s['poll' + str(question.poll.id)] = question.poll.get_codes()[0]
+        s.save()
+
         response = self.client.post(
             url, {'is_open': True,
-                  'code': password,
                   'new_choice': 'odp3'})
 
-        self.client.session.flush()
+        del s['poll' + str(question.poll.id)]
+        s.save()
 
-        password = question.poll.get_codes()[1]
+        s['poll' + str(question.poll.id)] = question.poll.get_codes()[1]
+        s.save()
+
         response = self.client.post(
             url, {'is_open': True,
-                  'code': password,
                   'new_choice': '3odp'})
+
         self.assertIs(question.choice_set.filter(votes__exact=1).count(), 2)
         self.assertIs(question.choice_set.filter(votes__exact=0).count(), 2)
         self.assertIs(question.choice_set.all().count(), 4)
@@ -259,14 +278,18 @@ class OpenQuestionVoteViewTests(TestCase):
         open_question.choice_set.create(choice_text="Odp1")
         open_question.choice_set.create(choice_text="Odp2")
 
+        s = self.client.session
+        s['poll' + str(open_question.poll.id)] = poll.get_codes()[0]
+        s.save()
+
     def test_two_answers_for_open_question(self):
         open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
         url = reverse('polls:vote', args=(open_question.id,))
         response = self.client.post(
             url, {'is_open': True,
                   'choice': open_question.choice_set.all().last().id,
-                  'new_choice': "sth",
-                  'code': open_question.poll.get_codes()[0]})
+                  'new_choice': "sth"})
+
         basic_check_of_open_question(
             self,
             response,
@@ -280,20 +303,22 @@ class OpenQuestionVoteViewTests(TestCase):
         response = self.client.post(
             url, {'is_open': True,
                   'new_choice': '',
-                  'code': open_question.poll.get_codes()[0]})
+                  'code': self.client.session['poll' + str(open_question.poll.id)]})
         basic_check_of_open_question(
             self, response, open_question, "Nie wybrano odpowiedzi")
 
-    def test_invalid_access_code_for_open_question(self):
-        open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
-        url = reverse('polls:vote', args=(open_question.id,))
-        response = self.client.post(
-            url, {'is_open': True,
-                  'choice': open_question.choice_set.all().last().id,
-                  'new_choice': '',
-                  'code': ""})
-        basic_check_of_open_question(
-            self, response, open_question, "Niewłaściwy kod uwierzytelniający")
+    # I think we don't need this test now - it is impossible to vote without being logged in
+    #
+    # def test_invalid_access_code_for_open_question(self):
+    #     open_question = OpenQuestion.objects.get(question_text="OpenQuestion")
+    #     url = reverse('polls:vote', args=(open_question.id,))
+    #     response = self.client.post(
+    #         url, {'is_open': True,
+    #               'choice': open_question.choice_set.all().last().id,
+    #               'new_choice': '',
+    #               'code': ""})
+    #     basic_check_of_open_question(
+    #         self, response, open_question, "Niewłaściwy kod uwierzytelniający")
 
 
 class OpenQuestionTests(TestCase):
