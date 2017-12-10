@@ -183,7 +183,8 @@ class QuestionVoteViewTests(TestCase):
         question = Question.objects.get(question_text="Question")
         url = reverse('polls:vote', args=(question.id,))
         response = self.client.post(url,
-                                    {'code': self.client.session['poll' + str(question.poll.id)]})
+                                    {'code': self.client.session['poll' 
+                                                + str(question.poll.id)]})
         basic_check_of_question(self, response, question,
                                 "Nie wybrano odpowiedzi")
 
