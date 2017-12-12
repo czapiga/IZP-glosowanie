@@ -2,11 +2,13 @@
 {% block content %}
   {% if user.is_superuser %}
     {% if not poll.is_active %}
-    <form>
+    <form action="{% url 'polls:activate_poll' poll.id %}" method="post">
+      {% csrf_token %}
       <button class="btn btn-primary">Rozpocznij głosowanie</button>
     </form>
     {% else %}
-    <form>
+    <form action="{% url 'polls:deactivate_poll' poll.id %}" method="post">
+      {% csrf_token %}
       <button class="btn btn-primary">Zakończ głosowanie</button>
     </form>
     {% endif %}

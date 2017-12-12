@@ -30,7 +30,7 @@ def question_detail(request, question_id):
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
 
-    if not question.poll.is_active:
+    if not question.poll.active:
         return render(request, 'polls/question_detail.html', {
             'question': question, 'error': "Głosowanie nie jest aktywne"})
 
@@ -61,7 +61,7 @@ def format_code(code):
 
 def question_result(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    if timezone.now() < question.end_date:
+    if question.poll.active:
         return render(request, 'polls/question_result.html',
                       {'error': 'Głosowanie jeszcze się nie zakończyło'})
 
@@ -116,8 +116,7 @@ def login(request, poll_id):
         return render(request, 'polls/poll_detail.html',
                       {'poll': poll,
                        'questions_list': Question.objects.filter(
-                           poll__exact=poll).order_by('-end_date',
-                                                      '-start_date'),
+                           poll__exact=poll),
                        'is_session': False,
                        'error': "Niewłaściwy kod uwierzytelniający"
                        })
@@ -134,7 +133,7 @@ def vote(request, question_id):
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
 
-    if not question.poll.is_active:
+    if not question.poll.active:
         return render(request,
                       'polls/question_detail.html',
                       {'question': question,
@@ -223,3 +222,33 @@ def codes_pdf(request, poll_id):
     return render_to_pdf_response(
         request, 'polls/poll_codes_list.html',
         {"codes_list": format_codes_list(poll.get_codes())})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def activate_poll(request, poll_id):
+    poll = get_object_or_404(Poll, pk=poll_id)
+    active_polls = Poll.objects.filter(active=True)
+    
+    if active_polls:
+        return render(request, 'polls/poll_detail.html',
+                      {'poll': poll,
+                       'questions_list': Question.objects.filter(
+                           poll__exact=poll),
+                       'is_session': False,
+                       'error': "Aktywne inne głosowanie"
+                       })
+    
+    poll.active = True
+    poll.save()
+    return HttpResponseRedirect(reverse('polls:poll_detail',
+                                        args=(poll_id,)))
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def deactivate_poll(request, poll_id):
+    poll = get_object_or_404(Poll, pk=poll_id)
+    poll.active = False
+    poll.save()
+    
+    return HttpResponseRedirect(reverse('polls:poll_detail',
+                                        args=(poll_id,)))
