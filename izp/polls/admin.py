@@ -29,7 +29,7 @@ class SimpleQuestionInline(admin.StackedInline):
 
 
 class PollAdmin(admin.ModelAdmin):
-    fields = ('poll_name',)
+    fields = ('poll_name', 'date')
     inlines = [SimpleQuestionInline]
 
 
