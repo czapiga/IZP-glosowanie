@@ -1,31 +1,43 @@
 {% extends 'polls/base.html' %}
 {% block content %}
+  {% if user.is_superuser %}
+    {% if not poll.is_active %}
+    <form>
+      <button class="btn btn-primary">Rozpocznij głosowanie</button>
+    </form>
+    {% else %}
+    <form>
+      <button class="btn btn-primary">Zakończ głosowanie</button>
+    </form>
+    {% endif %}
+  {% endif %}
+
    {% if is_session %}
    <form action="{% url 'polls:logout' poll.id %}" method="post">
       {% csrf_token %}
       <button class="btn btn-primary">Zakończ sesję</button>
    </form>
    {% else %}
-   <form action="{% url 'polls:login' poll.id %}" method="post">
+    <form action="{% url 'polls:login' poll.id %}" method="post">
       {% csrf_token %}
       <div class="form-group">
-         <div class="col-sm-3">
-            <label for="code">
-               Kod dostępu:
-            </label>
-            <input id="code" name="code" type="password" class="form-control" size="10">
-            <button class="btn btn-primary">Zaloguj</button>
-         </div>
+          <div class="col-sm-3">
+              <label for="code">
+              Kod dostępu:
+              </label>
+              <input id="code" name="code" type="password" class="form-control" size="10">
+              <button class="btn btn-primary">Zaloguj</button>
+          </div>
       </div>
-   </form>
+    </form>
    {% endif %}
+
    {% if questions_list %}
    <table class="table table-striped">
       <caption><h3>Lista pytań</h3></caption>
       <thead>
          <tr>
             <th>Głosowanie</th>
-            <th>Data</th>
             <th>Wynik</th>
          </tr>
       </thead>
@@ -37,7 +49,6 @@
                   {{question.question_text}}
                </a>
             </td>
-            <td>{{question.start_date}} - {{question.end_date}}</td>
             <td><a href="{% url 'polls:question_result' question.id %}">Wynik</a></td>
          </tr>
          {% endfor %}
