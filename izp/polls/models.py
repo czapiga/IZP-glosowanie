@@ -44,8 +44,8 @@ class Question(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None):
         super(Question, self).save(force_insert=force_insert,
-                                    force_update=force_update,
-                                    using=using)
+                                   force_update=force_update,
+                                   using=using)
 
     def __str__(self):
         return self.question_text

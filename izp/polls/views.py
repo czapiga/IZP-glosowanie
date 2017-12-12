@@ -228,7 +228,7 @@ def codes_pdf(request, poll_id):
 def activate_question(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     active_question = Question.objects.filter(active=True)
-    
+
     if active_question:
         return render(request, 'polls/poll_detail.html',
                       {'poll': question.poll,
@@ -237,7 +237,7 @@ def activate_question(request, question_id):
                        'is_session': False,
                        'error': "Aktywne inne głosowanie"
                        })
-    
+
     question.active = True
     question.save()
     return HttpResponseRedirect(reverse('polls:poll_detail',
@@ -249,6 +249,6 @@ def deactivate_question(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     question.active = False
     question.save()
-    
+
     return HttpResponseRedirect(reverse('polls:poll_detail',
                                         args=(question.poll.id,)))

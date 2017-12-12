@@ -68,7 +68,7 @@ class PollDetailViewTests(TestCase):
             ['<Question: Question 3>',
              '<Question: Question 2>',
              '<Question: Question 1>'],
-             ordered=False
+            ordered=False
         )
 
 
