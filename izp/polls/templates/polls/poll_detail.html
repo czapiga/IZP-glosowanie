@@ -31,9 +31,9 @@
          <tr>
             <th>Głosowanie</th>
             <th>Wynik</th>
+            <th>Status</th>
 
             {% if user.is_superuser %}
-            <th>Status</th>
             <th>Zarządzanie</th>
             {% endif %}
 
@@ -48,9 +48,9 @@
                </a>
             </td>
             <td><a href="{% url 'polls:question_result' question.id %}">Wynik</a></td>
+            <td>{{question.active|yesno:"Aktywne,Nieaktywne"}}</td>
 
             {% if user.is_superuser %}
-            <td>{{question.active|yesno:"Aktywne,Nieaktywne"}}</td>
             <td>
                 {% if not question.active %}
                 <form action="{% url 'polls:activate_question' question.id %}" method="post">
