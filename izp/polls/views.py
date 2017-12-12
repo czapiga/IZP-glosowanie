@@ -20,7 +20,7 @@ def poll_detail(request, poll_id):
     return render(request, 'polls/poll_detail.html',
                   {'poll': poll,
                    'questions_list': Question.objects.filter(
-                       poll__exact=poll).order_by('-end_date', '-start_date'),
+                       poll__exact=poll),
                    'is_session': is_session})
 
 
@@ -30,8 +30,7 @@ def question_detail(request, question_id):
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
 
-    if question.start_date > timezone.now() \
-       or question.end_date < timezone.now():
+    if not question.poll.is_active:
         return render(request, 'polls/question_detail.html', {
             'question': question, 'error': "Głosowanie nie jest aktywne"})
 
@@ -135,8 +134,7 @@ def vote(request, question_id):
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
 
-    if question.start_date > timezone.now() \
-       or question.end_date < timezone.now():
+    if not question.poll.is_active:
         return render(request,
                       'polls/question_detail.html',
                       {'question': question,
