@@ -6,7 +6,6 @@ from .codes import generate_codes
 class Poll(models.Model):
     poll_name = models.CharField('Glosowanie', max_length=50)
     date = models.DateTimeField(default=timezone.now)
-    active = models.BooleanField(default=False)
 
     def save(self, force_insert=False, force_update=False, using=None):
         super(Poll, self).save(force_insert=force_insert,
@@ -41,6 +40,7 @@ class Question(models.Model):
 
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     question_text = models.CharField('Pytanie', max_length=200)
+    active = models.BooleanField(default=False)
 
     def save(self, force_insert=False, force_update=False, using=None):
         super(Question, self).save(force_insert=force_insert,

@@ -16,6 +16,8 @@ urlpatterns = [
         views.codes_pdf, name='codes_pdf'),
     url(r'^(?P<poll_id>[0-9]+)/logout/$', views.logout, name='logout'),
     url(r'^(?P<poll_id>[0-9]+)/login/$', views.login, name='login'),
-    url(r'^(?P<poll_id>[0-9]+)/activate/$', views.activate_poll, name='activate_poll'),
-    url(r'^(?P<poll_id>[0-9]+)/deactivate/$', views.deactivate_poll, name='deactivate_poll'),
+    url(r'^(?P<question_id>[0-9]+)/activate/$',
+        views.activate_question, name='activate_question'),
+    url(r'^(?P<question_id>[0-9]+)/deactivate/$',
+        views.deactivate_question, name='deactivate_question'),
 ]

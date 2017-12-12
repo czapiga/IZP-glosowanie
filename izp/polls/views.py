@@ -30,7 +30,7 @@ def question_detail(request, question_id):
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
 
-    if not question.poll.active:
+    if not question.active:
         return render(request, 'polls/question_detail.html', {
             'question': question, 'error': "Głosowanie nie jest aktywne"})
 
@@ -61,7 +61,7 @@ def format_code(code):
 
 def question_result(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    if question.poll.active:
+    if question.active:
         return render(request, 'polls/question_result.html',
                       {'error': 'Głosowanie jeszcze się nie zakończyło'})
 
@@ -133,7 +133,7 @@ def vote(request, question_id):
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
 
-    if not question.poll.active:
+    if not question.active:
         return render(request,
                       'polls/question_detail.html',
                       {'question': question,
@@ -225,30 +225,30 @@ def codes_pdf(request, poll_id):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def activate_poll(request, poll_id):
-    poll = get_object_or_404(Poll, pk=poll_id)
-    active_polls = Poll.objects.filter(active=True)
+def activate_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    active_question = Question.objects.filter(active=True)
     
-    if active_polls:
+    if active_question:
         return render(request, 'polls/poll_detail.html',
-                      {'poll': poll,
+                      {'poll': question.poll,
                        'questions_list': Question.objects.filter(
-                           poll__exact=poll),
+                           poll__exact=question.poll),
                        'is_session': False,
                        'error': "Aktywne inne głosowanie"
                        })
     
-    poll.active = True
-    poll.save()
+    question.active = True
+    question.save()
     return HttpResponseRedirect(reverse('polls:poll_detail',
-                                        args=(poll_id,)))
+                                        args=(question.poll.id,)))
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def deactivate_poll(request, poll_id):
-    poll = get_object_or_404(Poll, pk=poll_id)
-    poll.active = False
-    poll.save()
+def deactivate_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    question.active = False
+    question.save()
     
     return HttpResponseRedirect(reverse('polls:poll_detail',
-                                        args=(poll_id,)))
+                                        args=(question.poll.id,)))

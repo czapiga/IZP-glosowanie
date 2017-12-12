@@ -1,17 +1,7 @@
 {% extends 'polls/base.html' %}
 {% block content %}
   {% if user.is_superuser %}
-    {% if not poll.is_active %}
-    <form action="{% url 'polls:activate_poll' poll.id %}" method="post">
-      {% csrf_token %}
-      <button class="btn btn-primary">Rozpocznij głosowanie</button>
-    </form>
-    {% else %}
-    <form action="{% url 'polls:deactivate_poll' poll.id %}" method="post">
-      {% csrf_token %}
-      <button class="btn btn-primary">Zakończ głosowanie</button>
-    </form>
-    {% endif %}
+    
   {% endif %}
 
    {% if is_session %}
@@ -41,6 +31,12 @@
          <tr>
             <th>Głosowanie</th>
             <th>Wynik</th>
+
+            {% if user.is_superuser %}
+            <th>Status</th>
+            <th>Zarządzanie</th>
+            {% endif %}
+
          </tr>
       </thead>
       <tbody>
@@ -52,6 +48,24 @@
                </a>
             </td>
             <td><a href="{% url 'polls:question_result' question.id %}">Wynik</a></td>
+
+            {% if user.is_superuser %}
+            <td>{{question.active|yesno:"Aktywne,Nieaktywne"}}</td>
+            <td>
+                {% if not question.active %}
+                <form action="{% url 'polls:activate_question' question.id %}" method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-primary">Rozpocznij</button>
+                </form>
+                {% else %}
+                <form action="{% url 'polls:deactivate_question' question.id %}" method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-primary">Zakończ</button>
+                </form>
+                {% endif %}
+            </td>
+            {% endif %}
+
          </tr>
          {% endfor %}
       </tbody>
