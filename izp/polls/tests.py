@@ -33,7 +33,7 @@ class PollDetailViewTests(TestCase):
         """
         If no questions exist, an appropriate message is displayed.
         """
-        poll = Poll.objects.create(active=True)
+        poll = Poll.objects.create()
         response = self.client.get(reverse('polls:poll_detail',
                                            args=(poll.id,)))
         self.assertEqual(response.status_code, 200)
@@ -44,7 +44,7 @@ class PollDetailViewTests(TestCase):
         """
         The questions index view lists one question
         """
-        poll = Poll.objects.create(active=True)
+        poll = Poll.objects.create()
         Question.objects.create(poll=poll, question_text="Question")
         response = self.client.get(reverse('polls:poll_detail',
                                            args=(poll.id,)))
@@ -57,7 +57,7 @@ class PollDetailViewTests(TestCase):
         """
         The questions index view lists many questions.
         """
-        poll = Poll.objects.create(active=True)
+        poll = Poll.objects.create()
         Question.objects.create(poll=poll, question_text="Question 1")
         Question.objects.create(poll=poll, question_text="Question 2")
         Question.objects.create(poll=poll, question_text="Question 3")
@@ -77,15 +77,15 @@ class QuestionDetailViewTests(TestCase):
     Tests for Question detail view
     """
 
-    def test_active_poll_question(self):
-        poll = Poll.objects.create(active=True)
-        question = Question.objects.create(poll=poll)
+    def test_active_question(self):
+        poll = Poll.objects.create()
+        question = Question.objects.create(poll=poll, active=True)
         url = reverse('polls:question_detail', args=(question.id,))
         response = self.client.get(url)
         self.assertContains(response, question.question_text)
         self.assertNotContains(response, "Głosowanie nie jest aktywne")
 
-    def test_inactive_poll_question(self):
+    def test_inactive_question(self):
         poll = Poll.objects.create()
         question = Question.objects.create(poll=poll)
         url = reverse('polls:question_detail', args=(question.id,))
@@ -96,9 +96,9 @@ class QuestionDetailViewTests(TestCase):
 
 class OpenQuestionDetailViewTests(TestCase):
     def setUp(self):
-        poll = Poll.objects.create(active=True)
+        poll = Poll.objects.create()
         open_question = OpenQuestion.objects.create(
-            poll=poll, question_text="OpenQuestion")
+            poll=poll, question_text="OpenQuestion", active=True)
         open_question.choice_set.create(choice_text="Odp1")
         open_question.choice_set.create(choice_text="Odp2")
 
@@ -124,8 +124,9 @@ class OpenQuestionDetailViewTests(TestCase):
 
 class QuestionVoteViewTests(TestCase):
     def setUp(self):
-        poll = Poll.objects.create(active=True)
-        question = Question.objects.create(poll=poll, question_text='Question')
+        poll = Poll.objects.create()
+        question = Question.objects.create(
+            poll=poll, question_text='Question', active=True)
         question.choice_set.create(choice_text="Odp1")
         question.choice_set.create(choice_text="Odp2")
 
@@ -144,9 +145,9 @@ class QuestionVoteViewTests(TestCase):
 
 class ChoiceUniquenessTests(TestCase):
     def setUp(self):
-        poll = Poll.objects.create(active=True)
+        poll = Poll.objects.create()
         question = OpenQuestion.objects.create(
-            poll=poll, question_text="OpenQuestion")
+            poll=poll, question_text="OpenQuestion", active=True)
         question.choice_set.create(choice_text="Odp1")
         question.choice_set.create(choice_text="Odp2")
 
@@ -214,9 +215,9 @@ class ChoiceUniquenessTests(TestCase):
 
 class OpenQuestionVoteViewTests(TestCase):
     def setUp(self):
-        poll = Poll.objects.create(active=True)
+        poll = Poll.objects.create()
         open_question = OpenQuestion.objects.create(
-            poll=poll, question_text="OpenQuestion")
+            poll=poll, question_text="OpenQuestion", active=True)
         open_question.choice_set.create(choice_text="Odp1")
         open_question.choice_set.create(choice_text="Odp2")
 
