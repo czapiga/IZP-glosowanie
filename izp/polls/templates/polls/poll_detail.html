@@ -3,18 +3,20 @@
    {% if is_session %}
    <form action="{% url 'polls:logout' poll.id %}" method="post">
       {% csrf_token %}
-      <button class="btn btn-primary">Zakończ sesję</button>
+      <button class="btn btn-primary" style="margin-top:18px">Zakończ sesję</button>
    </form>
    {% else %}
    <form action="{% url 'polls:login' poll.id %}" method="post">
       {% csrf_token %}
       <div class="form-group">
          <div class="col-sm-3">
-            <label for="code">
+            <label for="code" style="margin-top:10px">
                Kod dostępu:
             </label>
-            <input id="code" name="code" type="password" class="form-control" size="10">
-            <button class="btn btn-primary">Zaloguj</button>
+            <div>
+               <input id="code" name="code" type="password" class="form-control" size="10">               
+            </div>
+            <button class="btn btn-primary" style="margin-top:7px" name="login_button">Zaloguj</button>
          </div>
       </div>
    </form>
