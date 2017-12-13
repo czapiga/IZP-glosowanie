@@ -85,7 +85,7 @@ def question_result(request, question_id):
 
 
 def is_vote_successful(codes):
-    return sum(code['num_of_votes'] for code in codes) / len(codes) * 100 > 50
+    return sum(code['num_of_votes'] for code in codes) / len(codes) * 100 >= 50
 
 
 def reformat_code(code):
