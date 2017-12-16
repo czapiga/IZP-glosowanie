@@ -9,8 +9,6 @@ from .models import Question, SimpleQuestion, OpenQuestion, Poll
 from .codes import generate_codes
 from django.contrib.auth.models import User
 from .views import reformat_code, format_codes_list
-from django.test import tag
-
 
 def basic_check_of_question(cls, response, quest, error=""):
     cls.assertContains(response, quest.question_text)
