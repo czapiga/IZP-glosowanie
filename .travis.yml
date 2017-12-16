@@ -8,5 +8,5 @@ script:
     - cd izp
     - python manage.py makemigrations
     - python manage.py migrate
-    - python manage.py test --exclude-tag=easy_pdf_test
+    - python manage.py test
     - pycodestyle . --exclude=polls/migrations

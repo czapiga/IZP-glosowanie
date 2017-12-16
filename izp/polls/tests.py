@@ -414,7 +414,6 @@ class CodesViewsTests(TestCase):
         self.q = OpenQuestion.objects.create(poll=self.poll,
                                              question_text="question 1")
 
-    @tag('easy_pdf_test')
     def test_codes_html_view_as_superuser(self):
         self.client.login(username="user1", password="pswd")
         url = reverse('polls:codes', args=(self.poll.id,))
@@ -424,7 +423,6 @@ class CodesViewsTests(TestCase):
             len(response.context['codes_list']) == len(self.poll.get_codes()))
         self.client.logout()
 
-    @tag('easy_pdf_test')
     def test_codes_pdf_view_as_superuser(self):
         self.client.login(username="user1", password="pswd")
         url = reverse('polls:codes_pdf', args=(self.poll.id,))
@@ -434,13 +432,11 @@ class CodesViewsTests(TestCase):
             len(response.context['codes_list']) == len(self.poll.get_codes()))
         self.client.logout()
 
-    @tag('easy_pdf_test')
     def test_codes_html_view_as_user(self):
         url = reverse('polls:codes', args=(self.poll.id,))
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 404)
 
-    @tag('easy_pdf_test')
     def test_codes_pdf_view_as_user(self):
         def test_codes_html_view_as_user(self):
             url = reverse('polls:codes_pdf', args=(self.poll.id,))

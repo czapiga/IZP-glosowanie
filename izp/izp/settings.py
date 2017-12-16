@@ -1,9 +1,14 @@
 import os
+import sys
+import logging
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '^6krs7tn!6g^8ag-nyth6801+^42f*eb@n8j%k)z^vvoe4bh77'
 DEBUG = True
 ALLOWED_HOSTS = []
+
+if len(sys.argv) > 1 and sys.argv[1] == 'test':
+    logging.disable(logging.CRITICAL)
 
 # Application definition
 
