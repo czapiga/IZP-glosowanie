@@ -77,7 +77,7 @@ def question_result(request, question_id):
         else:
             last_choice = '-'
         use_count = AccessCode.objects.filter(
-            poll__exact=question.poll, code__exact=code).last().counter    
+            poll__exact=question.poll, code__exact=code).last().counter
         codes.append({'code': format_code(code.code),
                       'num_of_votes': use_count,
                       'last_choice': last_choice})
