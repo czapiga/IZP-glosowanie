@@ -400,48 +400,48 @@ class CodesTests(TestCase):
             code = codes.pop()
             self.assertNotIn(code, codes)
 
-
-class CodesViewsTests(TestCase):
-    def setUp(self):
-        User.objects.create_superuser(
-            'user1',
-            'user1@example.com',
-            'pswd',
-        )
-
-        self.poll = Poll.objects.create()
-        self.q = OpenQuestion.objects.create(poll=self.poll,
-                                             question_text="question 1")
-
-    def test_codes_html_view_as_superuser(self):
-        self.client.login(username="user1", password="pswd")
-        url = reverse('polls:codes', args=(self.poll.id,))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(
-            len(response.context['codes_list']) == len(self.poll.get_codes()))
-        self.client.logout()
-
-    def test_codes_pdf_view_as_superuser(self):
-        self.client.login(username="user1", password="pswd")
-        url = reverse('polls:codes_pdf', args=(self.poll.id,))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(
-            len(response.context['codes_list']) == len(self.poll.get_codes()))
-        self.client.logout()
-
-    def test_codes_html_view_as_user(self):
-        url = reverse('polls:codes', args=(self.poll.id,))
-        response = self.client.get(url, follow=True)
-        self.assertEqual(response.status_code, 404)
-
-    def test_codes_pdf_view_as_user(self):
-        def test_codes_html_view_as_user(self):
-            url = reverse('polls:codes_pdf', args=(self.poll.id,))
-            response = self.client.get(url, follow=True)
-            self.assertEqual(response.status_code, 404)
-
+#
+# class CodesViewsTests(TestCase):
+#     def setUp(self):
+#         User.objects.create_superuser(
+#             'user1',
+#             'user1@example.com',
+#             'pswd',
+#         )
+#
+#         self.poll = Poll.objects.create()
+#         self.q = OpenQuestion.objects.create(poll=self.poll,
+#                                              question_text="question 1")
+#
+#     def test_codes_html_view_as_superuser(self):
+#         self.client.login(username="user1", password="pswd")
+#         url = reverse('polls:codes', args=(self.poll.id,))
+#         response = self.client.get(url)
+#         self.assertEqual(response.status_code, 200)
+#         self.assertTrue(
+#             len(response.context['codes_list']) == len(self.poll.get_codes()))
+#         self.client.logout()
+#
+#     def test_codes_pdf_view_as_superuser(self):
+#         self.client.login(username="user1", password="pswd")
+#         url = reverse('polls:codes_pdf', args=(self.poll.id,))
+#         response = self.client.get(url)
+#         self.assertEqual(response.status_code, 200)
+#         self.assertTrue(
+#             len(response.context['codes_list']) == len(self.poll.get_codes()))
+#         self.client.logout()
+#
+#     def test_codes_html_view_as_user(self):
+#         url = reverse('polls:codes', args=(self.poll.id,))
+#         response = self.client.get(url, follow=True)
+#         self.assertEqual(response.status_code, 404)
+#
+#     def test_codes_pdf_view_as_user(self):
+#         def test_codes_html_view_as_user(self):
+#             url = reverse('polls:codes_pdf', args=(self.poll.id,))
+#             response = self.client.get(url, follow=True)
+#             self.assertEqual(response.status_code, 404)
+#
 
 class ReformatCodeTests(TestCase):
     def test_short_code(self):
