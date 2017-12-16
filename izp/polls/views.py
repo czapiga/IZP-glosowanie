@@ -76,8 +76,10 @@ def question_result(request, question_id):
             last_choice = last_choice.choice.choice_text
         else:
             last_choice = '-'
+        use_count = AccessCode.objects.filter(
+            poll__exact=question.poll, code__exact=code).last().counter    
         codes.append({'code': format_code(code.code),
-                      'num_of_votes': code.counter,
+                      'num_of_votes': use_count,
                       'last_choice': last_choice})
     return render(request, 'polls/question_result.html',
                   {'question': question, 'choices': choices, 'codes': codes})
