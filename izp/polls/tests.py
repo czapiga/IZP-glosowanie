@@ -9,7 +9,6 @@ from .models import Question, SimpleQuestion, OpenQuestion, Poll
 from .codes import generate_codes
 from django.contrib.auth.models import User
 from .views import reformat_code, format_codes_list
-import sys
 import logging
 
 
@@ -414,7 +413,7 @@ class CodesViewsTests(TestCase):
         self.poll = Poll.objects.create()
         self.q = OpenQuestion.objects.create(poll=self.poll,
                                              question_text="question 1")
-        
+
     def tearDown(self):
         logging.disable(logging.NOTSET)
 
