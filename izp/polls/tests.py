@@ -9,6 +9,7 @@ from .models import Question, SimpleQuestion, OpenQuestion, Poll
 from .codes import generate_codes
 from django.contrib.auth.models import User
 from .views import reformat_code, format_codes_list
+import logging
 
 
 def basic_check_of_question(cls, response, quest, error=""):
@@ -408,10 +409,13 @@ class CodesViewsTests(TestCase):
             'user1@example.com',
             'pswd',
         )
-
+        logging.disable(logging.CRITICAL)
         self.poll = Poll.objects.create()
         self.q = OpenQuestion.objects.create(poll=self.poll,
                                              question_text="question 1")
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
 
     def test_codes_html_view_as_superuser(self):
         self.client.login(username="user1", password="pswd")
