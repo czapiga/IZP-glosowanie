@@ -20,7 +20,7 @@ def poll_detail(request, poll_id):
     return render(request, 'polls/poll_detail.html',
                   {'poll': poll,
                    'questions_list': Question.objects.filter(
-                       poll__exact=poll),
+                       poll__exact=poll).order_by('activation_time'),
                    'is_session': is_session})
 
 
@@ -116,7 +116,7 @@ def login(request, poll_id):
         return render(request, 'polls/poll_detail.html',
                       {'poll': poll,
                        'questions_list': Question.objects.filter(
-                           poll__exact=poll),
+                           poll__exact=poll).order_by('activation_time'),
                        'is_session': False,
                        'error': "Niewłaściwy kod uwierzytelniający"
                        })
@@ -235,7 +235,8 @@ def activate_question(request, question_id):
         return render(request, 'polls/poll_detail.html',
                       {'poll': question.poll,
                        'questions_list': Question.objects.filter(
-                           poll__exact=question.poll),
+                           poll__exact=question.poll).order_by(
+                           'activation_time'),
                        'is_session': is_session,
                        'error': "Aktywne inne głosowanie"
                        })
