@@ -1,14 +1,12 @@
 """
-Tests
+Tests for views
 """
 import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from .models import Question, SimpleQuestion, OpenQuestion, Poll
-from .codes import generate_codes
+from polls.models import Question, SimpleQuestion, OpenQuestion, Poll
 from django.contrib.auth.models import User
-from .views import reformat_code, format_codes_list
 
 
 def basic_check_of_question(cls, response, quest, error=""):
@@ -188,76 +186,6 @@ class QuestionVoteViewTests(TestCase):
                                 "Nie wybrano odpowiedzi")
 
 
-class ChoiceUniquenessTests(TestCase):
-    def setUp(self):
-        poll = Poll.objects.create()
-        question = OpenQuestion.objects.create(
-            poll=poll, question_text="OpenQuestion")
-        question.choice_set.create(choice_text="Odp1")
-        question.choice_set.create(choice_text="Odp2")
-
-    def test_vote_same_open_answer_twice(self):
-        """
-        If the same open answer is written twice in two votes,
-        it counts as one answer with two votes.
-        """
-        question = OpenQuestion.objects.get(question_text="OpenQuestion")
-
-        s = self.client.session
-        s['poll' + str(question.poll.id)] = question.poll.get_codes()[0]
-        s.save()
-
-        url = reverse('polls:vote', args=(question.id,))
-
-        response = self.client.post(
-            url, {'is_open': True,
-                  'new_choice': 'Odp'})
-
-        del s['poll' + str(question.poll.id)]
-        s.save()
-
-        s['poll' + str(question.poll.id)] = question.poll.get_codes()[1]
-        s.save()
-
-        response = self.client.post(
-            url, {'is_open': True,
-                  'new_choice': 'Odp'})
-
-        self.assertIs(question.choice_set.filter(votes__exact=2).count(), 1)
-        self.assertIs(question.choice_set.filter(votes__exact=0).count(), 2)
-        self.assertIs(question.choice_set.all().count(), 3)
-
-    def test_vote_two_similar_answers(self):
-        """
-        If two similar but not the same open answers are written in two votes,
-        it counts as two different answers with one vote each.
-        """
-        question = OpenQuestion.objects.get(question_text="OpenQuestion")
-        url = reverse('polls:vote', args=(question.id,))
-
-        s = self.client.session
-        s['poll' + str(question.poll.id)] = question.poll.get_codes()[0]
-        s.save()
-
-        response = self.client.post(
-            url, {'is_open': True,
-                  'new_choice': 'odp3'})
-
-        del s['poll' + str(question.poll.id)]
-        s.save()
-
-        s['poll' + str(question.poll.id)] = question.poll.get_codes()[1]
-        s.save()
-
-        response = self.client.post(
-            url, {'is_open': True,
-                  'new_choice': '3odp'})
-
-        self.assertIs(question.choice_set.filter(votes__exact=1).count(), 2)
-        self.assertIs(question.choice_set.filter(votes__exact=0).count(), 2)
-        self.assertIs(question.choice_set.all().count(), 4)
-
-
 class OpenQuestionVoteViewTests(TestCase):
     def setUp(self):
         poll = Poll.objects.create()
@@ -295,110 +223,6 @@ class OpenQuestionVoteViewTests(TestCase):
                                               + str(open_question.poll.id)]})
         basic_check_of_open_question(
             self, response, open_question, "Nie wybrano odpowiedzi")
-
-
-class OpenQuestionTests(TestCase):
-    def test_creating_open_question(self):
-        poll = Poll.objects.create()
-        open_question = OpenQuestion.objects.create(
-            poll=poll, question_text="OpenQuestion")
-        open_question.choice_set.create(choice_text="Odp1")
-        open_question.choice_set.create(choice_text="Odp2")
-        self.assertIs(len(open_question.choice_set.all()), 2)
-        open_question = map(str, open_question.choice_set.all())
-        self.assertIs(
-            'Odp1' in open_question and 'Odp2' in open_question, True)
-
-    def test_creating_empty_open_question(self):
-        poll = Poll.objects.create()
-        open_question = OpenQuestion.objects.create(
-            poll=poll, question_text="OpenQuestion")
-        self.assertIs(len(open_question.choice_set.all()), 0)
-
-
-class SimpleQuestionTests(TestCase):
-    def test_choices_count(self):
-        poll = Poll.objects.create()
-        q = SimpleQuestion(poll=poll, question_text="Tak czy nie?")
-        q.save()
-        self.assertIs(len(q.choice_set.all()), 2)
-
-    def test_choices_content(self):
-        poll = Poll.objects.create()
-        q = SimpleQuestion(poll=poll, question_text="Tak czy nie?")
-        q.save()
-        q = map(str, q.choice_set.all())
-        self.assertIs('Tak' in q and 'Nie' in q, True)
-
-    def test_initial_votes(self):
-        poll = Poll.objects.create()
-        q = SimpleQuestion(poll=poll, question_text="Tak czy nie?")
-        q.save()
-        for choice in q.choice_set.all():
-            self.assertIs(choice.votes, 0)
-
-
-class PollTests(TestCase):
-    def test_contains_codes(self):
-        poll = Poll.objects.create()
-        codes = poll.get_codes()
-        self.assertTrue(codes)
-        self.assertEqual(len(codes), 82)
-        self.assertEqual(len(codes[0]), 8)
-
-    def test_is_code_correct(self):
-        poll = Poll.objects.create()
-        codes = poll.get_codes()
-        for code in codes:
-            self.assertTrue(poll.is_code_correct(code))
-
-    def test_adding_question(self):
-        poll = Poll.objects.create()
-        question = Question.objects.create(
-            poll=poll, question_text="test-question")
-        self.assertIn(question, poll.question_set.all())
-
-    def test_adding_simple_question(self):
-        poll = Poll.objects.create()
-        question = SimpleQuestion.objects.create(
-            poll=poll, question_text="test-question")
-        question_names = map(str, poll.question_set.all())
-        self.assertIn(str(question), question_names)
-
-    def test_adding_open_question(self):
-        poll = Poll.objects.create()
-        question = OpenQuestion.objects.create(
-            poll=poll, question_text="test-question")
-        question_names = map(str, poll.question_set.all())
-        self.assertIn(str(question), question_names)
-
-
-class CodesTests(TestCase):
-    def test_codes_number_and_length(self):
-        codes = generate_codes(10, 10)
-        self.assertEqual(len(codes), 10)
-        for code in codes:
-            self.assertEqual(len(code), 10)
-
-    def test_codes_characters(self):
-        code = generate_codes(1, 1000)[0]
-        char_base = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        for char in code:
-            self.assertIn(char, char_base)
-
-    def test_codes_invalid_params(self):
-        try:
-            generate_codes(10, 1)
-        except ValueError:
-            return
-        else:
-            self.fail("Expected ValueError with given params")
-
-    def test_codes_uniqueness(self):
-        codes = generate_codes(100, 10)
-        while codes:
-            code = codes.pop()
-            self.assertNotIn(code, codes)
 
 
 class CodesViewsTests(TestCase):
@@ -441,41 +265,3 @@ class CodesViewsTests(TestCase):
             url = reverse('polls:codes_pdf', args=(self.poll.id,))
             response = self.client.get(url, follow=True)
             self.assertEqual(response.status_code, 404)
-
-
-class ReformatCodeTests(TestCase):
-    def test_short_code(self):
-        code = "OPA"
-        formated_code = reformat_code(code)
-        self.assertEqual(code, formated_code)
-
-    def test_code_without_separators(self):
-        code = "OPAFAJEMDEDJ"
-        formated_code = reformat_code(code)
-        self.assertEqual(code, formated_code)
-
-    def test_good_code_with_separators(self):
-        code = "IZ02-FW4Z"
-        code2 = "IZ02-FW4Z-HBQX-JWO"
-        formated_code = reformat_code(code)
-        formated_code2 = reformat_code(code2)
-        self.assertEqual("IZ02FW4Z", formated_code)
-        self.assertEqual("IZ02FW4ZHBQXJWO", formated_code2)
-
-    def test_wrong_code_with_separators(self):
-        code = "IZ02-FW4Z-"
-        code2 = "IZ-02-FW4Z-HBQX-JWO"
-        formated_code = reformat_code(code)
-        formated_code2 = reformat_code(code2)
-        self.assertEqual("", formated_code)
-        self.assertEqual("", formated_code2)
-
-
-class FormatCodeListTests(TestCase):
-    def test_format_codes_list(self):
-        codes_list = ["IZ02FW4Z", "IZPW", "IZP", "IZ0FW4GEI"]
-        formated_codes_list = format_codes_list(codes_list)
-        self.assertEqual("IZ02-FW4Z", formated_codes_list[0])
-        self.assertEqual("IZPW", formated_codes_list[1])
-        self.assertEqual("IZP", formated_codes_list[2])
-        self.assertEqual("IZ0F-W4GE-I", formated_codes_list[3])
