@@ -1,16 +1,12 @@
 {% extends 'polls/base.html' %}
 {% block content %}
-  {% if user.is_superuser %}
-    
-  {% endif %}
-
    {% if is_session %}
    <form action="{% url 'polls:logout' poll.id %}" method="post">
       {% csrf_token %}
       <button class="btn btn-primary" style="margin-top:18px">Zakończ sesję</button>
    </form>
    {% else %}
-    <form action="{% url 'polls:login' poll.id %}" method="post">
+   <form action="{% url 'polls:login' poll.id %}" method="post">
       {% csrf_token %}
       <div class="form-group">
          <div class="col-sm-3">
@@ -21,7 +17,7 @@
             <button class="btn btn-primary" style="margin-top:7px" name="login_button">Zaloguj</button>
          </div>
       </div>
-    </form>
+   </form>
    {% endif %}
 
    {% if questions_list %}
@@ -31,12 +27,6 @@
          <tr>
             <th>Głosowanie</th>
             <th>Wynik</th>
-            <th>Status</th>
-
-            {% if user.is_superuser %}
-            <th>Zarządzanie</th>
-            {% endif %}
-
          </tr>
       </thead>
       <tbody>
@@ -48,19 +38,18 @@
                </a>
             </td>
             <td><a href="{% url 'polls:question_result' question.id %}">Wynik</a></td>
-            <td>{{question.active|yesno:"Aktywne,Nieaktywne"}}</td>
 
             {% if user.is_superuser %}
             <td>
                 {% if not question.active %}
                 <form action="{% url 'polls:activate_question' question.id %}" method="post">
                   {% csrf_token %}
-                  <button class="btn btn-primary">Rozpocznij</button>
+                  <button class="btn btn-success">Rozpocznij</button>
                 </form>
                 {% else %}
                 <form action="{% url 'polls:deactivate_question' question.id %}" method="post">
                   {% csrf_token %}
-                  <button class="btn btn-primary">Zakończ</button>
+                  <button class="btn btn-danger">Zakończ</button>
                 </form>
                 {% endif %}
             </td>

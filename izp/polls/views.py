@@ -228,13 +228,14 @@ def codes_pdf(request, poll_id):
 def activate_question(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     active_question = Question.objects.filter(active=True)
+    is_session = 'poll' + str(question.poll.id) in request.session
 
     if active_question:
         return render(request, 'polls/poll_detail.html',
                       {'poll': question.poll,
                        'questions_list': Question.objects.filter(
                            poll__exact=question.poll),
-                       'is_session': False,
+                       'is_session': is_session,
                        'error': "Aktywne inne głosowanie"
                        })
 
