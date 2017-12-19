@@ -41,12 +41,12 @@
 
             {% if user.is_superuser %}
             <td>
-                {% if not question.active %}
+                {% if question.is_available and not question.is_active %}
                 <form action="{% url 'polls:activate_question' question.id %}" method="post">
                   {% csrf_token %}
                   <button class="btn btn-success">Rozpocznij</button>
                 </form>
-                {% else %}
+                {% elif question.is_active %}
                 <form action="{% url 'polls:deactivate_question' question.id %}" method="post">
                   {% csrf_token %}
                   <button class="btn btn-danger">Zakończ</button>

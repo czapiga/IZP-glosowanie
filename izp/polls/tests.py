@@ -79,7 +79,8 @@ class QuestionDetailViewTests(TestCase):
 
     def test_active_question(self):
         poll = Poll.objects.create()
-        question = Question.objects.create(poll=poll, active=True)
+        question = Question.objects.create(poll=poll)
+        question.activate()
         url = reverse('polls:question_detail', args=(question.id,))
         response = self.client.get(url)
         self.assertContains(response, question.question_text)
@@ -98,7 +99,8 @@ class OpenQuestionDetailViewTests(TestCase):
     def setUp(self):
         poll = Poll.objects.create()
         open_question = OpenQuestion.objects.create(
-            poll=poll, question_text="OpenQuestion", active=True)
+            poll=poll, question_text="OpenQuestion")
+        open_question.activate()
         open_question.choice_set.create(choice_text="Odp1")
         open_question.choice_set.create(choice_text="Odp2")
 
@@ -126,7 +128,8 @@ class QuestionVoteViewTests(TestCase):
     def setUp(self):
         poll = Poll.objects.create()
         question = Question.objects.create(
-            poll=poll, question_text='Question', active=True)
+            poll=poll, question_text='Question')
+        question.activate()
         question.choice_set.create(choice_text="Odp1")
         question.choice_set.create(choice_text="Odp2")
 
@@ -147,7 +150,8 @@ class ChoiceUniquenessTests(TestCase):
     def setUp(self):
         poll = Poll.objects.create()
         question = OpenQuestion.objects.create(
-            poll=poll, question_text="OpenQuestion", active=True)
+            poll=poll, question_text="OpenQuestion")
+        question.activate()
         question.choice_set.create(choice_text="Odp1")
         question.choice_set.create(choice_text="Odp2")
 
@@ -217,7 +221,8 @@ class OpenQuestionVoteViewTests(TestCase):
     def setUp(self):
         poll = Poll.objects.create()
         open_question = OpenQuestion.objects.create(
-            poll=poll, question_text="OpenQuestion", active=True)
+            poll=poll, question_text="OpenQuestion")
+        open_question.activate()
         open_question.choice_set.create(choice_text="Odp1")
         open_question.choice_set.create(choice_text="Odp2")
 

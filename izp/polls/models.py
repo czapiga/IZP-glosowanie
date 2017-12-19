@@ -41,10 +41,27 @@ class Question(models.Model):
 
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     question_text = models.CharField('Pytanie', max_length=200)
-    active = models.BooleanField(default=False)
+    activation_time = models.DateTimeField(null=True, blank=True)
+    deactivation_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.question_text
+
+    def is_available(self):
+        return not self.deactivation_time
+
+    def is_active(self):
+        return self.activation_time and not self.deactivation_time
+
+    def activate(self):
+        if self.is_available() and not self.is_active():
+            self.activation_time = timezone.now()
+            self.save()
+
+    def deactivate(self):
+        if self.is_active():
+            self.deactivation_time = timezone.now()
+            self.save()
 
 
 class SimpleQuestion(Question):

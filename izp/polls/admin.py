@@ -24,6 +24,7 @@ class QuestionAdmin(BaseQuestionAdmin):
 
 class SimpleQuestionInline(admin.StackedInline):
     model = SimpleQuestion
+    fields = ("question_text", )
     extra = 2
     vervose_name = "Simple questions"
 
