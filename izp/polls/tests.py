@@ -8,7 +8,7 @@ from django.urls import reverse
 from .models import Question, SimpleQuestion, OpenQuestion, Poll
 from .codes import generate_codes
 from django.contrib.auth.models import User
-from .views import reformat_code, format_codes_list
+from .views import reformat_code, format_codes_list, is_vote_successful
 
 
 def basic_check_of_question(cls, response, quest, error=""):
@@ -291,8 +291,8 @@ class OpenQuestionVoteViewTests(TestCase):
         response = self.client.post(
             url, {'is_open': True,
                   'new_choice': '',
-                  'code': self.client.session['poll'
-                                              + str(open_question.poll.id)]})
+                  'code': self.client.session['poll' +
+                                              str(open_question.poll.id)]})
         basic_check_of_open_question(
             self, response, open_question, "Nie wybrano odpowiedzi")
 
@@ -399,6 +399,38 @@ class CodesTests(TestCase):
         while codes:
             code = codes.pop()
             self.assertNotIn(code, codes)
+
+
+class ViewsIsVoteSuccessfulFunctionTest(TestCase):
+    def test_is_vote_successful_expected_false(self):
+        """
+        In the same way as in function quesion_result from views.py
+        we create list of dictionaries named codes,
+        but with only one key 'last_choice'.
+        voting is successful only if >= 50% was used
+        We don't need other keys to check is voting successful.
+        """
+        codes = [{'last_choice': '-'}, {'last_choice': '-'}]
+        self.assertFalse(is_vote_successful(codes))
+
+        codes = [{'last_choice': 'Tak'}, {'last_choice': '-'},
+                 {'last_choice': '-'}]
+        self.assertFalse(is_vote_successful(codes))
+
+        codes = []
+        self.assertFalse(is_vote_successful(codes))
+
+    def test_is_vote_successful_expected_true(self):
+        codes = [{'last_choice': 'Tak'}, {'last_choice': 'Nie'},
+                 {'last_choice': '-'}, {'last_choice': '-'}]
+        self.assertTrue(is_vote_successful(codes))
+
+        codes = [{'last_choice': 'Tak'}, {'last_choice': 'Nie'},
+                 {'last_choice': '-'}]
+        self.assertTrue(is_vote_successful(codes))
+
+        codes = [{'last_choice': 'Nie'}, {'last_choice': 'Tak'}]
+        self.assertTrue(is_vote_successful(codes))
 
 
 class CodesViewsTests(TestCase):
