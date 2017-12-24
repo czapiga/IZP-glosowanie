@@ -48,17 +48,39 @@ class Question(models.Model):
         return self.question_text
 
     def is_available(self):
+        """
+        Method checking if Question is available
+        (in other words - can be activated),
+        which is true if it has never been activated before.
+        """
+
         return not self.is_active() and not self.deactivation_time
 
     def is_active(self):
+        """
+        Method checking if Question is currently active,
+        which is true if it has been activated
+        and has not been deactivated yet.
+        """
+
         return self.activation_time and not self.deactivation_time
 
     def activate(self):
+        """
+        Method activates the Question
+        by setting activation time to current time.
+        """
+
         if self.is_available():
             self.activation_time = timezone.now()
             self.save()
 
     def deactivate(self):
+        """
+        Method deactivates the Question
+        by setting deactivation time to current time.
+        """
+
         if self.is_active():
             self.deactivation_time = timezone.now()
             self.save()
