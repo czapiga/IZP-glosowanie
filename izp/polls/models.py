@@ -48,13 +48,13 @@ class Question(models.Model):
         return self.question_text
 
     def is_available(self):
-        return not self.deactivation_time
+        return not self.is_active() and not self.deactivation_time
 
     def is_active(self):
         return self.activation_time and not self.deactivation_time
 
     def activate(self):
-        if self.is_available() and not self.is_active():
+        if self.is_available():
             self.activation_time = timezone.now()
             self.save()
 

@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils import timezone
 from django.contrib.auth.decorators import user_passes_test
 from easy_pdf.rendering import render_to_pdf_response
 
@@ -10,7 +9,7 @@ from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll
 
 def poll_index(request):
     return render(request, 'polls/poll_index.html',
-                  {'polls_list': Poll.objects.all})
+                  {'polls_list': Poll.objects.all.order_by('-date')})
 
 
 def poll_detail(request, poll_id):
@@ -20,7 +19,7 @@ def poll_detail(request, poll_id):
     return render(request, 'polls/poll_detail.html',
                   {'poll': poll,
                    'questions_list': Question.objects.filter(
-                       poll__exact=poll).order_by('activation_time'),
+                       poll__exact=poll).order_by('-activation_time'),
                    'is_session': is_session})
 
 
@@ -116,7 +115,7 @@ def login(request, poll_id):
         return render(request, 'polls/poll_detail.html',
                       {'poll': poll,
                        'questions_list': Question.objects.filter(
-                           poll__exact=poll).order_by('activation_time'),
+                           poll__exact=poll).order_by('-activation_time'),
                        'is_session': False,
                        'error': "Niewłaściwy kod uwierzytelniający"
                        })
@@ -236,7 +235,7 @@ def activate_question(request, question_id):
                       {'poll': question.poll,
                        'questions_list': Question.objects.filter(
                            poll__exact=question.poll).order_by(
-                           'activation_time'),
+                           '-activation_time'),
                        'is_session': is_session,
                        'error': "Aktywne inne głosowanie"
                        })
