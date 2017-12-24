@@ -13,6 +13,7 @@ class ChoiceUniquenessTests(TestCase):
             poll=poll, question_text="OpenQuestion")
         question.choice_set.create(choice_text="Odp1")
         question.choice_set.create(choice_text="Odp2")
+        question.activate()
 
     def test_vote_same_open_answer_twice(self):
         """
