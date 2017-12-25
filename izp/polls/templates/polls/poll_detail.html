@@ -34,7 +34,11 @@
          <tr>
             <td>
                <a href="{% url 'polls:question_detail' question.id %}">
+                  {% if question.is_active %}
+                  <strong>{{question.question_text}}</strong>
+                  {% else %}
                   {{question.question_text}}
+                  {% endif %}
                </a>
             </td>
             <td><a href="{% url 'polls:question_result' question.id %}">Wynik</a></td>
