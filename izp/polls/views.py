@@ -9,7 +9,7 @@ from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll
 
 def poll_index(request):
     return render(request, 'polls/poll_index.html',
-                  {'polls_list': Poll.objects.all.order_by('-date')})
+                  {'polls_list': Poll.objects.all().order_by('-date')})
 
 
 def poll_detail(request, poll_id):

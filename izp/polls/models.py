@@ -54,7 +54,7 @@ class Question(models.Model):
         which is true if it has never been activated before.
         """
 
-        return not self.is_active() and not self.deactivation_time
+        return not self.activation_time and not self.deactivation_time
 
     def is_active(self):
         """
