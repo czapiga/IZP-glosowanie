@@ -1,20 +1,23 @@
 {% extends 'polls/base.html' %}
 {% block content %}
    <h1>{{ question.question_text }}</h1>
-   {% if choices %}
+   
    <table class="table table-striped">
-       <caption>
-          <div class="row">
-             <div class="col-sm-4">
-                <h3>Wynik głosowania:</h3>    
-             </div>
-             {% if not successful %}
-             <div class="text-center text-info">
-                <h3>Głosowanie nieważne. Użyto mniej niż połowy kodów.</h3>
-             </div>
-             {% endif %} 
-          </div>
-		</caption>
+      <caption>
+         <div class="row">
+            <div class="col-sm-4">
+               <h3>Wynik głosowania:</h3>    
+            </div>
+            <div>
+               {% if successful %}
+               <h3 class="text-center text-success">Głosowanie ważne.</h3>
+               {% else %}
+               <h3 class="text-center text-danger">Głosowanie nieważne. Użyto mniej niż połowy kodów.</h3>
+               {% endif %}
+            </div>
+         </div>
+      </caption>
+      {% if choices %}
       <thead>
          <tr>
             <th>Odpowiedź</th>
