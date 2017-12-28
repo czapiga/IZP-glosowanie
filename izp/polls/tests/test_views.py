@@ -224,3 +224,35 @@ class CodesViewsTests(TestCase):
             url = reverse('polls:codes_pdf', args=(self.poll.id,))
             response = self.client.get(url, follow=True)
             self.assertEqual(response.status_code, 404)
+
+
+class ViewsIsVoteSuccessfulFunctionTest(TestCase):
+    def test_is_vote_successful_expected_false(self):
+        """
+        In the same way as in function quesion_result from views.py
+        we create list of dictionaries named codes,
+        but with only one key 'last_choice'.
+        voting is successful only if >= 50% was used
+        We don't need other keys to check is voting successful.
+        """
+        codes = [{'last_choice': '-'}, {'last_choice': '-'}]
+        self.assertFalse(is_vote_successful(codes))
+
+        codes = [{'last_choice': 'Tak'}, {'last_choice': '-'},
+                 {'last_choice': '-'}]
+        self.assertFalse(is_vote_successful(codes))
+
+        codes = []
+        self.assertFalse(is_vote_successful(codes))
+
+    def test_is_vote_successful_expected_true(self):
+        codes = [{'last_choice': 'Tak'}, {'last_choice': 'Nie'},
+                 {'last_choice': '-'}, {'last_choice': '-'}]
+        self.assertTrue(is_vote_successful(codes))
+
+        codes = [{'last_choice': 'Tak'}, {'last_choice': 'Nie'},
+                 {'last_choice': '-'}]
+        self.assertTrue(is_vote_successful(codes))
+
+        codes = [{'last_choice': 'Nie'}, {'last_choice': 'Tak'}]
+        self.assertTrue(is_vote_successful(codes))
