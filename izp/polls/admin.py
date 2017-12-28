@@ -11,12 +11,10 @@ class ChoiceInline(admin.TabularInline):
 
 class BaseQuestionAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['poll', 'question_text']}),
-        ('Termin głosowania', {'fields': ['start_date', 'end_date', 'time']}),
+        (None, {'fields': ['poll', 'question_text']})
     ]
 
-    list_display = ('question_text', 'start_date', 'end_date')
-    list_filter = ['start_date', 'end_date']
+    list_display = ('question_text', )
     verbose_name = 'Pytanie'
 
 
@@ -26,12 +24,13 @@ class QuestionAdmin(BaseQuestionAdmin):
 
 class SimpleQuestionInline(admin.StackedInline):
     model = SimpleQuestion
+    fields = ("question_text", )
     extra = 2
     vervose_name = "Simple questions"
 
 
 class PollAdmin(admin.ModelAdmin):
-    fields = ('poll_name',)
+    fields = ('poll_name', 'date')
     inlines = [SimpleQuestionInline]
 
 

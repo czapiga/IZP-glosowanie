@@ -19,13 +19,13 @@
       </div>
    </form>
    {% endif %}
+
    {% if questions_list %}
    <table class="table table-striped">
       <caption><h3>Lista pytań</h3></caption>
       <thead>
          <tr>
             <th>Głosowanie</th>
-            <th>Data</th>
             <th>Wynik</th>
          </tr>
       </thead>
@@ -34,11 +34,31 @@
          <tr>
             <td>
                <a href="{% url 'polls:question_detail' question.id %}">
+                  {% if question.is_active %}
+                  <strong>{{question.question_text}}</strong>
+                  {% else %}
                   {{question.question_text}}
+                  {% endif %}
                </a>
             </td>
-            <td>{{question.start_date}} - {{question.end_date}}</td>
             <td><a href="{% url 'polls:question_result' question.id %}">Wynik</a></td>
+
+            {% if user.is_superuser %}
+            <td>
+                {% if question.is_available %}
+                <form action="{% url 'polls:activate_question' question.id %}" method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-success">Rozpocznij</button>
+                </form>
+                {% elif question.is_active %}
+                <form action="{% url 'polls:deactivate_question' question.id %}" method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-danger">Zakończ</button>
+                </form>
+                {% endif %}
+            </td>
+            {% endif %}
+
          </tr>
          {% endfor %}
       </tbody>

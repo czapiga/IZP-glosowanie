@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 from django.utils import timezone
 from .codes import generate_codes
@@ -5,6 +6,7 @@ from .codes import generate_codes
 
 class Poll(models.Model):
     poll_name = models.CharField('Glosowanie', max_length=50)
+    date = models.DateField(default=date.today)
 
     def save(self, force_insert=False, force_update=False, using=None):
         super(Poll, self).save(force_insert=force_insert,
@@ -39,33 +41,49 @@ class Question(models.Model):
 
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     question_text = models.CharField('Pytanie', max_length=200)
-    start_date = models.DateTimeField(
-        'Data rozpoczęcia', blank=True, default=timezone.now)
-    end_date = models.DateTimeField('Data zakończenia', blank=True)
-    # TODO Remove time variable. We need it only as field in form based
-    # on which we can calculate end_date if user
-    # does not provide one
-    time = models.IntegerField('Czas na odpowiedź [minuty]', default=5)
-
-    def save(self, force_insert=False, force_update=False, using=None):
-        # TODO validate self.time variable
-        if not self.id:
-            if self.start_date and self.end_date:
-                self.time = (self.end_date -
-                             self.start_date).total_seconds() / 60
-            if not self.start_date:
-                self.start_date = timezone.now()
-            if not self.end_date:
-                self.end_date = self.start_date + \
-                    timezone.timedelta(minutes=self.time)
-
-        if self.start_date != self.end_date:  # TODO better error case handling
-            super(Question, self).save(force_insert=force_insert,
-                                       force_update=force_update,
-                                       using=using)
+    activation_time = models.DateTimeField(null=True, blank=True)
+    deactivation_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.question_text
+
+    def is_available(self):
+        """
+        Method checking if Question is available
+        (in other words - can be activated),
+        which is true if it has never been activated before.
+        """
+
+        return not self.activation_time and not self.deactivation_time
+
+    def is_active(self):
+        """
+        Method checking if Question is currently active,
+        which is true if it has been activated
+        and has not been deactivated yet.
+        """
+
+        return self.activation_time and not self.deactivation_time
+
+    def activate(self):
+        """
+        Method activates the Question
+        by setting activation time to current time.
+        """
+
+        if self.is_available():
+            self.activation_time = timezone.now()
+            self.save()
+
+    def deactivate(self):
+        """
+        Method deactivates the Question
+        by setting deactivation time to current time.
+        """
+
+        if self.is_active():
+            self.deactivation_time = timezone.now()
+            self.save()
 
 
 class SimpleQuestion(Question):

@@ -6,6 +6,7 @@
       <thead>
          <tr>
             <th>Ankieta</th>
+            <th>Data</th>
             <th>Kody</th>
             <th>Kody w pdf</th>
          </tr>
@@ -15,6 +16,9 @@
          <tr>
             <td><a href="{% url 'polls:poll_detail' poll.id %}">
                   {{poll.poll_name}}</a>
+            </td>
+            <td>
+                  {{poll.date}}
             </td>
             <td><a href="{% url 'polls:codes' poll.id %}">
                Wyświetl kody</a>
