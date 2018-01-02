@@ -5,7 +5,7 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from polls.models import Question, SimpleQuestion, OpenQuestion, Poll
+from polls.models import Question, SimpleQuestion, OpenQuestion, Vote, Poll
 from django.contrib.auth.models import User
 
 
