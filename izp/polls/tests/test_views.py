@@ -183,6 +183,65 @@ class OpenQuestionVoteViewTests(TestCase):
         basic_check_of_open_question(
             self, response, open_question, "Nie wybrano odpowiedzi")
 
+class QuestionResultsTests(TestCase):
+    def test_codes_count(self):
+        """
+        We create 2 questions and use the same code in question A 2 times,
+        while using the same code once for the other question.
+        The result when checking the question A results:
+        1 code used twice, the rest are unused.
+        """
+        poll = Poll.objects.create()
+        questionA = OpenQuestion.objects.create(
+            poll=poll, question_text="OpenQuestionA")
+        questionA.choice_set.create(choice_text="Odp1")
+        questionA.choice_set.create(choice_text="Odp2")
+        questionA.activate()
+
+        s = self.client.session
+        password = questionA.poll.get_codes()[0]
+        s['poll' + str(questionA.poll.id)] = password
+        s.save()
+
+        url = reverse('polls:vote', args=(questionA.id,))
+
+        response = self.client.post(
+            url, {'is_open': True,
+                  'new_choice': 'odp1'})
+        
+        s['poll' + str(questionA.poll.id)] = password
+        s.save()
+
+        response = self.client.post(
+            url, {'is_open': True,
+                  'new_choice': 'odp2'})
+
+        questionB = OpenQuestion.objects.create(
+            poll=poll, question_text="OpenQuestionA")
+        questionB.choice_set.create(choice_text="Odp1")
+        questionB.activate()
+
+        s = self.client.session
+        s['poll' + str(questionB.poll.id)] = password
+        s.save()
+        
+        url = reverse('polls:vote', args=(questionB.id,))
+
+        response = self.client.post(
+            url, {'is_open': True,
+                  'new_choice': 'odp'})
+        self.assertIs(Vote.objects.filter(
+            question__exact=questionA, counter__exact=1).count(),0)
+        self.assertIs(Vote.objects.filter(
+            question__exact=questionA, counter__exact=2).count(),1)
+        self.assertIs(Vote.objects.filter(
+            question__exact=questionA, counter__exact=3).count(),0)
+        self.assertIs(Vote.objects.filter(
+            question__exact=questionB, counter__exact=1).count(),1)
+        self.assertIs(Vote.objects.filter(
+            question__exact=questionB, counter__exact=2).count(),0)
+        self.assertIs(Vote.objects.filter(
+            question__exact=questionB, counter__exact=3).count(),0)
 
 class CodesViewsTests(TestCase):
     def setUp(self):
