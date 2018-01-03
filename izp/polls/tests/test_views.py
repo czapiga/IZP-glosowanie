@@ -244,7 +244,7 @@ class QuestionResultsTests(TestCase):
         self.assertIs(Vote.objects.filter(
             question__exact=questionB, counter__exact=3).count(), 0)
 
-        
+
 class CodesViewsTests(TestCase):
     def setUp(self):
         User.objects.create_superuser(
