@@ -183,6 +183,7 @@ class OpenQuestionVoteViewTests(TestCase):
         basic_check_of_open_question(
             self, response, open_question, "Nie wybrano odpowiedzi")
 
+
 class QuestionResultsTests(TestCase):
     def test_codes_count(self):
         """
@@ -208,7 +209,7 @@ class QuestionResultsTests(TestCase):
         response = self.client.post(
             url, {'is_open': True,
                   'new_choice': 'odp1'})
-        
+
         s['poll' + str(questionA.poll.id)] = password
         s.save()
 
@@ -224,25 +225,26 @@ class QuestionResultsTests(TestCase):
         s = self.client.session
         s['poll' + str(questionB.poll.id)] = password
         s.save()
-        
+
         url = reverse('polls:vote', args=(questionB.id,))
 
         response = self.client.post(
             url, {'is_open': True,
                   'new_choice': 'odp'})
         self.assertIs(Vote.objects.filter(
-            question__exact=questionA, counter__exact=1).count(),0)
+            question__exact=questionA, counter__exact=1).count(), 0)
         self.assertIs(Vote.objects.filter(
-            question__exact=questionA, counter__exact=2).count(),1)
+            question__exact=questionA, counter__exact=2).count(), 1)
         self.assertIs(Vote.objects.filter(
-            question__exact=questionA, counter__exact=3).count(),0)
+            question__exact=questionA, counter__exact=3).count(), 0)
         self.assertIs(Vote.objects.filter(
-            question__exact=questionB, counter__exact=1).count(),1)
+            question__exact=questionB, counter__exact=1).count(), 1)
         self.assertIs(Vote.objects.filter(
-            question__exact=questionB, counter__exact=2).count(),0)
+            question__exact=questionB, counter__exact=2).count(), 0)
         self.assertIs(Vote.objects.filter(
-            question__exact=questionB, counter__exact=3).count(),0)
+            question__exact=questionB, counter__exact=3).count(), 0)
 
+        
 class CodesViewsTests(TestCase):
     def setUp(self):
         User.objects.create_superuser(
