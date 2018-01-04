@@ -45,17 +45,20 @@
 
             {% if user.is_superuser %}
             <td>
-                {% if question.is_available %}
-                <form action="{% url 'polls:activate_question' question.id %}" method="post">
+               {% if question.is_available %}
+               <form action="{% url 'polls:activate_question' question.id %}" method="post">
                   {% csrf_token %}
                   <button class="btn btn-success">Rozpocznij</button>
-                </form>
-                {% elif question.is_active %}
-                <form action="{% url 'polls:deactivate_question' question.id %}" method="post">
+                  na
+                  <input name="time" type="text" size="4">
+                  min
+               </form>
+               {% elif question.is_active %}
+               <form action="{% url 'polls:deactivate_question' question.id %}" method="post">
                   {% csrf_token %}
                   <button class="btn btn-danger">Zakończ</button>
-                </form>
-                {% endif %}
+               </form>
+               {% endif %}
             </td>
             {% endif %}
 

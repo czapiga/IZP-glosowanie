@@ -152,7 +152,7 @@ def vote(request, question_id):
 
     choice = request.POST.get('choice', None)
     new_choice = request.POST.get('new_choice', '')
-    if(choice and new_choice != ''):
+    if choice and new_choice != '':
         return render(
             request,
             'polls/question_detail.html',
@@ -226,9 +226,24 @@ def codes_pdf(request, poll_id):
 @user_passes_test(lambda u: u.is_superuser)
 def activate_question(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
+    time = request.POST.get("time")
+
     active_questions = [question for question in Question.objects.all()
                         if question.is_active()]
     is_session = 'poll' + str(question.poll.id) in request.session
+
+    if time:
+        try:
+            time = int(time)
+        except ValueError:
+            return render(request, 'polls/poll_detail.html',
+                          {'poll': question.poll,
+                           'questions_list': Question.objects.filter(
+                               poll__exact=question.poll).order_by(
+                               '-activation_time'),
+                           'is_session': is_session,
+                           'error': "Zły format czasu"
+                           })
 
     if active_questions:
         return render(request, 'polls/poll_detail.html',
@@ -240,7 +255,7 @@ def activate_question(request, question_id):
                        'error': "Aktywne inne głosowanie"
                        })
 
-    question.activate()
+    question.activate(time)
 
     return HttpResponseRedirect(reverse('polls:poll_detail',
                                         args=(question.poll.id,)))
