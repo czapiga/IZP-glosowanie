@@ -2,7 +2,10 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import user_passes_test
-from easy_pdf.rendering import render_to_pdf_response
+from weasyprint import HTML
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+
 
 from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll
 
@@ -218,9 +221,18 @@ def codes(request, poll_id):
 @user_passes_test(lambda u: u.is_superuser)
 def codes_pdf(request, poll_id):
     poll = get_object_or_404(Poll, pk=poll_id)
-    return render_to_pdf_response(
-        request, 'polls/poll_codes_list.html',
-        {"codes_list": format_codes_list(poll.get_codes())})
+
+    # Rendered
+    html_string = render_to_string(
+        'polls/poll_codes_list.html',
+        {'codes_list': format_codes_list(poll.get_codes())})
+    html = HTML(string=html_string)
+
+    result = html.write_pdf()
+
+    response = HttpResponse(result, content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="home_page.pdf"'
+    return response
 
 
 @user_passes_test(lambda u: u.is_superuser)

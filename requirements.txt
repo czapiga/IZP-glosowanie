@@ -1,4 +1,3 @@
 pycodestyle
 django >= 1.11.6
-git+https://github.com/chrisglass/xhtml2pdf.git
-django-easy-pdf >= 0.1.1
+WeasyPrint
