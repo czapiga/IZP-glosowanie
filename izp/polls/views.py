@@ -232,6 +232,16 @@ def activate_question(request, question_id):
                         if question.is_active()]
     is_session = 'poll' + str(question.poll.id) in request.session
 
+    if active_questions:
+        return render(request, 'polls/poll_detail.html',
+                      {'poll': question.poll,
+                       'questions_list': Question.objects.filter(
+                           poll__exact=question.poll).order_by(
+                           '-activation_time'),
+                       'is_session': is_session,
+                       'error': "Aktywne inne głosowanie"
+                       })
+
     if time:
         try:
             time = int(time)
@@ -244,18 +254,9 @@ def activate_question(request, question_id):
                            'is_session': is_session,
                            'error': "Zły format czasu"
                            })
-
-    if active_questions:
-        return render(request, 'polls/poll_detail.html',
-                      {'poll': question.poll,
-                       'questions_list': Question.objects.filter(
-                           poll__exact=question.poll).order_by(
-                           '-activation_time'),
-                       'is_session': is_session,
-                       'error': "Aktywne inne głosowanie"
-                       })
-
-    question.activate(time)
+        question.activate(time)
+    else:
+        question.activate()
 
     return HttpResponseRedirect(reverse('polls:poll_detail',
                                         args=(question.poll.id,)))

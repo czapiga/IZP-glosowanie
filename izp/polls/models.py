@@ -65,19 +65,22 @@ class Question(models.Model):
 
         return ((self.activation_time and not self.deactivation_time)
                 or (self.activation_time
-                    and self.deactivation_time < timezone.now()))
+                    and self.deactivation_time > timezone.now()))
 
-    def activate(self, time=None):
+    def activate(self, minutes=None):
         """
         Method activates the Question
         by setting activation time to current time.
+        If time is specified,
+        the Question will be active for that many minutes.
         """
 
         if self.is_available():
             self.activation_time = timezone.now()
-            if time:
-                self.deactivation_time = (timezone.now()
-                                          + timezone.timedelta(minutes=time))
+            if minutes:
+                self.deactivation_time =\
+                    (self.activation_time
+                     + timezone.timedelta(minutes=minutes))
             self.save()
 
     def deactivate(self):
