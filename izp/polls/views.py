@@ -85,8 +85,9 @@ def question_result(request, question_id):
 def is_vote_successful(codes):
     if len(codes) == 0:
         return False
-    return sum(1 for code in codes
-               if code['last_choice'] != '-') / len(codes) * 100 >= 50
+    return (len(filter(
+            lambda code: code.get('last_choice') != '-', codes))
+            / len(codes) * 100 >= 50)
 
 
 def reformat_code(code):
