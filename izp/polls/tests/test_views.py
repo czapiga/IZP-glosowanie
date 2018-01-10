@@ -206,7 +206,7 @@ class CodesViewsTests(TestCase):
         self.client.logout()
 
     def test_codes_pdf_view_as_superuser(self):
-        # logging.disable(logging.CRITICAL)
+        logging.disable(logging.CRITICAL)
         self.client.login(username="user1", password="pswd")
         url = reverse('polls:codes_pdf', args=(self.poll.id,))
         response = self.client.get(url)
