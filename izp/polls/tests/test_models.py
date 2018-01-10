@@ -91,56 +91,34 @@ class QuestionTests(TestCase):
     def test_is_available(self):
         question = Question.objects.get(question_text="test-question")
         self.assertTrue(question.is_available())
-        question.activation_time = timezone.now()
+        question.activate()
         self.assertFalse(question.is_available())
-        question.deactivation_time = timezone.now()
+        question.deactivate()
         self.assertFalse(question.is_available())
 
     def test_is_active_no_deactivation_time(self):
         question = Question.objects.get(question_text="test-question")
         self.assertFalse(question.is_active())
-        question.activation_time = timezone.now()
+        question.activate()
         self.assertTrue(question.is_active())
-        question.deactivation_time = timezone.now()
+        question.deactivate()
         self.assertFalse(question.is_active())
 
     def test_is_active_given_deactivation_time(self):
         question = Question.objects.get(question_text="test-question")
         self.assertFalse(question.is_active())
-        question.activation_time = timezone.now()
+        question.activate()
         self.assertTrue(question.is_active())
         question.deactivation_time = (timezone.now()
                                       + timezone.timedelta(seconds=10))
         self.assertTrue(question.is_active())
-        question.deactivation_time = timezone.now()
-        self.assertFalse(question.is_active())
-
-    def test_activate_forever(self):
-        question = Question.objects.get(question_text="test-question")
-        question.activate()
-        self.assertAlmostEqual(timezone.now(), question.activation_time,
-                               delta=timezone.timedelta(seconds=1))
-
-    def test_activate_for_given_minutes(self):
-        question = Question.objects.get(question_text="test-question")
-        question.activate(minutes=10)
-        self.assertAlmostEqual(timezone.now(), question.activation_time,
-                               delta=timezone.timedelta(seconds=1))
-        self.assertAlmostEqual(timezone.now() + timezone.timedelta(minutes=10),
-                               question.deactivation_time,
-                               delta=timezone.timedelta(seconds=1))
-
-    def test_deactivate_active_question(self):
-        question = Question.objects.get(question_text="test-question")
-        question.activate()
         question.deactivate()
-        self.assertAlmostEqual(timezone.now(), question.deactivation_time,
-                               delta=timezone.timedelta(seconds=1))
+        self.assertFalse(question.is_active())
 
     def test_try_to_deativate_inactive_question(self):
         question = Question.objects.get(question_text="test-question")
         question.deactivate()
-        self.assertFalse(question.deactivation_time)
+        self.assertIsNone(question.deactivation_time)
 
 
 class OpenQuestionTests(TestCase):
