@@ -70,7 +70,8 @@ def question_result(request, question_id):
     for code in question.poll.accesscode_set.all():
         last_choice = Vote.objects.filter(
             question__exact=question, code__exact=code).last()
-        code_count = last_choice.counter
+        code_count = Vote.objects.filter(
+            question__exact=question, code__exact=code).count()
         if last_choice:
             last_choice = last_choice.choice.choice_text
         else:
@@ -193,14 +194,10 @@ def vote(request, question_id):
                 question=question, choice_text=new_choice)
 
     code = AccessCode.objects.get(poll=question.poll, code=code)
-    new_counter = 0
     prev_vote = Vote.objects.filter(
         question__exact=question, code__exact=code).last()
     if prev_vote:
         prev_vote.choice.votes -= 1
-        new_counter = prev_vote.counter
-        prev_vote.counter = 0
-        prev_vote.save()
         prev_vote.choice.save()
 
     choice = Choice.objects.get(pk=choice.id)
@@ -208,8 +205,7 @@ def vote(request, question_id):
     choice.save()
     code.counter += 1
     code.save()
-    Vote.objects.create(
-        question=question, choice=choice, code=code, counter=new_counter+1)
+    Vote.objects.create(question=question, choice=choice, code=code)
     return HttpResponseRedirect(reverse('polls:poll_detail',
                                         args=(question.poll.id,)))
 
