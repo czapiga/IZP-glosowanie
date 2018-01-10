@@ -5,7 +5,7 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from polls.models import Question, SimpleQuestion, OpenQuestion, Vote, Poll
+from polls.models import Question, SimpleQuestion, AccessCode, OpenQuestion, Vote, Poll
 from django.contrib.auth.models import User
 
 
@@ -231,18 +231,11 @@ class QuestionResultsTests(TestCase):
         response = self.client.post(
             url, {'is_open': True,
                   'new_choice': 'odp'})
+        password = AccessCode.objects.get(poll=questionA.poll, code=password)
         self.assertIs(Vote.objects.filter(
-            question__exact=questionA, counter__exact=1).count(), 0)
+            question__exact=questionA, code__exact=password).count(), 2)
         self.assertIs(Vote.objects.filter(
-            question__exact=questionA, counter__exact=2).count(), 1)
-        self.assertIs(Vote.objects.filter(
-            question__exact=questionA, counter__exact=3).count(), 0)
-        self.assertIs(Vote.objects.filter(
-            question__exact=questionB, counter__exact=1).count(), 1)
-        self.assertIs(Vote.objects.filter(
-            question__exact=questionB, counter__exact=2).count(), 0)
-        self.assertIs(Vote.objects.filter(
-            question__exact=questionB, counter__exact=3).count(), 0)
+            question__exact=questionB, code__exact=password).count(), 1)
 
 
 class CodesViewsTests(TestCase):
