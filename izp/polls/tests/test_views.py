@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.urls import reverse
 from polls.models import Question, SimpleQuestion, OpenQuestion, Poll
 from django.contrib.auth.models import User
+import logging
 
 
 def basic_check_of_question(cls, response, quest, error=""):
@@ -191,6 +192,7 @@ class CodesViewsTests(TestCase):
             'user1@example.com',
             'pswd',
         )
+        logging.disable(logging.CRITICAL)
 
         self.poll = Poll.objects.create()
         self.q = OpenQuestion.objects.create(poll=self.poll,
