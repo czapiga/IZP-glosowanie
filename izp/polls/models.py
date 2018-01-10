@@ -143,7 +143,6 @@ class Vote(models.Model):
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
     code = models.ForeignKey(AccessCode, on_delete=models.CASCADE)
     date = models.DateTimeField(default=timezone.now)
-    counter = models.IntegerField('Liczba użyć kodu', default=0)
 
     def __str__(self):
         return self.question.question_text + ' ' + \
