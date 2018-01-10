@@ -85,8 +85,8 @@ def question_result(request, question_id):
 def is_vote_successful(codes):
     if len(codes) == 0:
         return False
-    return (len(filter(
-            lambda code: code.get('last_choice') != '-', codes))
+    return (len(list(filter(
+            lambda code: code.get('last_choice') != '-', codes)))
             / len(codes) * 100 >= 50)
 
 
