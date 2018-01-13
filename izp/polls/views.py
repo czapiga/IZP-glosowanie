@@ -227,9 +227,13 @@ def codes(request, poll_id):
 @user_passes_test(lambda u: u.is_superuser)
 def codes_pdf(request, poll_id):
     poll = get_object_or_404(Poll, pk=poll_id)
+    options = {
+        "codes_list": format_codes_list(poll.get_codes()),
+        'quiet': True
+    }
+
     return render_to_pdf_response(
-        request, 'polls/poll_codes_list.html',
-        {"codes_list": format_codes_list(poll.get_codes())})
+        request, 'polls/poll_codes_list.html', options)
 
 
 @user_passes_test(lambda u: u.is_superuser)
