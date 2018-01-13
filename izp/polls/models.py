@@ -146,4 +146,4 @@ class Vote(models.Model):
 
     def __str__(self):
         return self.question.question_text + ' ' + \
-            self.choice.choice_text + ' ' + self.code
+            self.choice.choice_text + ' ' + str(self.code)

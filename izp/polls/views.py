@@ -81,7 +81,16 @@ def question_result(request, question_id):
                       'num_of_votes': code.counter,
                       'last_choice': last_choice})
     return render(request, 'polls/question_result.html',
-                  {'question': question, 'choices': choices, 'codes': codes})
+                  {'question': question, 'choices': choices, 'codes': codes,
+                   'successful': is_vote_successful(codes)})
+
+
+def is_vote_successful(codes):
+    if len(codes) == 0:
+        return False
+    return (len(list(filter(
+            lambda code: code.get('last_choice') != '-', codes)))
+            / len(codes) * 100 >= 50)
 
 
 def reformat_code(code):
