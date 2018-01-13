@@ -188,6 +188,7 @@ class OpenQuestionVoteViewTests(TestCase):
 
 class CodesViewsTests(TestCase):
     def setUp(self):
+        logging.disable(logging.CRITICAL)
         User.objects.create_superuser(
             'user1',
             'user1@example.com',
@@ -207,7 +208,6 @@ class CodesViewsTests(TestCase):
         self.client.logout()
 
     def test_codes_pdf_view_as_superuser(self):
-        logging.disable(logging.CRITICAL)
         self.client.login(username="user1", password="pswd")
         url = reverse('polls:codes_pdf', args=(self.poll.id,))
         response = self.client.get(url)
