@@ -107,10 +107,7 @@ class QuestionTests(TestCase):
     def test_is_active_given_deactivation_time(self):
         question = Question.objects.get(question_text="test-question")
         self.assertFalse(question.is_active())
-        question.activate()
-        self.assertTrue(question.is_active())
-        question.deactivation_time = (timezone.now()
-                                      + timezone.timedelta(seconds=10))
+        question.activate(minutes=1)
         self.assertTrue(question.is_active())
         question.deactivate()
         self.assertFalse(question.is_active())
