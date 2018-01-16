@@ -14,7 +14,7 @@ class Poll(models.Model):
                                using=using)
 
         if self.id and self.accesscode_set.all().count() == 0:
-            for code in generate_codes(10, 8):
+            for code in generate_codes(82, 8):
                 self.accesscode_set.create(code=code)
 
     def __str__(self):
