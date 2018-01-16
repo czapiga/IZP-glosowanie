@@ -11,7 +11,7 @@ class ChoiceInline(admin.TabularInline):
 
 class BaseQuestionAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['poll', 'question_text']})
+        (None, {'fields': ['poll', 'question_text', 'depends_on']})
     ]
 
     list_display = ('question_text', )
@@ -24,7 +24,7 @@ class QuestionAdmin(BaseQuestionAdmin):
 
 class SimpleQuestionInline(admin.StackedInline):
     model = SimpleQuestion
-    fields = ("question_text", )
+    fields = ("question_text",)
     extra = 2
     vervose_name = "Simple questions"
 
