@@ -5,8 +5,9 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from polls.models import Question, SimpleQuestion, AccessCode
-from polls.models import OpenQuestion, Vote, Poll
+from polls.models import (Question, SimpleQuestion, AccessCode,
+                          OpenQuestion, Vote, Poll)
+from polls.views import format_code
 from django.contrib.auth.models import User
 
 
@@ -201,7 +202,7 @@ class QuestionResultsTests(TestCase):
         questionA.activate()
 
         s = self.client.session
-        password = questionA.poll.get_codes()[0]
+        password = poll.get_codes()[0]
         s['poll' + str(questionA.poll.id)] = password
         s.save()
 
@@ -210,9 +211,6 @@ class QuestionResultsTests(TestCase):
         response = self.client.post(
             url, {'is_open': True,
                   'new_choice': 'odp1'})
-
-        s['poll' + str(questionA.poll.id)] = password
-        s.save()
 
         response = self.client.post(
             url, {'is_open': True,
@@ -223,7 +221,6 @@ class QuestionResultsTests(TestCase):
         questionB.choice_set.create(choice_text="Odp1")
         questionB.activate()
 
-        s = self.client.session
         s['poll' + str(questionB.poll.id)] = password
         s.save()
 
@@ -232,6 +229,17 @@ class QuestionResultsTests(TestCase):
         response = self.client.post(
             url, {'is_open': True,
                   'new_choice': 'odp'})
+
+        questionA.deactivate()
+
+        url = reverse('polls:question_result', args=(questionA.id,))
+        response = self.client.get(url)
+        formated_code = format_code(password)
+        self.assertContains(response, 'Użyte kody:')
+        self.assertContains(response, formated_code)
+        self.assertContains(response, '2')
+        self.assertContains(response, 'odp2')
+
         password = AccessCode.objects.get(poll=questionA.poll, code=password)
         self.assertIs(Vote.objects.filter(
             question__exact=questionA, code__exact=password).count(), 2)
