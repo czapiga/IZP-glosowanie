@@ -25,7 +25,7 @@
       <thead>
          <tr>
             <th>Kod</th>
-            <th>Liczba zmian</th>
+            <th>Liczba użyć</th>
             <th>Ostatni wybór</th>
          </tr>
       </thead>
@@ -33,7 +33,7 @@
          {% for code in codes %}
          <tr>
             <td>{{ code.code }}</td>
-            <td>{{ code.num_of_votes }}</td>
+            <td>{{ code.num_of_uses }}</td>
             <td>{{ code.last_choice }}</td>
          </tr>
          {% endfor %}
