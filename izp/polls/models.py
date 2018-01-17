@@ -159,7 +159,8 @@ class Vote(models.Model):
 
 
 class Comment(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='comments')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE,
+                                 related_name='comments')
     context = models.TextField()
     created_date = models.DateTimeField(default=timezone.now)
 

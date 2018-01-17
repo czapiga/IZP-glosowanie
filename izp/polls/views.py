@@ -4,7 +4,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import user_passes_test
 from easy_pdf.rendering import render_to_pdf_response
 
-from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll, Comment, CommentForm
+from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll, \
+    Comment, CommentForm
 
 
 def poll_index(request):
@@ -31,12 +32,10 @@ def question_detail(request, question_id):
     comments = Comment.objects.filter(
         question__exact=question).order_by('-created_date')
 
-    # comments = [comment for comment in Comment.objects.all() if comment.question == question]
-    # comments.order_by('-created_date')
-
     if not question.is_active():
         return render(request, 'polls/question_detail.html', {
-            'question': question, 'error': "Głosowanie nie jest aktywne", "comments": comments})
+            'question': question, 'error': "Głosowanie nie jest aktywne",
+            "comments": comments})
 
     if not is_session:
         return render(request,
