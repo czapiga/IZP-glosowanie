@@ -43,9 +43,18 @@ class Question(models.Model):
     question_text = models.CharField('Pytanie', max_length=200)
     activation_time = models.DateTimeField(null=True, blank=True)
     deactivation_time = models.DateTimeField(null=True, blank=True)
+    depends_on = models.ForeignKey(
+        'self', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.question_text
+
+    def satisfied(self):
+        if self.deactivation_time:
+            return self.deactivation_time < timezone.now() and \
+                Choice.objects.filter(question__exact=self).order_by('-votes') \
+                .first() == Choice.objects.filter(question__exact=self) \
+                .get(winner__exact=True)
 
     def is_available(self):
         """
@@ -53,6 +62,8 @@ class Question(models.Model):
         (in other words - can be activated),
         which is true if it has never been activated before.
         """
+        if self.depends_on and not self.depends_on.satisfied():
+            return False
 
         return not self.activation_time and not self.deactivation_time
 
@@ -124,6 +135,7 @@ class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField('Odpowiedź', max_length=200)
     votes = models.IntegerField('Liczba głosów', default=0)
+    winner = models.BooleanField('Wygrany', blank=True, default=False)
 
     def __str__(self):
         return self.choice_text
