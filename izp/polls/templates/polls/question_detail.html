@@ -23,5 +23,19 @@
          <button class="btn btn-primary">Głosuj</button>
          {% endif %}
       </form>
+
+      <br/>
+      <a class="btn btn-default" href="{% url 'polls:add_comment_to_question' question.id %}">Dodaj komentarz</a>
+
+      <br/><br/>
+      {% for comment in comments %}
+      <div class="comment">
+         <br/>
+         <div class="date"><strong>{{ comment.created_date }}</strong></div>
+         <p>{{ comment.context|linebreaks }}</p>
+      </div>
+      {% empty %}
+         <p>No comments</p>
+      {% endfor %}
    </div>
 {% endblock %}

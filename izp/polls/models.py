@@ -2,6 +2,7 @@ from datetime import date
 from django.db import models
 from django.utils import timezone
 from .codes import generate_codes
+from django import forms
 
 
 class Poll(models.Model):
@@ -155,3 +156,18 @@ class Vote(models.Model):
     def __str__(self):
         return self.question.question_text + ' ' + \
             self.choice.choice_text + ' ' + str(self.code)
+
+
+class Comment(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='comments')
+    context = models.TextField()
+    created_date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.context
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('context',)

@@ -1,10 +1,10 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import user_passes_test
 from easy_pdf.rendering import render_to_pdf_response
 
-from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll
+from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll, Comment, CommentForm
 
 
 def poll_index(request):
@@ -28,10 +28,15 @@ def question_detail(request, question_id):
 
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
+    comments = Comment.objects.filter(
+        question__exact=question).order_by('-created_date')
+
+    # comments = [comment for comment in Comment.objects.all() if comment.question == question]
+    # comments.order_by('-created_date')
 
     if not question.is_active():
         return render(request, 'polls/question_detail.html', {
-            'question': question, 'error': "Głosowanie nie jest aktywne"})
+            'question': question, 'error': "Głosowanie nie jest aktywne", "comments": comments})
 
     if not is_session:
         return render(request,
@@ -39,12 +44,14 @@ def question_detail(request, question_id):
                       {'question': question,
                        'error': "Użytkownik niezalogowany",
                        'is_open': is_open,
-                       'is_session': is_session})
+                       'is_session': is_session,
+                       "comments": comments})
 
     return render(request, 'polls/question_detail.html',
                   {'question': question,
                    'is_open': is_open,
-                   'is_session': is_session})
+                   'is_session': is_session,
+                   "comments": comments})
 
 
 def format_codes_list(codes_list):
@@ -282,3 +289,22 @@ def deactivate_question(request, question_id):
 
     return HttpResponseRedirect(reverse('polls:poll_detail',
                                         args=(question.poll.id,)))
+
+
+def add_comment_to_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    if question.is_active():
+        return HttpResponseRedirect(reverse('polls:question_detail',
+                                            args=(question_id,)))
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.question = question
+            comment.save()
+            return HttpResponseRedirect(reverse('polls:question_detail',
+                                        args=(question_id,)))
+    else:
+        form = CommentForm()
+    return render(request, 'polls/comment_form.html', {'form': form})
