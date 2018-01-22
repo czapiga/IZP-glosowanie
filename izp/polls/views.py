@@ -29,19 +29,19 @@ def question_detail(request, question_id):
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
 
-    properties = {'question': question,
+    context = {'question': question,
                   'is_open': is_open,
                   'is_session': is_session}
 
     if not question.is_active():
-        properties['error'] = "Głosowanie nie jest aktywne"
-        return render(request, 'polls/question_detail.html', properties)
+        context['error'] = "Głosowanie nie jest aktywne"
+        return render(request, 'polls/question_detail.html', context)
 
     if not is_session:
-        properties['error'] = "Użytkownik niezalogowany"
-        return render(request, 'polls/question_detail.html', properties)
+        context['error'] = "Użytkownik niezalogowany"
+        return render(request, 'polls/question_detail.html', context)
 
-    return render(request, 'polls/question_detail.html', properties)
+    return render(request, 'polls/question_detail.html', context)
 
 
 def format_codes_list(codes_list):
@@ -138,37 +138,37 @@ def vote(request, question_id):
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
 
-    properties = {'question': question,
+    context = {'question': question,
                   'is_open': is_open,
                   'is_session': is_session}
 
     if not question.is_active():
-        properties['error'] = "Głosowanie nie jest aktywne"
-        return render(request, 'polls/question_detail.html', properties)
+        context['error'] = "Głosowanie nie jest aktywne"
+        return render(request, 'polls/question_detail.html', context)
 
     if is_session:
         code = request.session['poll' + str(question.poll.id)]
     else:
-        properties['error'] = "Użytkownik niezalogowany"
-        return render(request, 'polls/question_detail.html', properties)
+        context['error'] = "Użytkownik niezalogowany"
+        return render(request, 'polls/question_detail.html', context)
 
     choice = request.POST.get('choice', None)
     new_choice = request.POST.get('new_choice', '')
     if choice and new_choice != '':
-        properties['error'] = "Nie można głosować na istniejącą odpowiedź i \
+        context['error'] = "Nie można głosować na istniejącą odpowiedź i \
                           jednocześnie proponować nową",
-        return render(request, 'polls/question_detail.html', properties)
+        return render(request, 'polls/question_detail.html', context)
 
     if not choice and new_choice == '':
-        properties['error'] = "Nie wybrano odpowiedzi"
-        return render(request, 'polls/question_detail.html', properties)
+        context['error'] = "Nie wybrano odpowiedzi"
+        return render(request, 'polls/question_detail.html', context)
 
     if choice:
         if question.choice_set.filter(pk=choice).exists():
             choice = question.choice_set.get(pk=choice)
         else:
-            properties['error'] = "Odpowiedź nie istnieje"
-            return render(request, 'polls/question_detail.html', properties)
+            context['error'] = "Odpowiedź nie istnieje"
+            return render(request, 'polls/question_detail.html', context)
 
     if not choice and is_open:
         if Choice.objects.filter(question__exact=question,
@@ -224,7 +224,7 @@ def activate_question(request, question_id):
                         if question.is_active()]
     is_session = 'poll' + str(question.poll.id) in request.session
 
-    properties = {'poll': question.poll,
+    context = {'poll': question.poll,
                   'questions_list': Question.objects.filter(
                       poll__exact=question.poll).order_by(
                       '-activation_time'),
@@ -232,15 +232,15 @@ def activate_question(request, question_id):
                   }
 
     if active_questions:
-        properties['error'] = "Aktywne inne głosowanie"
-        return render(request, 'polls/poll_detail.html', properties)
+        context['error'] = "Aktywne inne głosowanie"
+        return render(request, 'polls/poll_detail.html', context)
 
     if time:
         try:
             time = int(time)
         except ValueError:
-            properties['error'] = "Zły format czasu"
-            return render(request, 'polls/poll_detail.html', properties)
+            context['error'] = "Zły format czasu"
+            return render(request, 'polls/poll_detail.html', context)
         question.activate(time)
     else:
         question.activate()
