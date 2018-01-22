@@ -30,8 +30,8 @@ def question_detail(request, question_id):
     is_session = 'poll' + str(question.poll.id) in request.session
 
     context = {'question': question,
-                  'is_open': is_open,
-                  'is_session': is_session}
+               'is_open': is_open,
+               'is_session': is_session}
 
     if not question.is_active():
         context['error'] = "Głosowanie nie jest aktywne"
@@ -139,8 +139,8 @@ def vote(request, question_id):
     is_session = 'poll' + str(question.poll.id) in request.session
 
     context = {'question': question,
-                  'is_open': is_open,
-                  'is_session': is_session}
+               'is_open': is_open,
+               'is_session': is_session}
 
     if not question.is_active():
         context['error'] = "Głosowanie nie jest aktywne"
@@ -225,11 +225,11 @@ def activate_question(request, question_id):
     is_session = 'poll' + str(question.poll.id) in request.session
 
     context = {'poll': question.poll,
-                  'questions_list': Question.objects.filter(
-                      poll__exact=question.poll).order_by(
-                      '-activation_time'),
-                  'is_session': is_session
-                  }
+               'questions_list': Question.objects.filter(
+                   poll__exact=question.poll).order_by(
+                   '-activation_time'),
+               'is_session': is_session
+               }
 
     if active_questions:
         context['error'] = "Aktywne inne głosowanie"
