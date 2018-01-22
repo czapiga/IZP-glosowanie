@@ -161,8 +161,8 @@ class Vote(models.Model):
 class Comment(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE,
                                  related_name='comments')
-    context = models.TextField()
-    created_date = models.DateTimeField(default=timezone.now)
+    text = models.TextField()
+    date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.context
@@ -171,4 +171,10 @@ class Comment(models.Model):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ('context',)
+        fields = ('text',)
+
+    def __init__(self, *args, **kwargs):
+        super(CommentForm, self).__init__(*args, **kwargs)
+        self.fields['text'].widget.attrs['style'] = \
+            'width:650px; height:80px; resize:none;'
+        self.fields['text'].widget.attrs['maxlength'] = '500'

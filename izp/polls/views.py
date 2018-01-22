@@ -3,6 +3,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import user_passes_test
 from easy_pdf.rendering import render_to_pdf_response
+from django.utils import timezone
+import textwrap
 
 from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll, \
     Comment, CommentForm
@@ -30,7 +32,14 @@ def question_detail(request, question_id):
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
     comments = Comment.objects.filter(
-        question__exact=question).order_by('-created_date')
+        question__exact=question).order_by('-date')
+
+    if question.activation_time is None \
+            or question.activation_time > timezone.now():
+        form = CommentForm()
+        return render(request, 'polls/question_detail.html', {
+            'question': question, 'error': "Głosowanie nie jest aktywne",
+            "comments": comments, 'form': form})
 
     if not question.is_active():
         return render(request, 'polls/question_detail.html', {
@@ -44,7 +53,7 @@ def question_detail(request, question_id):
                        'error': "Użytkownik niezalogowany",
                        'is_open': is_open,
                        'is_session': is_session,
-                       "comments": comments})
+                       'comments': comments})
 
     return render(request, 'polls/question_detail.html',
                   {'question': question,
@@ -292,18 +301,15 @@ def deactivate_question(request, question_id):
 
 def add_comment_to_question(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    if question.is_active():
-        return HttpResponseRedirect(reverse('polls:question_detail',
-                                            args=(question_id,)))
 
-    if request.method == "POST":
+    if (question.activation_time is None
+        or question.activation_time > timezone.now()) \
+            and request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.question = question
             comment.save()
-            return HttpResponseRedirect(reverse('polls:question_detail',
-                                        args=(question_id,)))
-    else:
-        form = CommentForm()
-    return render(request, 'polls/comment_form.html', {'form': form})
+
+    return HttpResponseRedirect(reverse('polls:question_detail',
+                                        args=(question_id, )))
