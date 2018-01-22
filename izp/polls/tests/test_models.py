@@ -83,6 +83,7 @@ class QuestionTests(TestCase):
     Tests for Question class methods:
     is_available, is_active, activate, deactivate
     """
+
     def setUp(self):
         poll = Poll.objects.create()
         question = Question.objects.create(
