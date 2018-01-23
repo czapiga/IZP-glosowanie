@@ -330,11 +330,11 @@ class ShowCommentsTest(TestCase):
                                            args=(question.id,)))
 
         self.assertEqual(response.status_code, 200)
-        self.assertQuerysetEqual(response.context['comments'],
-                                 ['<Comment: comment_c>',
-                                 '<Comment: comment_b>',
-                                 '<Comment: comment_a>'],
-                                 ordered=True)
+        self.assertQuerysetEqual(response.context['comments'], [
+            '<Comment: comment_c>',
+            '<Comment: comment_b>',
+            '<Comment: comment_a>'
+        ], ordered=True)
 
     def test_show_comments_when_question_active(self):
         poll = Poll.objects.create()
@@ -350,11 +350,11 @@ class ShowCommentsTest(TestCase):
                                            args=(question.id,)))
 
         self.assertEqual(response.status_code, 200)
-        self.assertQuerysetEqual(response.context['comments'],
-                                 ['<Comment: comment_c>',
-                                 '<Comment: comment_b>',
-                                 '<Comment: comment_a>'],
-                                 ordered=True)
+        self.assertQuerysetEqual(response.context['comments'], [
+            '<Comment: comment_c>',
+            '<Comment: comment_b>',
+            '<Comment: comment_a>'
+        ], ordered=True)
 
     def test_show_comments_when_question_ended(self):
         poll = Poll.objects.create()
@@ -369,9 +369,8 @@ class ShowCommentsTest(TestCase):
         response = self.client.get(reverse('polls:question_detail',
                                            args=(question.id,)))
 
-        self.assertEqual(response.status_code, 200)
-        self.assertQuerysetEqual(response.context['comments'],
-                                 ['<Comment: comment_c>',
-                                 '<Comment: comment_b>',
-                                 '<Comment: comment_a>'],
-                                 ordered=True)
+        self.assertQuerysetEqual(response.context['comments'], [
+            '<Comment: comment_c>',
+            '<Comment: comment_b>',
+            '<Comment: comment_a>'
+        ], ordered=True)
