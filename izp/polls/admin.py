@@ -21,8 +21,6 @@ class QuestionAdmin(BaseQuestionAdmin):
     inlines = [ChoiceInline]
 
 
-# Nested inlines for poll admininstation
-
 class NestedChoiceInline(nested_admin.NestedTabularInline):
     model = Choice
     fields = ("choice_text", )
