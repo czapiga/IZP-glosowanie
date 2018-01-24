@@ -6,4 +6,5 @@ urlpatterns = [
     url(r'^$', lambda _: HttpResponseRedirect('/polls/')),
     url(r'^polls/', include('polls.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^_nested_admin/', include('nested_admin.urls')),
 ]
