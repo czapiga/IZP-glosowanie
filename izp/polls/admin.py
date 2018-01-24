@@ -11,10 +11,10 @@ class ChoiceInline(admin.TabularInline):
 
 class BaseQuestionAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['poll', 'question_text']})
+        (None, {'fields': ['poll', 'question_text', 'depends_on', 'winner_choice']})
     ]
 
-    list_display = ('question_text', )
+    list_display = ('question_text',)
     verbose_name = 'Pytanie'
 
 
@@ -24,7 +24,7 @@ class QuestionAdmin(BaseQuestionAdmin):
 
 class SimpleQuestionInline(admin.StackedInline):
     model = SimpleQuestion
-    fields = ("question_text", )
+    fields = (("question_text", "depends_on", "winner_choice"), )
     extra = 2
     vervose_name = "Simple questions"
 
@@ -32,6 +32,9 @@ class SimpleQuestionInline(admin.StackedInline):
 class PollAdmin(admin.ModelAdmin):
     fields = ('poll_name', 'date')
     inlines = [SimpleQuestionInline]
+    
+    class Media:
+        js = ['js/poll.js']
 
 
 admin.site.register(Poll, PollAdmin)

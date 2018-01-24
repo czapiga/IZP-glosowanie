@@ -43,6 +43,13 @@ class Question(models.Model):
     question_text = models.CharField('Pytanie', max_length=200)
     activation_time = models.DateTimeField(null=True, blank=True)
     deactivation_time = models.DateTimeField(null=True, blank=True)
+    depends_on = models.ForeignKey(
+        'self', on_delete=models.CASCADE, null=True, blank=True
+    )
+    winner_choice = models.ForeignKey(
+        "Choice", related_name="+", on_delete=models.CASCADE,
+        blank=True, null=True
+    )
 
     def __str__(self):
         return self.question_text
