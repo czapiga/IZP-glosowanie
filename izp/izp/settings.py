@@ -3,7 +3,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '^6krs7tn!6g^8ag-nyth6801+^42f*eb@n8j%k)z^vvoe4bh77'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['2fuy823l.apps.lair.io']
 
 # Application definition
 

@@ -1,12 +1,20 @@
 
 (function($) {
-    
     function filter_answers(select) {
-        alert(select.id);
+        $.ajax({
+            type: 'GET',
+            url: '/getanswers',
+            data: {'selected': 'lol'},
+            success: function(data) {
+                console.log(data);
+            },
+            error: function(xhr){
+                alert('Request Status: ' + xhr.status + ' Status Text: ' + xhr.statusText + ' ' + xhr.responseText);
+            }
+        });
     }
     
     $(document).ready(function() {
-       var element = document.getElementById('id_simplequestion_set-0-depends_on');
        $('select[id$="depends_on"]').change(function () {
            filter_answers(this);
        });
