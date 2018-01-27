@@ -7,5 +7,5 @@ urlpatterns = [
     url(r'^$', lambda _: HttpResponseRedirect('/polls/')),
     url(r'^polls/', include('polls.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^getanswers$', ajax_views.getanswers, name='getanswers'),
+    url(r'^getquestions$', ajax_views.get_questions, name = 'getquestions'),
 ]
