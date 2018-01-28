@@ -2,6 +2,7 @@ from datetime import date
 from django.db import models
 from django.utils import timezone
 from .codes import generate_codes
+from django import forms
 
 def is_vote_successful(codes):
     if len(codes) == 0:
@@ -190,3 +191,25 @@ class Vote(models.Model):
     def __str__(self):
         return self.question.question_text + ' ' + \
             self.choice.choice_text + ' ' + str(self.code)
+
+
+class Comment(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE,
+                                 related_name='comments')
+    text = models.TextField(max_length=500)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.text
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('text',)
+
+    def __init__(self, *args, **kwargs):
+        super(CommentForm, self).__init__(*args, **kwargs)
+        self.fields['text'].widget.attrs['style'] = \
+            'width:650px; height:80px; resize:none;'
+        self.fields['text'].widget.attrs['maxlength'] = '500'

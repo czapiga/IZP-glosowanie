@@ -5,7 +5,8 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from polls.models import Question, SimpleQuestion, OpenQuestion, Poll
+from polls.models import Question, SimpleQuestion, OpenQuestion, Poll, \
+    CommentForm, Comment
 from django.contrib.auth.models import User
 from polls.views import is_vote_successful
 
@@ -257,3 +258,120 @@ class ViewsIsVoteSuccessfulFunctionTest(TestCase):
 
         codes = [{'last_choice': 'Nie'}, {'last_choice': 'Tak'}]
         self.assertTrue(is_vote_successful(codes))
+
+
+class ShowCommentFormTest(TestCase):
+
+    def test_show_comments_form_before_active_question(self):
+        poll = Poll.objects.create()
+        question = Question.objects.create(poll=poll, question_text="Question")
+
+        response = self.client.get(reverse('polls:question_detail',
+                                           args=(question.id,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['form'], CommentForm)
+
+    def test_not_show_comment_form_when_active_question(self):
+        poll = Poll.objects.create()
+        question = Question.objects.create(poll=poll, question_text="Question")
+        question.activate(5)
+
+        response = self.client.get(reverse('polls:question_detail',
+                                           args=(question.id,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('form' not in response.context.keys())
+
+    def test_not_show_comment_form_on_ended_question(self):
+        poll = Poll.objects.create()
+        question = Question.objects.create(poll=poll, question_text="Question")
+        question.activate(5)
+        question.deactivate()
+
+        response = self.client.get(reverse('polls:question_detail',
+                                           args=(question.id,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('form' not in response.context.keys())
+
+
+class ShowCommentsTest(TestCase):
+
+    def test_show_no_comments(self):
+        poll = Poll.objects.create()
+        question = Question.objects.create(poll=poll, question_text="Question")
+
+        response = self.client.get(reverse('polls:question_detail',
+                                           args=(question.id,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(response.context['comments'], [])
+
+    def test_show_comments(self):
+        poll = Poll.objects.create()
+        question = Question.objects.create(poll=poll, question_text="Question")
+        Comment.objects.create(question=question, text="comment_a")
+
+        response = self.client.get(reverse('polls:question_detail',
+                                           args=(question.id,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(response.context['comments'],
+                                 ['<Comment: comment_a>'],)
+
+    def test_show_comments_ordered_by_date(self):
+        poll = Poll.objects.create()
+        question = Question.objects.create(poll=poll, question_text="Question")
+        Comment.objects.create(question=question, text="comment_a")
+        Comment.objects.create(question=question, text="comment_b")
+        Comment.objects.create(question=question, text="comment_c")
+
+        response = self.client.get(reverse('polls:question_detail',
+                                           args=(question.id,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(response.context['comments'], [
+            '<Comment: comment_c>',
+            '<Comment: comment_b>',
+            '<Comment: comment_a>'
+        ], ordered=True)
+
+    def test_show_comments_when_question_active(self):
+        poll = Poll.objects.create()
+        question = Question.objects.create(poll=poll, question_text="Question")
+
+        Comment.objects.create(question=question, text="comment_a")
+        Comment.objects.create(question=question, text="comment_b")
+        Comment.objects.create(question=question, text="comment_c")
+
+        question.activate(5)
+
+        response = self.client.get(reverse('polls:question_detail',
+                                           args=(question.id,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(response.context['comments'], [
+            '<Comment: comment_c>',
+            '<Comment: comment_b>',
+            '<Comment: comment_a>'
+        ], ordered=True)
+
+    def test_show_comments_when_question_ended(self):
+        poll = Poll.objects.create()
+        question = Question.objects.create(poll=poll, question_text="Question")
+
+        Comment.objects.create(question=question, text="comment_a")
+        Comment.objects.create(question=question, text="comment_b")
+        Comment.objects.create(question=question, text="comment_c")
+
+        question.activate(5)
+        question.deactivate()
+        response = self.client.get(reverse('polls:question_detail',
+                                           args=(question.id,)))
+
+        self.assertQuerysetEqual(response.context['comments'], [
+            '<Comment: comment_c>',
+            '<Comment: comment_b>',
+            '<Comment: comment_a>'
+        ], ordered=True)

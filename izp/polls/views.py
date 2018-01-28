@@ -3,8 +3,11 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import user_passes_test
 from easy_pdf.rendering import render_to_pdf_response
+from django.utils import timezone
+import textwrap
 
-from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll
+from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll, \
+    Comment, CommentForm
 
 
 def poll_index(request):
@@ -28,10 +31,19 @@ def question_detail(request, question_id):
 
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
+    comments = Comment.objects.filter(
+        question__exact=question).order_by('-date')
 
     context = {'question': question,
                'is_open': is_open,
-               'is_session': is_session}
+               'is_session': is_session,
+               'comments': comments}
+
+    if question.activation_time is None \
+            or question.activation_time > timezone.now():
+        context['error'] = "Głosowanie nie jest aktywne"
+        context['form'] = CommentForm()
+        return render(request, 'polls/question_detail.html', context)
 
     if not question.is_active():
         context['error'] = "Głosowanie nie jest aktywne"
@@ -256,3 +268,19 @@ def deactivate_question(request, question_id):
 
     return HttpResponseRedirect(reverse('polls:poll_detail',
                                         args=(question.poll.id,)))
+
+
+def add_comment_to_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+
+    if ((question.activation_time is None)
+        or question.activation_time > timezone.now()) \
+            and request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.question = question
+            comment.save()
+
+    return HttpResponseRedirect(reverse('polls:question_detail',
+                                        args=(question_id, )))

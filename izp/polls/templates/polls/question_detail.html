@@ -23,5 +23,28 @@
          <button class="btn btn-primary">Głosuj</button>
          {% endif %}
       </form>
+
+      {% if form %}
+      <br/><br/>
+      <h3>Nowy komentarz</h3>
+      <form method="POST" class="post-form" action="{% url 'polls:add_comment_to_question' question.id %}" >{% csrf_token %}
+         {{ form.as_p }}
+         <button type="submit" class="save btn btn-default">Dodaj komentarz</button>
+      </form>
+      <br/>
+      {% else %}
+      <br/><br/>
+      <p>Dodawanie komentarzy możliwe tylko przed rozpoczęciem głosowania</p>
+      {% endif %}
+
+      {% for comment in comments %}
+      <div class="comment">
+         <br/>
+         <div class="date"><strong>{{ comment.date }}</strong></div>
+         <p>{{ comment.text|linebreaks }}</p>
+      </div>
+      {% empty %}
+         <p>No comments</p>
+      {% endfor %}
    </div>
 {% endblock %}

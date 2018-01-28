@@ -9,5 +9,4 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^getquestions$', ajax_views.get_questions, name = 'getquestions'),
     url(r'^getchoices$', ajax_views.get_choices_for_question, name = 'getchoices'),
-
-]
+    url(r'^_nested_admin/', include('nested_admin.urls')),
