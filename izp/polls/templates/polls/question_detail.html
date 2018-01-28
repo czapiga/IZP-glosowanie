@@ -19,7 +19,7 @@
                    Własna propozycja:
                </label>
                <input id="new_choice" name="new_choice"
-                      type="text" class="form-control" >
+                      type="text" class="form-control">
             </div>
             {% endif %}
             {% if is_session %}
@@ -31,7 +31,7 @@
          {% if form %}
          <h3>Nowy komentarz</h3>
          <form method="POST" class="post-form"
-               action="{% url 'polls:add_comment_to_question' question.id %}" >
+               action="{% url 'polls:add_comment_to_question' question.id %}">
             {{ form.as_p }}
             <button type="submit" class="save btn btn-default">Dodaj komentarz</button>
          </form>
