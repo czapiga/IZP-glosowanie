@@ -8,4 +8,6 @@ urlpatterns = [
     url(r'^polls/', include('polls.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^getquestions$', ajax_views.get_questions, name = 'getquestions'),
+    url(r'^getchoices$', ajax_views.get_choices_for_question, name = 'getchoices'),
+
 ]

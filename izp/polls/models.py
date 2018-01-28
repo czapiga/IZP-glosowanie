@@ -3,12 +3,20 @@ from django.db import models
 from django.utils import timezone
 from .codes import generate_codes
 
+def is_vote_successful(codes):
+    if len(codes) == 0:
+        return False
+    return (len(list(filter(
+            lambda code: code.get('last_choice') != '-', codes)))
+            / len(codes) * 100 >= 50)
+
 
 class Poll(models.Model):
     poll_name = models.CharField('Glosowanie', max_length=50)
     date = models.DateField(default=date.today)
 
     def save(self, force_insert=False, force_update=False, using=None):
+        print('heyyy')
         super(Poll, self).save(force_insert=force_insert,
                                force_update=force_update,
                                using=using)
@@ -44,15 +52,33 @@ class Question(models.Model):
     activation_time = models.DateTimeField(null=True, blank=True)
     deactivation_time = models.DateTimeField(null=True, blank=True)
     depends_on = models.ForeignKey(
-        'self', on_delete=models.CASCADE, null=True, blank=True
+        "Question", on_delete=models.SET_NULL, null=True, blank=True
     )
     winner_choice = models.ForeignKey(
-        "Choice", related_name="+", on_delete=models.CASCADE,
+        "Choice", related_name="+", on_delete=models.SET_NULL,
         blank=True, null=True
     )
 
     def __str__(self):
         return self.question_text
+    
+    def satisfied(self):
+        if self.deactivation_time:
+            codes = []
+            for code in self.poll.accesscode_set.all():
+                last_choice = Vote.objects.filter(
+                    question__exact=question, code__exact=code).last()
+                if last_choice:
+                    last_choice = last_choice.choice.choice_text
+                else:
+                    last_choice = '-'
+                codes.append({'code': format_code(code.code),
+                      'num_of_votes': code.counter,
+                      'last_choice': last_choice})
+            return self.deactivation_time < timezone.now() and \
+                Choice.objects.filter(question__exact=self) \
+                .order_by('-votes').first() == winner_choice and \
+                is_vote_successful(codes)
 
     def is_available(self):
         """
@@ -60,7 +86,8 @@ class Question(models.Model):
         (in other words - can be activated),
         which is true if it has never been activated before.
         """
-
+        if self.depends_on and not self.depends_on.satisfied():
+            return False
         return not self.activation_time and not self.deactivation_time
 
     def is_active(self):
@@ -73,7 +100,7 @@ class Question(models.Model):
         return ((self.activation_time and not self.deactivation_time)
                 or (self.activation_time
                     and self.deactivation_time > timezone.now()))
-
+   
     def activate(self, minutes=None):
         """
         Method activates the Question
@@ -107,6 +134,7 @@ class SimpleQuestion(Question):
     """
 
     def save(self, force_insert=False, force_update=False, using=None):
+        print("heeeeeyy")
         super(SimpleQuestion, self).save(force_insert=force_insert,
                                          force_update=force_update,
                                          using=using)

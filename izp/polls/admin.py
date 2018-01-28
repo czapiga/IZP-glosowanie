@@ -16,10 +16,15 @@ class BaseQuestionAdmin(admin.ModelAdmin):
 
     list_display = ('question_text',)
     verbose_name = 'Pytanie'
-
+    
+    class Media:
+        js = ['js/question.js']
 
 class QuestionAdmin(BaseQuestionAdmin):
     inlines = [ChoiceInline]
+    
+    class Media:
+        js = ['js/question.js']
 
 
 class SimpleQuestionInline(admin.StackedInline):
@@ -27,7 +32,7 @@ class SimpleQuestionInline(admin.StackedInline):
     fields = (("question_text", "depends_on", "winner_choice"), )
     extra = 2
     vervose_name = "Simple questions"
-
+    
 
 class PollAdmin(admin.ModelAdmin):
     fields = ('poll_name', 'date')
