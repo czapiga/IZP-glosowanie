@@ -107,10 +107,7 @@ class Question(models.Model):
         comments = Comment.objects.filter(
         question__exact=self).order_by('-date')
         if comments and self.last_seen_by_admin:
-            print(comments.first().date)
-            print(comments.last().date)
-            print(self.last_seen_by_admin)
-            return comments.last().date > self.last_seen_by_admin
+            return comments.first().date > self.last_seen_by_admin
         else:
             return False
 

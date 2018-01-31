@@ -39,10 +39,10 @@
                   {% else %}
                   {{question.question_text}}
                   {% endif %}
-                  {% if user.is_superuser and question.available_unread_comments%}
-                  <b>!</b>
-                  {% endif %}
                </a>
+               {% if user.is_superuser and question.available_unread_comments%}
+               <b class="text-danger">!</b>
+               {% endif %}
             </td>
             <td><a href="{% url 'polls:question_result' question.id %}">Wynik</a></td>
 
