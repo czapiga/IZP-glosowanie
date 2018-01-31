@@ -78,12 +78,14 @@ def question_result(request, question_id):
     for code in question.poll.accesscode_set.all():
         last_choice = Vote.objects.filter(
             question__exact=question, code__exact=code).last()
+        use_count = Vote.objects.filter(
+            question__exact=question, code__exact=code).count()
         if last_choice:
             last_choice = last_choice.choice.choice_text
         else:
             last_choice = '-'
         codes.append({'code': format_code(code.code),
-                      'num_of_votes': code.counter,
+                      'num_of_uses': use_count,
                       'last_choice': last_choice})
     return render(request, 'polls/question_result.html',
                   {'question': question, 'choices': choices, 'codes': codes,
