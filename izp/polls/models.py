@@ -44,7 +44,7 @@ class Question(models.Model):
     question_text = models.CharField('Pytanie', max_length=200)
     activation_time = models.DateTimeField(null=True, blank=True)
     deactivation_time = models.DateTimeField(null=True, blank=True)
-    last_seen_by_admin = models.DateTimeField(null=True, blank=True)
+    last_seen_by_admin = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.question_text
@@ -105,11 +105,8 @@ class Question(models.Model):
 
     def available_unread_comments(self):
         comments = Comment.objects.filter(
-            question__exact=self).order_by('-date')
-        if comments and self.last_seen_by_admin:
-            return comments.first().date > self.last_seen_by_admin
-        else:
-            return False
+            question__exact=self).filter(date__gte=self.last_seen_by_admin)
+        return len(comments)
 
 
 class SimpleQuestion(Question):

@@ -1,4 +1,5 @@
 {% extends 'polls/base.html' %}
+{%load staticfiles %}
 {% block content %}
    {% if is_session %}
    <form action="{% url 'polls:logout' poll.id %}" method="post">
@@ -26,6 +27,7 @@
       <thead>
          <tr>
             <th>Głosowanie</th>
+            <th></th>
             <th>Wynik</th>
          </tr>
       </thead>
@@ -40,8 +42,10 @@
                   {{question.question_text}}
                   {% endif %}
                </a>
-               {% if user.is_superuser and question.available_unread_comments%}
-               <b class="text-danger">!</b>
+            </td>
+            <td>
+               {% if user.is_superuser and question.available_unread_comments %}
+               <img src={% static "icons/announcement.svg" %}>
                {% endif %}
             </td>
             <td><a href="{% url 'polls:question_result' question.id %}">Wynik</a></td>
