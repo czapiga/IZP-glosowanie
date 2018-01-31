@@ -117,6 +117,10 @@ class OpenQuestion(Question):
     ...
 
 
+class PeopleQuestion(OpenQuestion):
+    ...
+
+
 class Choice(models.Model):
     """
     Class representing answer to a question.

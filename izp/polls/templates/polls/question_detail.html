@@ -16,7 +16,18 @@
             <label for="new_choice">
                 Własna propozycja:
             </label>
-            <input id="new_choice" name="new_choice" type="text" class="form-control" >
+            {% if is_people_question %}
+                <input id="new_choice" name="new_choice" type="text" class="form-control"  list="employers">
+                <datalist id="employers">
+                    <select>
+                        {% for e in employers %}
+                        <option value="{{ e }}">{{ e }} </option>
+                        {% endfor %}
+                    </select>
+                </datalist>
+            {% else %}
+                <input id="new_choice" name="new_choice" type="text" class="form-control">
+            {% endif %}
          </div>
          {% endif %}
          {% if is_session %}

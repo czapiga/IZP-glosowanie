@@ -5,9 +5,9 @@ from django.contrib.auth.decorators import user_passes_test
 from easy_pdf.rendering import render_to_pdf_response
 from django.utils import timezone
 import textwrap
-
+from .employers import Employers
 from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll, \
-    Comment, CommentForm
+    PeopleQuestion, Comment, CommentForm
 
 
 def poll_index(request):
@@ -30,6 +30,7 @@ def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
 
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
+    is_people_question = PeopleQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
     comments = Comment.objects.filter(
         question__exact=question).order_by('-date')
@@ -37,6 +38,8 @@ def question_detail(request, question_id):
     context = {'question': question,
                'is_open': is_open,
                'is_session': is_session,
+               'is_people_question': is_people_question,
+               'employers': Employers.get_list(),
                'comments': comments}
 
     if question.activation_time is None \
@@ -148,10 +151,12 @@ def login(request, poll_id):
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
+    is_people_question = PeopleQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
-
     context = {'question': question,
                'is_open': is_open,
+               'is_people_question': is_people_question,
+               'employers': Employers.get_list(),
                'is_session': is_session}
 
     if not question.is_active():

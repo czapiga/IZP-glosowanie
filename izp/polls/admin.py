@@ -1,7 +1,8 @@
 from django.contrib import admin
 import nested_admin
 
-from .models import Choice, Poll, Question, SimpleQuestion, OpenQuestion
+from .models import Choice, Poll, Question, SimpleQuestion, \
+    OpenQuestion, PeopleQuestion
 
 
 class ChoiceInline(admin.TabularInline):
@@ -60,3 +61,4 @@ admin.site.register(Poll, PollAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(SimpleQuestion, BaseQuestionAdmin)
 admin.site.register(OpenQuestion, QuestionAdmin)
+admin.site.register(PeopleQuestion, QuestionAdmin)

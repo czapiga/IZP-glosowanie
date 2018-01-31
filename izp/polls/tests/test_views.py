@@ -1,13 +1,11 @@
 """
 Tests for views
 """
-import datetime
 from django.test import TestCase
-from django.utils import timezone
 from django.urls import reverse
-from polls.models import Question, SimpleQuestion, OpenQuestion, Poll, \
-    CommentForm, Comment
 from django.contrib.auth.models import User
+from polls.models import Question, OpenQuestion, PeopleQuestion, Poll, \
+     CommentForm, Comment
 from polls.views import is_vote_successful
 
 
@@ -122,6 +120,41 @@ class OpenQuestionDetailViewTests(TestCase):
         response = self.client.get(url)
         self.assertContains(response, open_question.question_text)
         self.assertContains(response, 'new_choice')
+
+
+class PeopleQuestionDetailViewTests(TestCase):
+    def setUp(self):
+        poll = Poll.objects.create()
+        people_question = PeopleQuestion.objects.create(
+            poll=poll, question_text="PeopleQuestion")
+        people_question.activate()
+        people_question.choice_set.create(choice_text="Odp1")
+        people_question.choice_set.create(choice_text="Odp2")
+
+    def test_people_question_with_choices(self):
+        '''
+        Test for detail view of people question
+        '''
+        people_question = PeopleQuestion.objects.get(
+            question_text="PeopleQuestion")
+        url = reverse('polls:question_detail', args=(people_question.id,))
+        response = self.client.get(url)
+        basic_check_of_open_question(self, response, people_question)
+        self.assertContains(response, 'list="employers"')
+        self.assertContains(response, 'datalist id="employers"')
+
+    def test_people_question_without_choices(self):
+        '''
+        Test for detail view of empty people question
+        '''
+        people_question = PeopleQuestion.objects.get(
+            question_text="PeopleQuestion")
+        url = reverse('polls:question_detail', args=(people_question.id,))
+        response = self.client.get(url)
+        self.assertContains(response, people_question.question_text)
+        self.assertContains(response, 'new_choice')
+        self.assertContains(response, 'list="employers"')
+        self.assertContains(response, 'datalist id="employers"')
 
 
 class QuestionVoteViewTests(TestCase):

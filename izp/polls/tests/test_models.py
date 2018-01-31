@@ -1,10 +1,13 @@
 """
 Tests for models
 """
+import os
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from polls.models import Question, SimpleQuestion, OpenQuestion, Poll
+from polls.models import Question, SimpleQuestion, OpenQuestion, \
+    PeopleQuestion, Poll
+from polls.employers import Employers
 
 
 class ChoiceUniquenessTests(TestCase):
@@ -120,6 +123,7 @@ class QuestionTests(TestCase):
 
 
 class OpenQuestionTests(TestCase):
+
     def test_creating_open_question(self):
         poll = Poll.objects.create()
         open_question = OpenQuestion.objects.create(
@@ -193,3 +197,23 @@ class PollTests(TestCase):
             poll=poll, question_text="test-question")
         question_names = map(str, poll.question_set.all())
         self.assertIn(str(question), question_names)
+
+
+class EmployersClassTest(TestCase):
+    """
+    Tests for Employers class
+    """
+
+    def test_list_correction(self):
+        """
+        Test if employers_list is created correctly
+        """
+
+        employers_list = Employers.get_list()
+        if os.path.exists('polls/static/data/employers'):
+            data = []
+            with open("polls/static/data/employers") as f:
+                data = f.read().split('\n')
+            assert data == employers_list
+        else:
+            assert employers_list == []
