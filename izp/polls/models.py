@@ -161,7 +161,7 @@ class Vote(models.Model):
 class Comment(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE,
                                  related_name='comments')
-    text = models.TextField(max_length=500)
+    text = models.TextField('Treść', max_length=500)
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
