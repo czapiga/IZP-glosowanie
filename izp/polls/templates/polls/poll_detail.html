@@ -1,4 +1,5 @@
 {% extends 'polls/base.html' %}
+{% load static %}
 {% block content %}
    {% if is_session %}
    <form action="{% url 'polls:logout' poll.id %}" method="post">
@@ -49,9 +50,13 @@
                <form action="{% url 'polls:activate_question' question.id %}" method="post">
                   {% csrf_token %}
                   <button class="btn btn-success">Rozpocznij</button>
-                  na
-                  <input name="time" type="text" size="4">
-                  min
+                  <img src="{% static 'icons/clock.png' %}" id="open-time-field" alt="Otwórz">
+                  <div id="time-field" class="hidden-lg visible-lg-inline-block">
+                      na
+                      <input name="time" type="text" size="4">
+                      min
+                      <img src="{% static 'icons/close.png' %}" id="close-time-field" alt="Zamknij">
+                  </div>
                </form>
                {% elif question.is_active %}
                <form action="{% url 'polls:deactivate_question' question.id %}" method="post">
