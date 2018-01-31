@@ -5,8 +5,8 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-from polls.models import (Question, SimpleQuestion, AccessCode,
-                          OpenQuestion, Vote, Poll)
+from polls.models import Question, SimpleQuestion, OpenQuestion, Poll, \
+     CommentForm, Comment, Vote, AccessCode
 from polls.views import format_code
 from django.contrib.auth.models import User
 
