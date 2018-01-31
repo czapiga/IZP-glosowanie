@@ -2,49 +2,52 @@
 {% block content %}
    <h1>{{ question.question_text }}</h1>
    <div class="col-sm-3">
-      <form action="{% url 'polls:vote' question.id %}" method="post">
-      {% csrf_token %}
-         {% for choice in question.choice_set.all %}
-       	 <div class="radio">
-            <label><input id="{{ choice.id }}" type="radio" name="choice" value="{{ choice.id }}">
-                {{ choice.choice_text}}
-            </label>
-          </div>
-         {% endfor %}
-         {% if is_open %}
-         <div class="form-group">
-            <label for="new_choice">
-                Własna propozycja:
-            </label>
-            <input id="new_choice" name="new_choice" type="text" class="form-control" >
-         </div>
-         {% endif %}
-         {% if is_session %}
-         <button class="btn btn-primary">Głosuj</button>
-         {% endif %}
-      </form>
-
-      {% if form %}
-      <br/><br/>
-      <h3>Nowy komentarz</h3>
-      <form method="POST" class="post-form" action="{% url 'polls:add_comment_to_question' question.id %}" >{% csrf_token %}
-         {{ form.as_p }}
-         <button type="submit" class="save btn btn-default">Dodaj komentarz</button>
-      </form>
-      <br/>
-      {% else %}
-      <br/><br/>
-      <p>Dodawanie komentarzy możliwe tylko przed rozpoczęciem głosowania</p>
-      {% endif %}
-
-      {% for comment in comments %}
-      <div class="comment">
-         <br/>
-         <div class="date"><strong>{{ comment.date }}</strong></div>
-         <p>{{ comment.text|linebreaks }}</p>
+      <div class="row container-fluid">
+         <form action="{% url 'polls:vote' question.id %}" method="post">
+         {% csrf_token %}
+            {% for choice in question.choice_set.all %}
+            <div class="radio">
+               <label><input id="{{ choice.id }}" type="radio"
+                             name="choice" value="{{ choice.id }}">
+                   {{ choice.choice_text}}
+               </label>
+             </div>
+            {% endfor %}
+            {% if is_open %}
+            <div class="form-group">
+               <label for="new_choice">
+                   Własna propozycja:
+               </label>
+               <input id="new_choice" name="new_choice"
+                      type="text" class="form-control">
+            </div>
+            {% endif %}
+            {% if is_session %}
+            <button class="btn btn-primary">Głosuj</button>
+            {% endif %}
+         </form>
       </div>
-      {% empty %}
-         <p>No comments</p>
-      {% endfor %}
+      <div class="row container-fluid top10">
+         {% if form %}
+         <h3>Nowy komentarz</h3>
+         <form method="POST" class="post-form"
+               action="{% url 'polls:add_comment_to_question' question.id %}">{% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="save btn btn-default">Dodaj komentarz</button>
+         </form>
+         {% else %}
+         <p>Dodawanie komentarzy możliwe tylko przed rozpoczęciem głosowania</p>
+         {% endif %}
+       </div>
+      <div class="row container-fluid top10">
+         {% for comment in comments %}
+         <div class="comment">
+            <div class="date"><strong>{{ comment.date }}</strong></div>
+            <p>{{ comment.text|linebreaks }}</p>
+         </div>
+         {% empty %}
+            <p>Brak komentarzy</p>
+         {% endfor %}
+      </div>
    </div>
 {% endblock %}
