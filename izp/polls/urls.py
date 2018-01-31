@@ -20,4 +20,6 @@ urlpatterns = [
         views.activate_question, name='activate_question'),
     url(r'^[0-9]+/(?P<question_id>[0-9]+)/deactivate/$',
         views.deactivate_question, name='deactivate_question'),
+    url(r'^[0-9]+/(?P<question_id>[0-9]+)/comment/$',
+        views.add_comment_to_question, name='add_comment_to_question'),
 ]

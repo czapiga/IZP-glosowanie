@@ -3,6 +3,7 @@ Tests for models
 """
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 from polls.models import Question, SimpleQuestion, OpenQuestion, Poll
 
 
@@ -75,6 +76,47 @@ class ChoiceUniquenessTests(TestCase):
         self.assertIs(question.choice_set.filter(votes__exact=1).count(), 2)
         self.assertIs(question.choice_set.filter(votes__exact=0).count(), 2)
         self.assertIs(question.choice_set.all().count(), 4)
+
+
+class QuestionTests(TestCase):
+    """
+    Tests for Question class methods:
+    is_available, is_active, activate, deactivate
+    """
+
+    def setUp(self):
+        poll = Poll.objects.create()
+        question = Question.objects.create(
+            poll=poll, question_text="test-question")
+
+    def test_is_available(self):
+        question = Question.objects.get(question_text="test-question")
+        self.assertTrue(question.is_available())
+        question.activate()
+        self.assertFalse(question.is_available())
+        question.deactivate()
+        self.assertFalse(question.is_available())
+
+    def test_is_active_no_deactivation_time(self):
+        question = Question.objects.get(question_text="test-question")
+        self.assertFalse(question.is_active())
+        question.activate()
+        self.assertTrue(question.is_active())
+        question.deactivate()
+        self.assertFalse(question.is_active())
+
+    def test_is_active_given_deactivation_time(self):
+        question = Question.objects.get(question_text="test-question")
+        self.assertFalse(question.is_active())
+        question.activate(minutes=1)
+        self.assertTrue(question.is_active())
+        question.deactivate()
+        self.assertFalse(question.is_active())
+
+    def test_try_to_deativate_inactive_question(self):
+        question = Question.objects.get(question_text="test-question")
+        question.deactivate()
+        self.assertIsNone(question.deactivation_time)
 
 
 class OpenQuestionTests(TestCase):
