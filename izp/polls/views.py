@@ -29,6 +29,10 @@ def poll_detail(request, poll_id):
 def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
 
+    if request.user.is_superuser:
+        question.update_last_seen()
+        print(question.last_seen_by_admin)
+
     is_open = OpenQuestion.objects.filter(pk=question.pk).exists()
     is_session = 'poll' + str(question.poll.id) in request.session
     comments = Comment.objects.filter(

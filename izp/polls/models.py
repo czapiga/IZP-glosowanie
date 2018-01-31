@@ -44,6 +44,7 @@ class Question(models.Model):
     question_text = models.CharField('Pytanie', max_length=200)
     activation_time = models.DateTimeField(null=True, blank=True)
     deactivation_time = models.DateTimeField(null=True, blank=True)
+    last_seen_by_admin = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.question_text
@@ -93,6 +94,25 @@ class Question(models.Model):
         if self.is_active():
             self.deactivation_time = timezone.now()
             self.save()
+
+    def update_last_seen(self):
+        """
+        Method updates the time, when the Question has been seen by admin
+        by setting last_seen_by_admin to current time.
+        """
+        self.last_seen_by_admin = timezone.now()
+        self.save()
+
+    def available_unread_comments(self):
+        comments = Comment.objects.filter(
+        question__exact=self).order_by('-date')
+        if comments and self.last_seen_by_admin:
+            print(comments.first().date)
+            print(comments.last().date)
+            print(self.last_seen_by_admin)
+            return comments.last().date > self.last_seen_by_admin
+        else:
+            return False
 
 
 class SimpleQuestion(Question):
