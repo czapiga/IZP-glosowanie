@@ -8,7 +8,7 @@ from django.urls import reverse
 from polls.models import Question, SimpleQuestion, OpenQuestion, Poll, \
      CommentForm, Comment, Vote, AccessCode
 from django.contrib.auth.models import User
-from polls.views import is_vote_successful
+from polls.views import is_vote_successful, format_code
 
 
 def basic_check_of_question(cls, response, quest, error=""):
