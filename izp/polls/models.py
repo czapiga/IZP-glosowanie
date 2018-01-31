@@ -168,6 +168,16 @@ class Comment(models.Model):
         return self.text
 
 
+class CommentResponse(models.Model):
+    parent = models.ForeignKey(Comment, on_delete=models.CASCADE,
+                               related_name='comment_response')
+    text = models.TextField(max_length=500)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.text
+
+
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment

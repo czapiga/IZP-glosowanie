@@ -7,7 +7,7 @@ from django.utils import timezone
 import textwrap
 
 from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll, \
-    Comment, CommentForm
+    Comment, CommentForm, CommentResponse
 
 
 def poll_index(request):
@@ -34,10 +34,15 @@ def question_detail(request, question_id):
     comments = Comment.objects.filter(
         question__exact=question).order_by('-date')
 
+    comment_response = []
+    for comment in comments:
+        comment_response = (comment, CommentResponse.objects.filter(
+            parent_exact=comment).order_by('-date'))
+
     context = {'question': question,
                'is_open': is_open,
                'is_session': is_session,
-               'comments': comments}
+               'comments': comment_response}
 
     if question.activation_time is None \
             or question.activation_time > timezone.now():
