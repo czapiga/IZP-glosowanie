@@ -295,7 +295,6 @@ def response_to_comment(request, question_id, comment_id):
     question = get_object_or_404(Question, pk=question_id)
     comment = get_object_or_404(Comment, pk=comment_id)
 
-    # comment_response = CommentResponse.objects.filter(parent=comment).order_by('-date')
     if request.method == "POST":
         form = ResponseCommentForm(request.POST)
         if form.is_valid():
@@ -306,6 +305,5 @@ def response_to_comment(request, question_id, comment_id):
                                                 args=(question_id, )))
     else:
         form = ResponseCommentForm()
-    return render(request, 'polls/comment_response.html', {'form': form,
-                                                           'comment': comment,
-                                                           'question': question, })
+    return render(request, 'polls/comment_response.html',
+                  {'form': form, 'comment': comment, 'question': question, })
