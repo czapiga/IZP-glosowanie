@@ -3537,6 +3537,14 @@ button.list-group-item-danger.active:focus {
     display: none !important;
   }
 }
-.top10 {
-    margin-top:10%;
-    }
+.top2 {
+    margin-top:2%;
+}
+
+.left2 {
+    margin-left:2%;
+}
+
+.bottom1 {
+    margin-bottom:1%;
+}

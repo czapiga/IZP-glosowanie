@@ -1,8 +1,8 @@
 {% extends 'polls/base.html' %}
 {% block content %}
    <h1>{{ question.question_text }}</h1>
-   <div class="col-sm-3">
-      <div class="row container-fluid">
+   <div class="row">
+      <div class="col-sm-3 container-fluid">
          <form action="{% url 'polls:vote' question.id %}" method="post">
          {% csrf_token %}
             {% for choice in question.choice_set.all %}
@@ -27,7 +27,9 @@
             {% endif %}
          </form>
       </div>
-      <div class="row container-fluid top10">
+   </div>
+   <div class="row">
+      <div class="container-fluid top2">
          {% if form %}
          <h3>Nowy komentarz</h3>
          <form method="POST" class="post-form"
@@ -38,12 +40,28 @@
          {% else %}
          <p>Dodawanie komentarzy możliwe tylko przed rozpoczęciem głosowania</p>
          {% endif %}
-       </div>
-      <div class="row container-fluid top10">
-         {% for comment in comments %}
+      </div>
+      <div class="container-fluid top2">
+         {% for comment, responses in comments %}
          <div class="comment">
             <div class="date"><strong>{{ comment.date }}</strong></div>
             <p>{{ comment.text|linebreaks }}</p>
+            {% if user.is_superuser and form %}
+            <div class="container-fluid bottom1">
+            <a class="btn btn-default" href="{% url 'polls:response_to_comment' question.id comment.id %}">
+               Odpowiedz
+            </a>
+            </div>
+            {% endif %}
+
+            <div class="row container-fluid">
+               <div class="left2">
+                  {% for response in responses %}
+                  <div class="date"><strong>{{ response.date }}</strong></div>
+                  <p>{{ response.text|linebreaks }}</p>
+                  {% endfor %}
+               </div>
+            </div>
          </div>
          {% empty %}
             <p>Brak komentarzy</p>

@@ -1,0 +1,18 @@
+{% extends 'polls/base.html' %}
+{% block content %}
+    <div class="row">
+        <div class="container-fluid top2">
+            <div class="date"><strong>{{ comment.date }}</strong></div>
+            <p>{{ comment.text|linebreaks }}</p>
+        </div>
+        <div class="container-fluid">
+             <h3>Odpowiedź</h3>
+             <form method="POST" class="post-form"
+                   action="{% url 'polls:response_to_comment' question.id comment.id %}">{% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="save btn btn-default">Dodaj odpowiedź</button>
+             </form>
+        </div>
+    </div>
+
+{% endblock %}

@@ -316,8 +316,8 @@ class ShowCommentsTest(TestCase):
                                            args=(question.id,)))
 
         self.assertEqual(response.status_code, 200)
-        self.assertQuerysetEqual(response.context['comments'],
-                                 ['<Comment: comment_a>'],)
+        self.assertQuerysetEqual(response.context['comments'], [
+            '(<Comment: comment_a>, <QuerySet []>)'])
 
     def test_show_comments_ordered_by_date(self):
         poll = Poll.objects.create()
@@ -331,9 +331,9 @@ class ShowCommentsTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(response.context['comments'], [
-            '<Comment: comment_c>',
-            '<Comment: comment_b>',
-            '<Comment: comment_a>'
+            '(<Comment: comment_c>, <QuerySet []>)',
+            '(<Comment: comment_b>, <QuerySet []>)',
+            '(<Comment: comment_a>, <QuerySet []>)'
         ], ordered=True)
 
     def test_show_comments_when_question_active(self):
@@ -351,9 +351,9 @@ class ShowCommentsTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(response.context['comments'], [
-            '<Comment: comment_c>',
-            '<Comment: comment_b>',
-            '<Comment: comment_a>'
+            '(<Comment: comment_c>, <QuerySet []>)',
+            '(<Comment: comment_b>, <QuerySet []>)',
+            '(<Comment: comment_a>, <QuerySet []>)'
         ], ordered=True)
 
     def test_show_comments_when_question_ended(self):
@@ -370,7 +370,7 @@ class ShowCommentsTest(TestCase):
                                            args=(question.id,)))
 
         self.assertQuerysetEqual(response.context['comments'], [
-            '<Comment: comment_c>',
-            '<Comment: comment_b>',
-            '<Comment: comment_a>'
+            '(<Comment: comment_c>, <QuerySet []>)',
+            '(<Comment: comment_b>, <QuerySet []>)',
+            '(<Comment: comment_a>, <QuerySet []>)'
         ], ordered=True)
