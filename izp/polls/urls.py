@@ -22,4 +22,6 @@ urlpatterns = [
         views.deactivate_question, name='deactivate_question'),
     url(r'^[0-9]+/(?P<question_id>[0-9]+)/comment/$',
         views.add_comment_to_question, name='add_comment_to_question'),
+    url(r'^[0-9]+/(?P<question_id>[0-9]+)/(?P<comment_id>[0-9]+)/$',
+        views.response_to_comment, name='response_to_comment'),
 ]

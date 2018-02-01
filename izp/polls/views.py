@@ -6,7 +6,7 @@ from easy_pdf.rendering import render_to_pdf_response
 from django.utils import timezone
 
 from .models import AccessCode, Choice, Question, Vote, OpenQuestion, Poll, \
-    Comment, CommentForm, CommentResponse
+    Comment, CommentForm, CommentResponse, ResponseCommentForm
 
 
 def poll_index(request):
@@ -35,13 +35,17 @@ def question_detail(request, question_id):
 
     comment_response = []
     for comment in comments:
-        comment_response = (comment, CommentResponse.objects.filter(
-            parent_exact=comment).order_by('-date'))
+        commet_dict = {}
+        commet_dict["comment"] = comment
+        commet_dict["response"] = CommentResponse.objects.filter(
+            parent_id=comment.id).order_by('-date')
+        comment_response.append(commet_dict)
 
     context = {'question': question,
                'is_open': is_open,
                'is_session': is_session,
-               'comments': comment_response}
+               'comments': comment_response,
+               'is_active': question.is_active()}
 
     if question.activation_time is None \
             or question.activation_time > timezone.now():
@@ -288,3 +292,23 @@ def add_comment_to_question(request, question_id):
 
     return HttpResponseRedirect(reverse('polls:question_detail',
                                         args=(question_id, )))
+
+
+def response_to_comment(request, question_id, comment_id):
+    question = get_object_or_404(Question, pk=question_id)
+    comment = get_object_or_404(Comment, pk=comment_id)
+
+    # comment_response = CommentResponse.objects.filter(parent=comment).order_by('-date')
+    if request.method == "POST":
+        form = ResponseCommentForm(request.POST)
+        if form.is_valid():
+            commentResponse = form.save(commit=False)
+            commentResponse.parent = comment
+            commentResponse.save()
+            return HttpResponseRedirect(reverse('polls:question_detail',
+                                                args=(question_id, )))
+    else:
+        form = ResponseCommentForm()
+    return render(request, 'polls/comment_response.html', {'form': form,
+                                                           'comment': comment,
+                                                           'question': question, })

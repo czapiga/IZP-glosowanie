@@ -171,7 +171,7 @@ class Comment(models.Model):
 class CommentResponse(models.Model):
     parent = models.ForeignKey(Comment, on_delete=models.CASCADE,
                                related_name='comment_response')
-    text = models.TextField(max_length=500)
+    text = models.TextField('Treść', max_length=500)
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -185,6 +185,18 @@ class CommentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
+        self.fields['text'].widget.attrs['style'] = \
+            'width:650px; height:80px; resize:none;'
+        self.fields['text'].widget.attrs['maxlength'] = '500'
+
+
+class ResponseCommentForm(forms.ModelForm):
+    class Meta:
+        model = CommentResponse
+        fields = ('text',)
+
+    def __init__(self, *args, **kwargs):
+        super(ResponseCommentForm, self).__init__(*args, **kwargs)
         self.fields['text'].widget.attrs['style'] = \
             'width:650px; height:80px; resize:none;'
         self.fields['text'].widget.attrs['maxlength'] = '500'
