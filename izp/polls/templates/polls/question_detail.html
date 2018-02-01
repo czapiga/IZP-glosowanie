@@ -42,20 +42,21 @@
          {% endif %}
       </div>
       <div class="container-fluid top2">
-         {% for row in comments %}
+         {% for comment, responses in comments %}
          <div class="comment">
-            <div class="date"><strong>{{ row.comment.date }}</strong></div>
-            <p>{{ row.comment.text|linebreaks }}</p>
-            {% if user.is_superuser %}
+            <div class="date"><strong>{{ comment.date }}</strong></div>
+            <p>{{ comment.text|linebreaks }}</p>
+            {% if user.is_superuser and form %}
             <div class="container-fluid bottom1">
-            <a class="btn btn-default" href="{% url 'polls:response_to_comment' question.id row.comment.id %}">
+            <a class="btn btn-default" href="{% url 'polls:response_to_comment' question.id comment.id %}">
                Odpowiedz
             </a>
             </div>
             {% endif %}
+
             <div class="row container-fluid">
                <div class="left2">
-                  {% for response in row.response %}
+                  {% for response in responses %}
                   <div class="date"><strong>{{ response.date }}</strong></div>
                   <p>{{ response.text|linebreaks }}</p>
                   {% endfor %}

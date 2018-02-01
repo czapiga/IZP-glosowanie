@@ -35,17 +35,14 @@ def question_detail(request, question_id):
 
     comment_response = []
     for comment in comments:
-        commet_dict = {}
-        commet_dict["comment"] = comment
-        commet_dict["response"] = CommentResponse.objects.filter(
+        responses = CommentResponse.objects.filter(
             parent_id=comment.id).order_by('-date')
-        comment_response.append(commet_dict)
+        comment_response.append((comment, responses))
 
     context = {'question': question,
                'is_open': is_open,
                'is_session': is_session,
-               'comments': comment_response,
-               'is_active': question.is_active()}
+               'comments': comment_response}
 
     if question.activation_time is None \
             or question.activation_time > timezone.now():
