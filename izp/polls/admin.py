@@ -12,13 +12,21 @@ class ChoiceInline(admin.TabularInline):
 
 
 class BaseQuestionAdmin(admin.ModelAdmin):
-    fields = ('poll', 'question_text')
-    list_display = ('question_text', )
-    verbose_name = 'Pytanie'
+    fieldsets = [
+        (None, {'fields': ['poll', 'question_text', 'depends_on', 'winner_choice']})
+    ]
 
+    list_display = ('question_text',)
+    verbose_name = 'Pytanie'
+    
+    class Media:
+        js = ['js/question.js']
 
 class QuestionAdmin(BaseQuestionAdmin):
     inlines = [ChoiceInline]
+    
+    class Media:
+        js = ['js/question.js']
 
 
 class NestedChoiceInline(nested_admin.NestedTabularInline):
@@ -30,8 +38,9 @@ class NestedChoiceInline(nested_admin.NestedTabularInline):
 
 class SimpleQuestionInline(nested_admin.NestedStackedInline):
     model = SimpleQuestion
-    fields = ("question_text", )
+    fields = (("question_text", "depends_on", "winner_choice"), )
     extra = 2
+    
     verbose_name = "Pytania zamknięte"
 
 
@@ -53,7 +62,11 @@ class OpenQuestionInline(nested_admin.NestedStackedInline):
 
 class PollAdmin(nested_admin.NestedModelAdmin):
     fields = ('poll_name', 'date')
-    inlines = [SimpleQuestionInline, QuestionInline, OpenQuestionInline]
+    inlines = [SimpleQuestionInline]
+    
+    class Media:
+        js = ['js/poll.js']
+
 
 
 admin.site.register(Poll, PollAdmin)
