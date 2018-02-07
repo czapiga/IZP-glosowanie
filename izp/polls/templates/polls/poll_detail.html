@@ -1,4 +1,5 @@
 {% extends 'polls/base.html' %}
+{%load staticfiles %}
 {% block content %}
    {% if is_session %}
    <form action="{% url 'polls:logout' poll.id %}" method="post">
@@ -38,6 +39,9 @@
                   <strong>{{question.question_text}}</strong>
                   {% else %}
                   {{question.question_text}}
+                  {% endif %}
+                  {% if user.is_superuser and question.available_unread_comments %}
+                  <img src={% static "icons/cloud.png" %} height="20" width="20">
                   {% endif %}
                </a>
             </td>
