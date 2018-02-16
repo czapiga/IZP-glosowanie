@@ -11,8 +11,12 @@
            <img src={% static "image/logo.jpg" %} />
        </div>
        <div class="navbar">
-          <div class="left-nav"><a href="{% url 'polls:poll_index' %}">Ankiety</a></div>
-          <div class="right-nav"><a href="{% url 'admin:index' %}">Administracja</a></div>
+            <div class="breadcrumb">
+                {% block breadcrumbs %}
+                <div class="left-nav"><a href="{% url 'polls:poll_index' %}">Ankiety</a></div>
+                {% endblock %}
+            </div>
+            <div class="right-nav"><a href="{% url 'admin:index' %}">Administracja</a></div>
        </div>
        <div class="container-fluid">
          {% if error %}
@@ -21,7 +25,7 @@
             <span><h4>{{error}}</h4></span>
          </div>
          {% endif %}
-
+         
          {% block content %}
          {% endblock %}
       </div>

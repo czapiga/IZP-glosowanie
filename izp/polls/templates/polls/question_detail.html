@@ -1,4 +1,17 @@
 {% extends 'polls/base.html' %}
+{% block breadcrumbs %} 
+        <div class="left-nav"><a href="{% url 'polls:poll_index' %}">Ankiety</a></div>
+        {% if  question.poll.poll_name|length > 26 %}
+            <div class="left-nav"><a href="{% url 'polls:poll_detail' question.poll.pk %}">{{ question.poll.poll_name|slice:"20" }}(...)</a></div>
+        {% else %}
+            <div class="left-nav"><a href="{% url 'polls:poll_detail' question.poll.pk %}">{{ question.poll }}</a></div>
+        {% endif %}
+        {% if  question.question_text|length > 26 %}
+            <div class="left-nav"><p class="navbar-text">{{ question.question_text|slice:"20" }}(...)</p></div>
+        {% else %}
+            <div class="left-nav"><p class="navbar-text">{{ question.question_text }}</p></div>
+        {% endif %}
+{% endblock %}
 {% block content %}
    <h1>{{ question.question_text }}</h1>
    <div class="col-sm-3">

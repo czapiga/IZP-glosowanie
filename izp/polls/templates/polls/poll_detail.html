@@ -1,4 +1,12 @@
 {% extends 'polls/base.html' %}
+{% block breadcrumbs %} 
+        <div class="left-nav"><a href="{% url 'polls:poll_index' %}">Ankiety</a></div>
+        {% if  poll.poll_name|length > 26 %}
+            <div class="left-nav"><p class="navbar-text">{{ poll.poll_name|slice:"20" }}(...)</p></div>
+        {% else %}
+            <div class="left-nav"><p class="navbar-text">{{ poll.poll_name}}</p></div>
+        {% endif %}
+{% endblock %}
 {% block content %}
    {% if is_session %}
    <form action="{% url 'polls:logout' poll.id %}" method="post">
